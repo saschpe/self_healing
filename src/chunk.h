@@ -1,4 +1,9 @@
 
+// Copyright Sascha Peilicke <sasch.pe@gmx.de> 2010.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef ROBUST_CHUNK_H
 #define ROBUST_CHUNK_H
 
@@ -18,6 +23,7 @@ public:
         for (std::size_t i = 0; i < S * sizeof(T); i++) {
             m_payload[i] = value;
         }
+
         // Compute and store initial CRC checksums
         boost::crc_32_type crc;
         crc.process_bytes(&m_payload, S * sizeof(T));
