@@ -2,11 +2,8 @@
 Robust
 =======
 
-A graphical tool to visualize and compute signal-flow graphs (or Mason graphs)
-written in C++ with Qt which uses either Matlab (commercial) or GNU Octave as
-the computational backend. It serves as a fully interactive editor to signal-
-flow graphs and allows you to run additional custom Matlab/Octave scripts as
-well as saving your graph files and results.
+A library for robust (fault-rolerant) data-structures with an STL-like
+templated interface.
 
 ----
 
@@ -17,22 +14,16 @@ Prerequisites
 This project uses Git_ as the revision-control system. Git_ is optional if you
 retrieved this project as a source tarball and is only useful if you plan to
 further develop the project or to send patches. The following software is
-necessary to build this application:
+necessary to build this project:
 
  - CMake_ 2.6 or later
- - Qt_ 4.6 or later
-
-Additionally, one of the following software packages is needed to run the
-application (only one required):
-
- - Matlab_ r2008a or later (preferred, commercial)
- - GNU Octave_ 3.2 or later (default, free)
+ - Boost_ 1.42.0 or later
 
 
 Installation
 ------------
 
-How to build masonry depends on your platform. Generally you have to  use
+How to build the project depends on your platform. Generally you have to  use
 CMake_ to generate a platform-dependent build-environment. You can do that
 like this (in a terminal session)::
 
@@ -64,7 +55,10 @@ application binary and data files.
 License
 -------
 
-Please see the file LICENSE.txt for details.
+Copyright Sascha Peilicke <sasch.pe@gmx.de> 2010.
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
 Authors
@@ -84,7 +78,7 @@ Python docutils_. Use the following command::
 
 .. _Git: http://git.or.cz/index.html
 .. _CMake: http://www.cmake.org/
-.. _Qt: http://qt.nokia.com/
+.. _Boost: http://www.boost.org/
 .. _Octave: http://www.gnu.org/software/octave/
 .. _Matlab: http://www.mathworks.com/products/matlab/
 .. _reStructuredText: http://en.wikipedia.org/wiki/Restructured_text
