@@ -42,7 +42,7 @@ You should now have either a Makefile on Unix-like operating systems or a
 Visual Studio project on Windows. You can now build and install the project by
 using Visual Studio (on Windows) or by issuing these commands (on Unix)::
 
-    $ make
+    $ make &% make test
     $ make install
 
 The exact build procedure may differ slightly on your platform. Have a look at
