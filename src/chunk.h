@@ -14,31 +14,30 @@
 
 namespace robust {
 
-template <class T, std::size_t S = 4>
+template <class T, std::size_t N = 64>
 class chunk
 {
 public:
     chunk(const T &value = 0, void *head = NULL, void *tail = NULL)
         : m_head(head), m_tail(tail)
     {
-        for (std::size_t i = 0; i < S * sizeof(T); i++) {
+        for (std::size_t i = 0; i < N; i++) {
             m_payload[i] = value;
         }
 
         // Compute and store initial CRC checksums
         boost::crc_32_type crc;
-        crc.process_bytes(&m_payload, S * sizeof(T));
+        crc.process_bytes(&m_payload, N * sizeof(T));
         m_crc1 = crc.checksum();
         m_crc2 = crc.checksum();
     }
 
-    bool is_valid() const {
-        return false;
-    }
-
-    unsigned int crc() const {
-        //TODO: check crcs
-        return m_crc1;
+    bool is_valid() {
+        bool valid = true;
+        valid &= check_head_pointer();
+        valid &= check_tail_pointer();
+        valid &= check_checksums();
+        return valid;
     }
 
     T at(std::size_t index) const {
@@ -47,27 +46,51 @@ public:
     }
 
     std::size_t size() const {
-        return S * sizeof(T);
+        return N;
     }
 
 private:
+    bool check_head_pointer() {
+        bool success = true;
+        // Check if the circular reference on head is ok
+        if (m_head != NULL) {
+            //**m_head == &m_head;
+            crc
+        }
+
+    }
+
+    bool check_tail_pointer() {
+        bool success = true;
+        // Check if the circular reference on tail is ok
+        if (m_tail != NULL) {
+            //success &= **m_tail == &m_tail;
+        }
+        return success;
+    }
+
+    unsigned int check_checksums() {
+        //TODO: check crcs
+        return m_crc1;
+    }
+
     void *m_head;
     unsigned int m_crc1;            // First CRC-32 checksum
-    T m_payload[S * sizeof(T)];     //
+    T m_payload[N];                 //
     unsigned int m_crc2;            // Second CRC-32 checksum
     void *m_tail;
 };
 
 } // namespace robust
 
-template <class T, std::size_t S>
-std::ostream &operator<<(std::ostream &os, const robust::chunk<T, S> &chunk)
+template <class T, std::size_t N>
+std::ostream &operator<<(std::ostream &os, const robust::chunk<T, N> &chunk)
 {
     os << "[";
     for (std::size_t i = 0; i < chunk.size(); i++) {
         os << (i == 0 ? "" : ",") << chunk.at(i);
     }
-    os << "]:" << chunk.crc();
+    os << "]";
     return os;
 }
 
