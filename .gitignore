@@ -2,6 +2,7 @@ core
 dist
 build/
 .svn
+.kdev4
 .stuff
 *~
 *.swp
