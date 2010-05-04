@@ -4,3 +4,5 @@ build/
 .kdev4/
 .stuff/
 *.swp
+*~
+robust.kdev4
