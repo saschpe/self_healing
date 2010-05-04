@@ -15,7 +15,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 option(ROBUST_BUILD_TESTS "Build the tests" on)
 set(ROBUST_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include/")
-#set(ROBUST_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/")
+set(ROBUST_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/")
 set(ROBUST_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/robust")
 
 set(robust_HDRS
@@ -23,8 +23,8 @@ set(robust_HDRS
     src/vector.h
 )
 
-#set(robust_LIB_SRCS
-#)
+set(robust_LIB_SRCS
+)
 
 if(ROBUST_BUILD_TESTS)
     enable_testing()
