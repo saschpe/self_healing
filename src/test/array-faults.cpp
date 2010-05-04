@@ -14,8 +14,8 @@ using namespace std;
 
 int main()
 {
-    robust::chunk<int> c1;
-    cout << "chunk 1: " << c1 << endl;
+    robust::array<int> c1;
+    cout << "array 1: " << c1 << endl;
 
     // Insert faults and check
 
