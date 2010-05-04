@@ -57,19 +57,82 @@ namespace robust {
     public:
         // type definitions
         typedef T              value_type;
-        //TODO: replace 'iterator' with safe class
-        typedef T*             iterator;
+        typedef T*             iterator;            //TODO: replace 'iterator' with safe class
         typedef const T*       const_iterator;
-        //TODO: replace 'reference' with safe class
-        typedef T&             reference;
+        //typedef T&             reference;         // replaced by safe class
         typedef const T&       const_reference;
         typedef std::size_t    size_type;
         typedef std::ptrdiff_t difference_type;
 
+        class reference
+        {
+        public:
+            reference(T& value, array<T, N> *parent = NULL)
+                : m_parent(parent), m_value(value) {}
+
+            reference& operator=(const T& rhs) { m_value = rhs; m_parent->update_checksums(); return *this; }
+            reference& operator=(const reference &rhs) { m_value = rhs.m_value; m_parent->update_checksums(); return *this; }
+
+            T operator+(const T& rhs) const { return m_value + rhs; }
+            T operator-(const T& rhs) const { return m_value - rhs; }
+            T operator*(const T& rhs) const { return m_value * rhs; }
+            T operator/(const T& rhs) const { return m_value / rhs; }
+            T operator%(const T& rhs) const { return m_value % rhs; }
+
+            reference& operator+=(const T& rhs) { m_value += rhs; m_parent->update_checksums(); return *this; }
+            reference& operator-=(const T& rhs) { m_value -= rhs; m_parent->update_checksums(); return *this; }
+            reference& operator*=(const T& rhs) { m_value *= rhs; m_parent->update_checksums(); return *this; }
+            reference& operator/=(const T& rhs) { m_value /= rhs; m_parent->update_checksums(); return *this; }
+            reference& operator%=(const T& rhs) { m_value %= rhs; m_parent->update_checksums(); return *this; }
+
+            reference& operator++() { ++m_value; m_parent->update_checksums(); return *this; }
+            reference& operator++(int) { m_value++; m_parent->update_checksums(); return *this; }
+            reference& operator--() { --m_value; m_parent->update_checksums(); return *this; }
+            reference& operator--(int) { m_value--; m_parent->update_checksums(); return *this; }
+
+            bool operator==(const T& rhs) const { return m_value == rhs; }
+            bool operator!=(const T& rhs) const { return m_value != rhs; }
+            bool operator>(const T& rhs) const { return m_value > rhs; }
+            bool operator>=(const T& rhs) const { return m_value >= rhs; }
+            bool operator<(const T& rhs) const { return m_value < rhs; }
+            bool operator<=(const T& rhs) const { return m_value <= rhs; }
+
+            friend std::ostream &operator<<(std::ostream &os, const robust::array<T, N>::reference &ref) {
+                return os << ref.m_value;
+            }
+
+        private:
+            array<T, N> *m_parent;
+            T& m_value;
+        };
+
+        /*class iterator : public std::iterator<std::random_access_iterator_tag, T>
+        {
+        public:
+            iterator(T* rhs) : m_p(rhs) {}
+            iterator(const iterator &rhs) : m_p(rhs.m_p) {}
+
+            iterator& operator+(difference_type n) { return *(this + n); }
+            iterator& operator++() { ++m_p; return *this; }
+            iterator& operator++(int) { m_p++; return *this; }
+            iterator& operator+=(difference_type n) { m_p += n; return *this; }
+            iterator& operator-(difference_type n) { return *(this - n); }
+            iterator& operator--() { --m_p; return *this; }
+            iterator& operator--(int) { m_p--; return *this; }
+            iterator& operator-=(difference_type n) { m_p -= n; return *this; }
+            bool operator==(const iterator& rhs) { return m_p == rhs.m_p; }
+            bool operator!=(const iterator& rhs) { return m_p != rhs.m_p; }
+            T& operator*() { return *m_p; }
+            T* operator->() const { return *m_p; }
+            iterator& operator=(T* rhs) { *m_p = rhs; ++m_p; return *this; }
+            iterator& operator=(const iterator& rhs) { m_p = rhs.m_p; return *this; }
+
+        private:
+            T* m_p;
+        };*/
+
         // contructor
-        array(const T &value = 0) {
-            fill(value);
-        }
+        array(const T &value = 0) { fill(value); }
 
         // iterator support
         iterator begin() { return m_elements; }
@@ -103,17 +166,17 @@ namespace robust {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // operator[] with range check
-        reference operator[](size_type i) { rangecheck(i); return m_elements[i]; }
+        reference operator[](size_type i) { rangecheck(i); return reference(m_elements[i], this); }
         const_reference operator[](size_type i) const { rangecheck(i); return m_elements[i]; }
 
         // at() with range check
-        reference at(size_type i) { rangecheck(i); return m_elements[i]; }
+        reference at(size_type i) { rangecheck(i); return reference(m_elements[i], this); }
         const_reference at(size_type i) const { rangecheck(i); return m_elements[i]; }
 
         // front() and back()
-        reference front() { return m_elements[0]; }
+        reference front() { return reference(m_elements[0], this); }
         const_reference front() const { return m_elements[0]; }
-        reference back() { return m_elements[N - 1]; }
+        reference back() { return reference(m_elements[N - 1], this); }
         const_reference back() const { return m_elements[N - 1]; }
 
         // size is constant
@@ -123,7 +186,7 @@ namespace robust {
         enum { static_size = N };
 
         // swap (note: linear complexity)
-        void swap (array<T, N>& y) {
+        void swap(array<T, N>& y) {
             for (size_type i = 0; i < N; ++i) {
                 boost::swap(m_elements[i], y.m_elements[i]);
             }
@@ -141,21 +204,21 @@ namespace robust {
 
         // assignment with type conversion
         template <typename T2>
-        array<T, N>& operator= (const array<T2, N>& rhs) {
+        array<T, N>& operator=(const array<T2, N>& rhs) {
             std::copy(rhs.begin(), rhs.end(), begin());
             update_checksums();
             return *this;
         }
 
         // assign one value to all elements
-        void assign (const T& value) { fill(value); }    // A synonym for fill
-        void fill (const T& value) {
+        void assign(const T& value) { fill(value); }    // A synonym for fill
+        void fill(const T& value) {
             std::fill_n(begin(), size(),value);
             update_checksums();
         }
 
         // check range (may be private because it is static)
-        static void rangecheck (size_type i) {
+        static void rangecheck(size_type i) {
             if (i >= size()) {
                 std::out_of_range e("array<>: index out of range");
                 boost::throw_exception(e);
@@ -250,7 +313,7 @@ namespace robust {
         static size_type max_size() { return 0; }
         enum { static_size = 0 };
 
-        void swap (array<T, 0>& /*y*/) {}
+        void swap(array<T, 0>& /*y*/) {}
 
         // direct access to data (read-only)
         const T* data() const { return 0; }
@@ -261,14 +324,14 @@ namespace robust {
 
         // assignment with type conversion
         template <typename T2>
-        array<T, 0>& operator= (const array<T2, 0>& ) { return *this; }
+        array<T, 0>& operator=(const array<T2, 0>& ) { return *this; }
 
         // assign one value to all elements
-        void assign (const T& value) { fill(value); }
-        void fill (const T& /*value*/) {}
+        void assign(const T& value) { fill(value); }
+        void fill(const T& /*value*/) {}
 
         // check range (may be private because it is static)
-        static reference failed_rangecheck () {
+        static reference failed_rangecheck() {
             std::out_of_range e("attempt to access element of an empty array");
             boost::throw_exception(e);
 #if defined(BOOST_NO_EXCEPTIONS) || !defined(BOOST_MSVC)
@@ -286,33 +349,33 @@ namespace robust {
 
     // comparisons
     template<class T, std::size_t N>
-    bool operator== (const array<T, N>& x, const array<T, N>& y) {
+    bool operator==(const array<T, N>& x, const array<T, N>& y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
     template<class T, std::size_t N>
-    bool operator< (const array<T, N>& x, const array<T, N>& y) {
+    bool operator<(const array<T, N>& x, const array<T, N>& y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
     template<class T, std::size_t N>
-    bool operator!= (const array<T, N>& x, const array<T, N>& y) {
+    bool operator!=(const array<T, N>& x, const array<T, N>& y) {
         return !(x == y);
     }
     template<class T, std::size_t N>
-    bool operator> (const array<T, N>& x, const array<T, N>& y) {
+    bool operator>(const array<T, N>& x, const array<T, N>& y) {
         return y < x;
     }
     template<class T, std::size_t N>
-    bool operator<= (const array<T, N>& x, const array<T, N>& y) {
+    bool operator<=(const array<T, N>& x, const array<T, N>& y) {
         return !(y < x);
     }
     template<class T, std::size_t N>
-    bool operator>= (const array<T, N>& x, const array<T, N>& y) {
+    bool operator>=(const array<T, N>& x, const array<T, N>& y) {
         return !(x < y);
     }
 
     // global swap()
     template<class T, std::size_t N>
-    inline void swap (array<T, N>& x, array<T, N>& y) {
+    inline void swap(array<T, N>& x, array<T, N>& y) {
         x.swap(y);
     }
 
@@ -325,8 +388,7 @@ std::ostream &operator<<(std::ostream &os, const robust::array<T, N> &array)
     for (std::size_t i = 0; i < array.size(); i++) {
         os << (i == 0 ? "" : ",") << array.at(i);
     }
-    os << "]";
-    return os;
+    return os << "]";
 }
 
 
