@@ -5,7 +5,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include "../vector.h"
+#include "../array.h"
 
 #include <iostream>
 #include <cassert>
@@ -14,5 +14,11 @@ using namespace std;
 
 int main()
 {
-    return 0;
+    robust::chunk<int> c1;
+    cout << "chunk 1: " << c1 << endl;
+
+    // Insert faults and check
+
+    return -1;
 }
+

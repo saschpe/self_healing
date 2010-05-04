@@ -19,7 +19,7 @@ set(ROBUST_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include/")
 set(ROBUST_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/robust")
 
 set(robust_HDRS
-    src/chunk.h
+    src/array.h
     src/vector.h
 )
 
@@ -28,14 +28,14 @@ set(robust_HDRS
 
 if(ROBUST_BUILD_TESTS)
     enable_testing()
-    add_executable(test-chunk-interface src/test/chunk-interface.cpp)
-    add_test(chunk-interface ${EXECUTABLE_OUTPUT_PATH}/test-chunk-interface)
-    add_executable(test-chunk-faults src/test/chunk-faults.cpp)
-    add_test(chunk-faults ${EXECUTABLE_OUTPUT_PATH}/test-chunk-faults)
-    #add_executable(test-vector-interface src/test/vector-interface.cpp)
-    #add_test(vector-interface ${EXECUTABLE_OUTPUT_PATH}/test-vector-interface)
-    #add_executable(test-vector-faults src/test/vector-faults.cpp)
-    #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
+    add_executable(test-array-base src/test/array-base.cpp)
+    add_test(array-base ${EXECUTABLE_OUTPUT_PATH}/test-array-base)
+    add_executable(test-array-faults src/test/array-faults.cpp)
+    add_test(array-faults ${EXECUTABLE_OUTPUT_PATH}/test-array-faults)
+    add_executable(test-vector-base src/test/vector-base.cpp)
+    add_test(vector-base ${EXECUTABLE_OUTPUT_PATH}/test-vector-base)
+    add_executable(test-vector-faults src/test/vector-faults.cpp)
+    add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 endif(ROBUST_BUILD_TESTS)
 
 # Installation
