@@ -191,6 +191,39 @@ private:
     void *m_tail;
 };
 
+
+// comparisons
+template<class T, std::size_t N>
+bool operator== (const array<T, N>& x, const array<T, N>& y) {
+    return std::equal(x.begin(), x.end(), y.begin());
+}
+template<class T, std::size_t N>
+bool operator< (const array<T, N>& x, const array<T, N>& y) {
+    return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
+}
+template<class T, std::size_t N>
+bool operator!= (const array<T, N>& x, const array<T, N>& y) {
+    return !(x == y);
+}
+template<class T, std::size_t N>
+bool operator> (const array<T, N>& x, const array<T, N>& y) {
+    return y < x;
+}
+template<class T, std::size_t N>
+bool operator<= (const array<T, N>& x, const array<T, N>& y) {
+    return !(y < x);
+}
+template<class T, std::size_t N>
+bool operator>= (const array<T, N>& x, const array<T, N>& y) {
+    return !(x < y);
+}
+
+// global swap()
+template<class T, std::size_t N>
+inline void swap (array<T, N>& x, array<T, N>& y) {
+    x.swap(y);
+}
+
 } // namespace robust
 
 template <class T, std::size_t N>
@@ -203,5 +236,9 @@ std::ostream &operator<<(std::ostream &os, const robust::array<T, N> &array)
     os << "]";
     return os;
 }
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
+# pragma warning(pop)
+#endif
 
 #endif // ROBUST_ARRAY_H
