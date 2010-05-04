@@ -1,8 +1,6 @@
-core
-dist
+dist/
 build/
-.svn
-.kdev4
-.stuff
-*~
+.svn/
+.kdev4/
+.stuff/
 *.swp
