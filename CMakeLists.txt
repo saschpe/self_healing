@@ -20,6 +20,8 @@ set(ROBUST_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/robust")
 
 set(robust_HDRS
     robust/array.hpp
+    robust/functor.hpp
+    robust/reference.hpp
     robust/vector.hpp
 )
 
