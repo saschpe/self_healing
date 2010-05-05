@@ -76,19 +76,19 @@ namespace robust {
         class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
         public:
-            explicit iterator(T* rhs, robust::functor &functor = void_functor)
+            explicit iterator(T *rhs, robust::functor &functor = void_functor)
                 : m_p(rhs), m_functor(functor) {}
             iterator(const iterator &rhs, robust::functor &functor = void_functor)
                 : m_p(rhs.m_p), m_functor(functor) {}
 
             //iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
-            iterator& operator=(const reference& rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
-            iterator& operator=(const iterator& rhs) { m_p = rhs.m_p; return *this; }
+            iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
 
             iterator& operator+(difference_type n) const { return m_p + n; }
             iterator& operator-(difference_type n) const { return m_p - n; }
-            difference_type operator+(const iterator& rhs) const { return m_p + rhs.m_p; }
-            difference_type operator-(const iterator& rhs) const { return m_p - rhs.m_p; }
+            difference_type operator+(const iterator &rhs) const { return m_p + rhs.m_p; }
+            difference_type operator-(const iterator &rhs) const { return m_p - rhs.m_p; }
 
             iterator& operator+=(difference_type n) { m_p += n; return *this; }
             iterator& operator-=(difference_type n) { m_p -= n; return *this; }
@@ -104,7 +104,7 @@ namespace robust {
             operator const_iterator() const { return m_p; }
 
         private:
-            T* m_p;
+            T *m_p;
             robust::functor &m_functor;
         };
 
@@ -164,7 +164,7 @@ namespace robust {
         enum { static_size = N };
 
         // swap (note: linear complexity)
-        void swap(array<T, N>& y) {
+        void swap(array<T, N> &y) {
             for (size_type i = 0; i < N; ++i) {
                 boost::swap(m_elements[i], y.m_elements[i]);
             }
@@ -184,15 +184,15 @@ namespace robust {
 
         // assignment with type conversion
         template <typename T2>
-        array<T, N>& operator=(const array<T2, N>& rhs) {
+        array<T, N>& operator=(const array<T2, N> &rhs) {
             std::copy(rhs.begin(), rhs.end(), begin());
             update_checksums();
             return *this;
         }
 
         // assign one value to all elements
-        void assign(const T& value) { fill(value); }    // A synonym for fill
-        void fill(const T& value) {
+        void assign(const T &value) { fill(value); }    // A synonym for fill
+        void fill(const T &value) {
             std::fill_n(begin(), size(),value);
             update_checksums();
         }
@@ -337,7 +337,7 @@ namespace robust {
         static size_type max_size() { return 0; }
         enum { static_size = 0 };
 
-        void swap(array<T, 0>& /*y*/) {}
+        void swap(array<T, 0> &/*y*/) {}
 
         // direct access to data (read-only)
         const T* data() const { return 0; }
@@ -348,11 +348,11 @@ namespace robust {
 
         // assignment with type conversion
         template <typename T2>
-        array<T, 0>& operator=(const array<T2, 0>& ) { return *this; }
+        array<T, 0>& operator=(const array<T2, 0> &) { return *this; }
 
         // assign one value to all elements
-        void assign(const T& value) { fill(value); }
-        void fill(const T& /*value*/) {}
+        void assign(const T &value) { fill(value); }
+        void fill(const T &/*value*/) {}
 
         // check range (may be private because it is static)
         static reference failed_rangecheck() {
@@ -373,33 +373,33 @@ namespace robust {
 
     // comparisons
     template<class T, std::size_t N>
-    bool operator==(const array<T, N>& x, const array<T, N>& y) {
+    bool operator==(const array<T, N> &x, const array<T, N> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
     template<class T, std::size_t N>
-    bool operator<(const array<T, N>& x, const array<T, N>& y) {
+    bool operator<(const array<T, N> &x, const array<T, N> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
     template<class T, std::size_t N>
-    bool operator!=(const array<T, N>& x, const array<T, N>& y) {
+    bool operator!=(const array<T, N> &x, const array<T, N> &y) {
         return !(x == y);
     }
     template<class T, std::size_t N>
-    bool operator>(const array<T, N>& x, const array<T, N>& y) {
+    bool operator>(const array<T, N> &x, const array<T, N> &y) {
         return y < x;
     }
     template<class T, std::size_t N>
-    bool operator<=(const array<T, N>& x, const array<T, N>& y) {
+    bool operator<=(const array<T, N> &x, const array<T, N> &y) {
         return !(y < x);
     }
     template<class T, std::size_t N>
-    bool operator>=(const array<T, N>& x, const array<T, N>& y) {
+    bool operator>=(const array<T, N> &x, const array<T, N> &y) {
         return !(x < y);
     }
 
     // global swap()
     template<class T, std::size_t N>
-    inline void swap(array<T, N>& x, array<T, N>& y) {
+    inline void swap(array<T, N> &x, array<T, N> &y) {
         x.swap(y);
     }
 
@@ -410,7 +410,7 @@ std::ostream &operator<<(std::ostream &os, const robust::array<T, N> &array)
 {
     os << "[";
     for (std::size_t i = 0; i < array.size(); i++) {
-        os << (i == 0 ? "" : ",") << array.at(i);
+        os << (i == 0 ? "" : ",") << array[i];
     }
     return os << "]";
 }

@@ -34,7 +34,8 @@ namespace robust {
     /**
      * Empty default functor instance suitable as a default value.
      */
-    static class void_functor : public functor {
+    static class void_functor : public functor
+    {
     public:
         void operator()() {}
     } void_functor;

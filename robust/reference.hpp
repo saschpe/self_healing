@@ -34,35 +34,35 @@ namespace robust {
     class reference
     {
     public:
-        reference(T& value, robust::functor &functor = void_functor)
+        reference(T &value, robust::functor &functor = void_functor)
             : m_value(value), m_functor(functor) {}
 
-        reference& operator=(const T& rhs) { m_value = rhs; m_functor(); return *this; }
+        reference& operator=(const T &rhs) { m_value = rhs; m_functor(); return *this; }
         reference& operator=(const reference &rhs) { m_value = rhs.m_value; m_functor(); return *this; }
 
-        T operator+(const T& rhs) const { return m_value + rhs; }
-        T operator-(const T& rhs) const { return m_value - rhs; }
-        T operator*(const T& rhs) const { return m_value * rhs; }
-        T operator/(const T& rhs) const { return m_value / rhs; }
-        T operator%(const T& rhs) const { return m_value % rhs; }
+        T operator+(const T &rhs) const { return m_value + rhs; }
+        T operator-(const T &rhs) const { return m_value - rhs; }
+        T operator*(const T &rhs) const { return m_value * rhs; }
+        T operator/(const T &rhs) const { return m_value / rhs; }
+        T operator%(const T &rhs) const { return m_value % rhs; }
 
-        reference& operator+=(const T& rhs) { m_value += rhs; m_functor(); return *this; }
-        reference& operator-=(const T& rhs) { m_value -= rhs; m_functor(); return *this; }
-        reference& operator*=(const T& rhs) { m_value *= rhs; m_functor(); return *this; }
-        reference& operator/=(const T& rhs) { m_value /= rhs; m_functor(); return *this; }
-        reference& operator%=(const T& rhs) { m_value %= rhs; m_functor(); return *this; }
+        reference& operator+=(const T &rhs) { m_value += rhs; m_functor(); return *this; }
+        reference& operator-=(const T &rhs) { m_value -= rhs; m_functor(); return *this; }
+        reference& operator*=(const T &rhs) { m_value *= rhs; m_functor(); return *this; }
+        reference& operator/=(const T &rhs) { m_value /= rhs; m_functor(); return *this; }
+        reference& operator%=(const T &rhs) { m_value %= rhs; m_functor(); return *this; }
 
         reference& operator++() { ++m_value; m_functor(); return *this; }
         reference& operator++(int) { m_value++; m_functor(); return *this; }
         reference& operator--() { --m_value; m_functor(); return *this; }
         reference& operator--(int) { m_value--; m_functor(); return *this; }
 
-        bool operator==(const T& rhs) const { return m_value == rhs; }
-        bool operator!=(const T& rhs) const { return m_value != rhs; }
-        bool operator>(const T& rhs) const { return m_value > rhs; }
-        bool operator>=(const T& rhs) const { return m_value >= rhs; }
-        bool operator<(const T& rhs) const { return m_value < rhs; }
-        bool operator<=(const T& rhs) const { return m_value <= rhs; }
+        bool operator==(const T &rhs) const { return m_value == rhs; }
+        bool operator!=(const T &rhs) const { return m_value != rhs; }
+        bool operator>(const T &rhs) const { return m_value > rhs; }
+        bool operator>=(const T &rhs) const { return m_value >= rhs; }
+        bool operator<(const T &rhs) const { return m_value < rhs; }
+        bool operator<=(const T &rhs) const { return m_value <= rhs; }
 
         T& operator*() const { return m_value; }
         operator T&() const { return m_value; }
@@ -72,7 +72,7 @@ namespace robust {
         }
 
     private:
-        T& m_value;
+        T &m_value;
         robust::functor &m_functor;
     };
 
