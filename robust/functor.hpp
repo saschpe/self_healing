@@ -1,4 +1,5 @@
-/* The following code declares class functor.
+/* The following code declares class functor,
+ * an abstract base for function objects (functors).
  *
  * The original author site is at: http://saschpe.wordpress.com/
  *

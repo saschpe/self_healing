@@ -1,4 +1,5 @@
-/* The following code declares class reference.
+/* The following code declares class reference,
+ * a reference to a value that calls a functor on value updates.
  *
  * The original author site is at: http://saschpe.wordpress.com/
  *
@@ -75,4 +76,4 @@ namespace robust {
 } // namespace robust
 
 
-#endif /* BOOST_ROBUST_FUNCTOR_HPP */
+#endif /* BOOST_ROBUST_REFERENCE_HPP */
