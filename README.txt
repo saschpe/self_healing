@@ -4,7 +4,7 @@ Robust
 
 (C) Copyright Sascha Peilicke 2010.
 
-Robust is a cross-platform C++ library for fault-rolerant data-structures with
+Robust is a cross-platform C++ library for fault-rolerant data structures with
 an STL-compatible interface and released under the Boost Software License.
 
 See doc/index.html for information on:
