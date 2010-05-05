@@ -64,6 +64,9 @@ namespace robust {
         bool operator<(const T& rhs) const { return m_value < rhs; }
         bool operator<=(const T& rhs) const { return m_value <= rhs; }
 
+        T& operator*() const { return m_value; }
+        operator T() { return m_value; }
+
         friend std::ostream &operator<<(std::ostream &os, const robust::reference<T> &ref) {
             return os << ref.m_value;
         }
