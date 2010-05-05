@@ -239,6 +239,9 @@ namespace robust {
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+    /**
+     * Partial template specialization for the corner case of a zero size array.
+     */
     template<class T>
     class array<T, 0>
     {
