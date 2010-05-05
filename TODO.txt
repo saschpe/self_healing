@@ -1,0 +1,16 @@
+==================
+Robust to-do items
+==================
+
+Documentation
+-------------
+
+ - Source code documentation
+ - Design rationale
+ - Tutorial
+
+
+Functionality
+-------------
+- Implement class vector
+- Implement more unit tests
