@@ -46,7 +46,7 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include <robust/reference.hpp>
+#include "reference.hpp"
 
 
 namespace robust {

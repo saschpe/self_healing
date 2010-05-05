@@ -39,7 +39,7 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include <robust/array.hpp>
+#include "array.hpp"
 
 
 namespace robust {

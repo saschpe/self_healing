@@ -13,7 +13,7 @@
  * May 4th, 2010
  */
 
-#include <robust/array.hpp>
+#include <boost/robust/array.hpp>
 
 #include <iostream>
 #include <cassert>

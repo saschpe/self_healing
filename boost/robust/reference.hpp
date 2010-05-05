@@ -21,7 +21,7 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include <robust/functor.hpp>
+#include "functor.hpp"
 
 
 namespace robust {

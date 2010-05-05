@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 2.6.4)
 set(CMAKE_MODULE_PATH "${robust_SOURCE_DIR}/cmake/modules")
 #
 find_package(Boost 1.42.0 REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS} .)
+include_directories(${Boost_INCLUDE_DIRS})
 
 option(ROBUST_BUILD_TESTS "Build the tests" on)
 set(ROBUST_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include/")
@@ -31,6 +31,7 @@ set(robust_LIB_SRCS
 
 if(ROBUST_BUILD_TESTS)
     enable_testing()
+    include_directories(.) # to allow global #include
     add_executable(test-array-base libs/robust/test/array-base.cpp)
     add_test(array-base ${EXECUTABLE_OUTPUT_PATH}/test-array-base)
     add_executable(test-array-faults libs/robust/test/array-faults.cpp)
