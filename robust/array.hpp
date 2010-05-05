@@ -45,11 +45,14 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
+#include <robust/functor.hpp>
+#include <robust/reference.hpp>
+
 
 namespace robust {
 
     /**
-     * Checksummed array
+     * Checksummed array of constant size.
      */
     template <class T, std::size_t N>
     class array
@@ -57,55 +60,16 @@ namespace robust {
     public:
         // type definitions
         typedef T              value_type;
-        typedef T*             iterator;            //TODO: replace 'iterator' with safe class
+        typedef T*             iterator;        // replaced by safe class robust::array<T, N>::iterator
         typedef const T*       const_iterator;
-        //typedef T&             reference;         // replaced by safe class
+        //typedef T&             reference;     // replaced by safe class robust::reference<T>
         typedef const T&       const_reference;
         typedef std::size_t    size_type;
         typedef std::ptrdiff_t difference_type;
 
-        class reference
-        {
-        public:
-            reference(T& value, array<T, N> *parent = NULL)
-                : m_parent(parent), m_value(value) {}
-
-            reference& operator=(const T& rhs) { m_value = rhs; m_parent->update_checksums(); return *this; }
-            reference& operator=(const reference &rhs) { m_value = rhs.m_value; m_parent->update_checksums(); return *this; }
-
-            T operator+(const T& rhs) const { return m_value + rhs; }
-            T operator-(const T& rhs) const { return m_value - rhs; }
-            T operator*(const T& rhs) const { return m_value * rhs; }
-            T operator/(const T& rhs) const { return m_value / rhs; }
-            T operator%(const T& rhs) const { return m_value % rhs; }
-
-            reference& operator+=(const T& rhs) { m_value += rhs; m_parent->update_checksums(); return *this; }
-            reference& operator-=(const T& rhs) { m_value -= rhs; m_parent->update_checksums(); return *this; }
-            reference& operator*=(const T& rhs) { m_value *= rhs; m_parent->update_checksums(); return *this; }
-            reference& operator/=(const T& rhs) { m_value /= rhs; m_parent->update_checksums(); return *this; }
-            reference& operator%=(const T& rhs) { m_value %= rhs; m_parent->update_checksums(); return *this; }
-
-            reference& operator++() { ++m_value; m_parent->update_checksums(); return *this; }
-            reference& operator++(int) { m_value++; m_parent->update_checksums(); return *this; }
-            reference& operator--() { --m_value; m_parent->update_checksums(); return *this; }
-            reference& operator--(int) { m_value--; m_parent->update_checksums(); return *this; }
-
-            bool operator==(const T& rhs) const { return m_value == rhs; }
-            bool operator!=(const T& rhs) const { return m_value != rhs; }
-            bool operator>(const T& rhs) const { return m_value > rhs; }
-            bool operator>=(const T& rhs) const { return m_value >= rhs; }
-            bool operator<(const T& rhs) const { return m_value < rhs; }
-            bool operator<=(const T& rhs) const { return m_value <= rhs; }
-
-            friend std::ostream &operator<<(std::ostream &os, const robust::array<T, N>::reference &ref) {
-                return os << ref.m_value;
-            }
-
-        private:
-            array<T, N> *m_parent;
-            T& m_value;
-        };
-
+        /**
+         * Safe iterator.
+         */
         /*class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
         public:
@@ -122,8 +86,8 @@ namespace robust {
             iterator& operator-=(difference_type n) { m_p -= n; return *this; }
             bool operator==(const iterator& rhs) { return m_p == rhs.m_p; }
             bool operator!=(const iterator& rhs) { return m_p != rhs.m_p; }
-            T& operator*() { return *m_p; }
-            T* operator->() const { return *m_p; }
+            reference& operator*() { return *m_p; }
+            //T* operator->() const { return *m_p; }
             iterator& operator=(T* rhs) { *m_p = rhs; ++m_p; return *this; }
             iterator& operator=(const iterator& rhs) { m_p = rhs.m_p; return *this; }
 
@@ -132,7 +96,8 @@ namespace robust {
         };*/
 
         // contructor
-        array(const T &value = 0) { fill(value); }
+        array(const T &value = 0)
+            : m_func(this) { fill(value); }
 
         // iterator support
         iterator begin() { return m_elements; }
@@ -166,17 +131,17 @@ namespace robust {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // operator[] with range check
-        reference operator[](size_type i) { rangecheck(i); return reference(m_elements[i], this); }
+        reference<T> operator[](size_type i) { rangecheck(i); return reference<T>(m_elements[i], m_func); }
         const_reference operator[](size_type i) const { rangecheck(i); return m_elements[i]; }
 
         // at() with range check
-        reference at(size_type i) { rangecheck(i); return reference(m_elements[i], this); }
+        reference<T> at(size_type i) { rangecheck(i); return reference<T>(m_elements[i], m_func); }
         const_reference at(size_type i) const { rangecheck(i); return m_elements[i]; }
 
         // front() and back()
-        reference front() { return reference(m_elements[0], this); }
+        reference<T> front() { return reference<T>(m_elements[0], m_func); }
         const_reference front() const { return m_elements[0]; }
-        reference back() { return reference(m_elements[N - 1], this); }
+        reference<T> back() { return reference<T>(m_elements[N - 1], m_func); }
         const_reference back() const { return m_elements[N - 1]; }
 
         // size is constant
@@ -194,13 +159,15 @@ namespace robust {
             boost::swap(m_crc2, y.m_crc2);
         }
 
-        //NOTE: those methods would bypass checksumming
-        /*// direct access to data (read-only)
+        // direct access to data (read-only)
         const T* data() const { return m_elements; }
+        //NOTE: those methods would bypass checksumming
+        /*
         T* data() { return m_elements; }
 
         // use array as C array (direct read/write access to data)
-        T* c_array() { return m_elements; }*/
+        T* c_array() { return m_elements; }
+        */
 
         // assignment with type conversion
         template <typename T2>
@@ -225,11 +192,21 @@ namespace robust {
             }
         }
 
+        /**
+         * Validity check that tries to correct minor checksum faults silently.
+         */
         bool is_valid() {
-            bool valid = true;
-            //valid &= check_checksums();
-            //TODO: check crcs
-            return valid;
+            boost::crc_32_type crc;
+            crc.process_bytes(&m_elements, N * sizeof(T));
+            //const uns
+
+            // All good if all checksums are equal
+            if ((m_crc1 == m_crc2) && m_crc1 == crc.checksum()) {
+                return true;
+            }
+
+            //TODO: implement
+            //if (
         }
 
     private:
@@ -241,9 +218,25 @@ namespace robust {
             m_crc2 = m_crc1;
         }
 
-        unsigned int m_crc1;            // first checksum
-        T m_elements[N];                // fixed-size array of elements of type T
-        unsigned int m_crc2;            // fecond checksum
+        /**
+         * Private functor class that calls update_checksums() for a given
+         * array instance.
+         */
+        class update_checksums_functor : public robust::functor
+        {
+        public:
+            update_checksums_functor(array<T, N> *parent)
+                : m_parent(parent) {}
+
+            void operator()() { m_parent->update_checksums(); }
+
+        private:
+            array<T, N> *m_parent;
+        } m_func;                           // functor instance to pass to robust::reference instances
+
+        unsigned int m_crc1;                // first checksum
+        T m_elements[N];                    // fixed-size array of elements of type T
+        unsigned int m_crc2;                // second checksum (backup)
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
