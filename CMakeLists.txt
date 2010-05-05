@@ -1,10 +1,10 @@
-
-# Copyright Sascha Peilicke <sasch.pe@gmx.de> 2010.
 #
-# Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or copy at
-#  http://www.boost.org/LICENSE_1_0.txt)
-
+# (C) Copyright Sascha Peilicke 2010.
+#
+# Distributed under the Boost Software License, Version 1.0. (See
+# accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+#
 project(robust)
 cmake_minimum_required(VERSION 2.6.4)
 
@@ -19,10 +19,11 @@ set(ROBUST_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/")
 set(ROBUST_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/robust")
 
 set(robust_HDRS
-    robust/array.hpp
-    robust/functor.hpp
-    robust/reference.hpp
-    robust/vector.hpp
+    boost/robust/array.hpp
+    boost/robust/functor.hpp
+    boost/robust/reference.hpp
+    boost/robust/vector.hpp
+    boost/robust.hpp
 )
 
 set(robust_LIB_SRCS
@@ -30,13 +31,13 @@ set(robust_LIB_SRCS
 
 if(ROBUST_BUILD_TESTS)
     enable_testing()
-    add_executable(test-array-base robust/test/array-base.cpp)
+    add_executable(test-array-base libs/robust/test/array-base.cpp)
     add_test(array-base ${EXECUTABLE_OUTPUT_PATH}/test-array-base)
-    add_executable(test-array-faults robust/test/array-faults.cpp)
+    add_executable(test-array-faults libs/robust/test/array-faults.cpp)
     add_test(array-faults ${EXECUTABLE_OUTPUT_PATH}/test-array-faults)
-    add_executable(test-vector-base robust/test/vector-base.cpp)
+    add_executable(test-vector-base libs/robust/test/vector-base.cpp)
     add_test(vector-base ${EXECUTABLE_OUTPUT_PATH}/test-vector-base)
-    add_executable(test-vector-faults robust/test/vector-faults.cpp)
+    add_executable(test-vector-faults libs/robust/test/vector-faults.cpp)
     add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 endif(ROBUST_BUILD_TESTS)
 

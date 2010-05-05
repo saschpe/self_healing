@@ -50,37 +50,39 @@ namespace robust {
     template <class T, class Allocator = allocator<T> >
     class vector
     {
-        template <class T>
-        struct chunk {
-            ::vector *parent_head;
-            ::array<T, 64> elems;   //NOTE: the size should be chosen based on CPU cache
-            ::vector *parent_tail;
-        };
-
     public:
+        // type definitions
+        typedef T                    value_type;
+        //typedef T*                 iterator;      // replaced by safe class robust::array<T, N>::iterator
+        //typedef const T*             const_iterator;
+        //typedef T&                 reference;     // replaced by safe class robust::reference<T>
+        typedef robust::reference<T> reference;
+        typedef const T&             const_reference;
+        typedef std::size_t          size_type;
+        typedef std::ptrdiff_t       difference_type;
 
-        /*explicit vector(const Allocator& = Allocator());
+        explicit vector(const Allocator& = Allocator());
         explicit vector(size_type, const Allocator& = Allocator());
         vector(size_type, const T&, const Allocator& = Allocator());
-        vector(const vector<T, Allocator>&);*/
+        vector(const vector<T, Allocator>&);
 
         explicit vector(size_type);
         vector(const vector<T>);
 
-        /*template <class InputIterator>
-        vector(InputIterator, InputIterator, const Allocator& = Allocator());*/
+        template <class InputIterator>
+        vector(InputIterator, InputIterator, const Allocator& = Allocator());
         ~vector();
 
-        //vector<T, Allocator>& operator=(const vector<T, Allocator>&);
+        vector<T, Allocator>& operator=(const vector<T, Allocator>&);
 
 
-        /*template <class InputIterator>
+        template <class InputIterator>
         void assign(InputIterator first, InputIterator last);
         template <class Size, class TT>
         void assign(Size n);
         template <class Size, class TT>
         void assign(Size n, const TT&);
-        allocator_type get_allocator() const;*/
+        allocator_type get_allocator() const;
 
         // Iterators
         iterator begin();
@@ -124,37 +126,61 @@ namespace robust {
         void swap(vector<T> &);
 
     private:
-        chunk const *m_head;
-        void *m_tail;
-        size_type m_chunks;
-        size_type m_size;
-        size_type m_capacity;
+        /**
+         * Private member class
+         *
+         * NOTE: The chunk size should be chosen based on CPU cache size.
+         */
+        template <class Size = 64>
+        class chunk
+        {
+        public:
+            chunk(vector<T, Allocator> *parent)
+                : m_parent_head(parent->m_head), m_parent_tail(m_tail), m_elements(0) {}
+
+            bool is_valid() const {
+                //TODO: implement
+                return false;
+            }
+
+        private:
+            robust::vector<T, Allocator> *m_parent_head;
+            robust::array<T, Size> m_elements;
+            robust::vector<T, Allocator> *m_parent_tail;
+        };
+
+        chunk *m_head;          // Pointer to the first chunk
+        chunk *m_tail;          // Pointer to the last chunk
+
+        size_type m_chunks;     // Chunk count
+        size_type m_size;       // How much elements are stored currently
+        size_type m_capacity;   // How much elements can be stored
     };
 
     // comparisons
     template<class T, class Allocator>
-    inline bool operator== (const vector<T> &x, const vector<T> &y) {
+    inline bool operator==(const vector<T> &x, const vector<T> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
     template<class T, class Allocator>
-    inline bool operator< (const vector<T> &x, const vector<T> &y) {
-        return std::lexicographical_compare(x.begin(),x.end(),y.begin(),y.end());
+    inline bool operator<(const vector<T> &x, const vector<T> &y) {
+        return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
     template<class T, class Allocator>
-    inline bool operator!= (const vector<T> &x, const vector<T> &y) {
-        return !(x==y);
+    inline bool operator!=(const vector<T> &x, const vector<T> &y) {
+        return !(x == y);
     }
     template<class T, class Allocator>
-    inline bool operator> (const vector<T> &x, const vector<T> &y) {
-        return y<x;
+    inline bool operator>(const vector<T> &x, const vector<T> &y) {
+        return y < x;
     }
     template<class T, class Allocator>
-    inline bool operator<= (const vector<T> &x, const vector<T> &y) {
-        return !(y<x);
+    inline bool operator<=(const vector<T> &x, const vector<T> &y) {
+        return !(y < x);
     }
     template<class T, class Allocator>
-    inline bool operator>= (const vector<T>& x, const vector<T> &y) {
-        return !(x<y);
+    inline bool operator>=(const vector<T>& x, const vector<T> &y) {
+        return !(x < y);
     }
 
     // global swap()
@@ -165,12 +191,12 @@ namespace robust {
 
 } // namespace robust
 
-template <class T, std::size_t N>
-std::ostream &operator<<(std::ostream &os, const robust::array<T, N> &array)
+template <class T, class Allocator>
+std::ostream &operator<<(std::ostream &os, const robust::vector<T, Allocator> &vector)
 {
     os << "[";
-    for (std::size_t i = 0; i < array.size(); i++) {
-        os << (i == 0 ? "" : ",") << array.at(i);
+    for (std::size_t i = 0; i < vector.size(); i++) {
+        os << (i == 0 ? "" : ",") << vector[i];
     }
     os << "]";
     return os;
