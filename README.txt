@@ -72,8 +72,6 @@ Python docutils_. Use the following command::
 .. _Git: http://git.or.cz/index.html
 .. _CMake: http://www.cmake.org/
 .. _Boost: http://www.boost.org/
-.. _Octave: http://www.gnu.org/software/octave/
-.. _Matlab: http://www.mathworks.com/products/matlab/
 .. _reStructuredText: http://en.wikipedia.org/wiki/Restructured_text
 .. _docutils: http://docutils.sourceforge.net/
 
