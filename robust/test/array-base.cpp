@@ -85,7 +85,9 @@ int main()
     std::cout << "testint iterator value assignment" << std::endl;
     robust::array<int, 16>::iterator tmp_it = a.begin();
     *tmp_it = 99;
+
     robust::array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
+    //TODO: fix this, the functor is not called here !!!
     *tmp_rit = 99;
 
     std::cout << "testing const iterators" << std::endl;
