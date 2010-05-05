@@ -82,14 +82,19 @@ int main()
         *it += 1;
     }
 
+    std::cout << "testint iterator value assignment" << std::endl;
+    robust::array<int, 16>::iterator tmp_it = a.begin();
+    *tmp_it = 99;
+    robust::array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
+    *tmp_rit = 99;
+
+    std::cout << "testing const iterators" << std::endl;
     const int* cit = a.begin();
     robust::array<int, 16>::const_iterator tmp_cit = a.begin();
-    robust::array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
     robust::array<int, 16>::const_reverse_iterator tmp_crit = a.rbegin();
 
     std::cout << "array 1:  ";
     for (std::reverse_iterator<robust::array<int, 16>::iterator> rit = a.rbegin(); rit != a.rend(); rit++) {
-        *rit;
         int i = *rit;
         std:: cout << i << ",";
     }

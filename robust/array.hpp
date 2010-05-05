@@ -32,6 +32,7 @@
 #endif
 
 #include <cstddef>
+#include <iostream>
 #include <stdexcept>
 #include <boost/assert.hpp>
 #include <boost/swap.hpp>
@@ -75,13 +76,13 @@ namespace robust {
         class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
         public:
-            iterator(T* rhs, robust::functor &functor = void_functor)
+            explicit iterator(T* rhs, robust::functor &functor = void_functor)
                 : m_p(rhs), m_functor(functor) {}
             iterator(const iterator &rhs, robust::functor &functor = void_functor)
                 : m_p(rhs.m_p), m_functor(functor) {}
 
-            iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
-            //iterator& operator=(const reference& rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            //iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            iterator& operator=(const reference& rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
             iterator& operator=(const iterator& rhs) { m_p = rhs.m_p; return *this; }
 
             iterator& operator+(difference_type n) const { return m_p + n; }
@@ -112,9 +113,9 @@ namespace robust {
             : m_func(this) { fill(value); }
 
         // iterator support
-        iterator begin() { return m_elements; }
+        iterator begin() { return iterator(m_elements, m_func); }
         const_iterator begin() const { return m_elements; }
-        iterator end() { return m_elements + N; }
+        iterator end() { return iterator(m_elements + N, m_func); }
         const_iterator end() const { return m_elements + N; }
 
         // reverse iterator support
@@ -134,8 +135,8 @@ namespace robust {
                                       value_type, const_reference, const_iterator, difference_type> const_reverse_iterator;
 #else
         // workaround for broken reverse_iterator implementations
-        typedef std::reverse_iterator<iterator,T> reverse_iterator;
-        typedef std::reverse_iterator<const_iterator,T> const_reverse_iterator;
+        typedef std::reverse_iterator<iterator, T> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator, T> const_reverse_iterator;
 #endif
         reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
@@ -206,25 +207,39 @@ namespace robust {
 
         /**
          * Validity check that tries to correct minor checksum faults silently.
+         * If one out of three checksums is wrong, this can be corrected.
          */
         bool is_valid() {
-            boost::crc_32_type crc;
-            crc.process_bytes(&m_elements, N * sizeof(T));
-            //const uns
+            boost::crc_32_type crc3;
+            crc3.process_bytes(&m_elements, N * sizeof(T));
+            const bool equal_13 = m_crc1 == crc3.checksum();
+            const bool equal_23 = m_crc2 == crc3.checksum();
+            const bool equal_12 = m_crc1 == m_crc2;
 
-            // All good if all checksums are equal
-            if ((m_crc1 == m_crc2) && m_crc1 == crc.checksum()) {
-                return true;
+            if (equal_12 && equal_13 && equal_23) {
+                return true;        // all fine
             }
-
-            //TODO: implement
-            //if (
+            if (equal_13) {
+                m_crc2 = m_crc1;    // fix m_crc2 as the others are equal
+                return true;        // all fine
+            }
+            if (equal_23) {
+                m_crc1 = m_crc2;    // fix m_crc1 as the others are equal
+                return true;        // all fine
+            }
+            if (equal_12) {
+                // The computed checksum over the content is not the same as
+                // the stored onces, thus the content was maliciously changed
+                // and the array is invalid.
+                return false;
+            }
+            return false;           // checksum mismatch, fail
         }
 
     private:
         void update_checksums() {
             // compute and store CRC checksums
-            //std::cout << "robust::array<T, N>::update_checksums()" << std::endl;
+            std::cout << "robust::array<T, N>::update_checksums()" << std::endl;
             boost::crc_32_type crc;
             crc.process_bytes(&m_elements, N * sizeof(T));
             m_crc1 = crc.checksum();
