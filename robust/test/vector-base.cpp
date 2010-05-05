@@ -33,26 +33,27 @@ int main()
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "locate the largest element, O(n)" << std::endl;
-    robust::vector<int>::const_iterator largest = max_element(numbers.begin(), numbers.end());
+    robust::vector<int>::const_iterator largest = std::max_element(numbers.begin(), numbers.end());
 
-    cout << "The largest number is " << *largest << "\n";
-    cout << "It is located at index " << largest - numbers.begin() << "\n";
+    std::cout << "The largest number is " << *largest << "\n";
+    std::cout << "It is located at index " << largest - numbers.begin() << "\n";
 
     std::cout << "sort the elements" << std::endl;
-    sort( numbers.begin(), numbers.end() );
+    std::sort( numbers.begin(), numbers.end() );
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "find the position of the number 5 in the vector, O(log n)" << std::endl;
-    robust::vector<int>::const_iterator five = lower_bound(numbers.begin(), numbers.end(), 5);
+    robust::vector<int>::const_iterator five = std::lower_bound(numbers.begin(), numbers.end(), 5);
 
-    cout << "The number 5 is located at index " << five - numbers.begin() << "\n";
+    std::cout << "The number 5 is located at index " << five - numbers.begin() << "\n";
 
     std::cout << "erase all the elements greater than 4" << std::endl;
-    numbers.erase(remove_if(numbers.begin(), numbers.end(), bind2nd(greater<int>(), 4)), numbers.end());
+    numbers.erase(std::remove_if(numbers.begin(), numbers.end(),
+                  std::bind2nd(std::greater<int>(), 4)), numbers.end());
 
-    std::cout << "print all the remaining numbers" << std:.endl;
+    std::cout << "print all the remaining numbers" << std::endl;
     for (robust::vector<int>::const_iterator it = numbers.begin(); it != numbers.end(); ++it) {
-        cout << *it << ",";
+        std::cout << *it << ",";
     }
     std::cout << std::endl;
 
