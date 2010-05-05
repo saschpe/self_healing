@@ -20,67 +20,82 @@
 
 int main()
 {
-    robust::array<int, 16> a1;
-    std::cout << "array 1: " << a1 << std::endl;
+    robust::array<int, 16> a;
+    std::cout << "array 1: " << a << std::endl;
 
-    assert(a1.at(0) == 0);
-    assert(a1.at(a1.size() - 1) == 0);
+    assert(a.at(0) == 0);
+    assert(a.at(a.size() - 1) == 0);
 
     int i = 3;
-    //TODO: move reference test code into own test case
-    robust::reference<int> r(i);
+    //TODO: move robust::reference<> test code into own test case
+    robust::reference<int> rr(i);
+    int j = 1 + *rr + 3;
+    int k = 1 + rr + 3;
+    robust::array<int, 16>::reference ar(i);
+    robust::array<int, 16>::const_reference car(i);
 
-    // testing class robust::array<>::reference assignment
-    a1.front() = 3;
-    a1.back() = 4;
-    a1[2] = 4;
-    a1.at(3) = 5;
-    a1.at(13) = a1.at(12);
 
-    // testing class robust::array<>::reference comparison
-    assert(a1.front() == 3);
-    assert(a1.front() != 5);
-    assert(a1.front() >= 2);
-    std::cout << (a1.front() <= 2) << std::endl;
-    std::cout << (a1.front() > 3) << std::endl;
-    std::cout << (a1.front() < 3) << std::endl;
+    std::cout << "sizeof(robust::reference<int>): " << sizeof(rr) << std::endl;
 
-    // testing class robust::array<>::reference arithmetic operations
-    std::cout << a1.front() + 2 << std::endl;
-    std::cout << a1.front() - 2 << std::endl;
-    std::cout << a1.front() * 2 << std::endl;
-    std::cout << a1.front() / 2 << std::endl;
-    std::cout << a1.front() % 2 << std::endl;
+    std::cout << "testing class robust::array<>::reference assignment" << std::endl;
+    a.front() = 3;
+    a.back() = 4;
+    a[2] = 4;
+    a.at(3) = 5;
+    a.at(13) = a.at(12);
 
-    std::cout << a1[0];
-    std::cout << "a1[6] += 1: " << (a1[6] += 1) << std::endl;
-    std::cout << (a1[7] -= 1) << std::endl;
-    std::cout << (a1[7] *= 1) << std::endl;
-    std::cout << (a1[7] /= 1) << std::endl;
-    std::cout << (a1[7] %= 1) << std::endl;
+    std::cout << "testing class robust::array<>::reference comparison" << std::endl;
+    assert(a.front() == 3);
+    assert(a.front() != 5);
+    assert(a.front() >= 2);
+    std::cout << (a.front() <= 2) << std::endl;
+    std::cout << (a.front() > 3) << std::endl;
+    std::cout << (a.front() < 3) << std::endl;
 
-    // testing class robust::array<>::reference increment and decrement operations
-    a1[8]++;
-    ++a1[9];
-    a1[10]--;
-    --a1[11];
+    std::cout << "testing class robust::array<>::reference arithmetic operations" << std::endl;
+    std::cout << a.front() + 2 << std::endl;
+    std::cout << a.front() - 2 << std::endl;
+    std::cout << a.front() * 2 << std::endl;
+    std::cout << a.front() / 2 << std::endl;
+    std::cout << a.front() % 2 << std::endl;
 
-    // testing iterators
+    std::cout << "testing class robust::array<>::reference arithmetic assignment operations" << std::endl;
+    std::cout << a[0];
+    std::cout << "a1[6] += 1: " << (a[6] += 1) << std::endl;
+    std::cout << (a[7] -= 1) << std::endl;
+    std::cout << (a[7] *= 1) << std::endl;
+    std::cout << (a[7] /= 1) << std::endl;
+    std::cout << (a[7] %= 1) << std::endl;
+
+    std::cout << "testing class robust::array<>::reference increment and decrement operations" << std::endl;
+    a[8]++;
+    ++a[9];
+    a[10]--;
+    --a[11];
+
+    std::cout << "testing iterators" << std::endl;
     std::cout << "array 1:  ";
-    std::copy(a1.begin(), a1.end(), std::ostream_iterator<int>(std::cout, ","));
+    std::copy(a.begin(), a.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
 
-    for (robust::array<int, 16>::iterator it = a1.begin(); it != a1.end(); it++) {
+    for (robust::array<int, 16>::iterator it = a.begin(); it != a.end(); it++) {
         *it += 1;
     }
 
+    const int* cit = a.begin();
+    robust::array<int, 16>::const_iterator tmp_cit = a.begin();
+    robust::array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
+    robust::array<int, 16>::const_reverse_iterator tmp_crit = a.rbegin();
+
     std::cout << "array 1:  ";
-    for (robust::array<int, 16>::const_reverse_iterator rit = a1.rbegin(); rit != a1.rend(); rit++) {
-        std:: cout << *rit << ",";
+    for (std::reverse_iterator<robust::array<int, 16>::iterator> rit = a.rbegin(); rit != a.rend(); rit++) {
+        *rit;
+        int i = *rit;
+        std:: cout << i << ",";
     }
     std::cout << std::endl;
 
-    std::cout << "array 1: " << a1 << std::endl;
+    std::cout << "array 1: " << a << std::endl;
 
     return 0;
 }

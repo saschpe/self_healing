@@ -58,41 +58,54 @@ namespace robust {
     {
     public:
         // type definitions
-        typedef T              value_type;
-        typedef T*             iterator;        // replaced by safe class robust::array<T, N>::iterator
-        typedef const T*       const_iterator;
-        //typedef T&             reference;     // replaced by safe class robust::reference<T>
-        typedef const T&       const_reference;
-        typedef std::size_t    size_type;
-        typedef std::ptrdiff_t difference_type;
+        typedef T                    value_type;
+        //typedef T*                 iterator;      // replaced by safe class robust::array<T, N>::iterator
+        typedef const T*             const_iterator;
+        //typedef T&                 reference;     // replaced by safe class robust::reference<T>
+        typedef robust::reference<T> reference;
+        typedef const T&             const_reference;
+        typedef std::size_t          size_type;
+        typedef std::ptrdiff_t       difference_type;
 
         /**
-         * Safe iterator.
+         * Safe iterator that calls a functor if the value at the current position
+         * is changed. Checksumms are also updated correctly if the iterator is
+         * dereferenced.
          */
-        /*class iterator : public std::iterator<std::random_access_iterator_tag, T>
+        class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
         public:
-            iterator(T* rhs) : m_p(rhs) {}
-            iterator(const iterator &rhs) : m_p(rhs.m_p) {}
+            iterator(T* rhs, robust::functor &functor = void_functor)
+                : m_p(rhs), m_functor(functor) {}
+            iterator(const iterator &rhs, robust::functor &functor = void_functor)
+                : m_p(rhs.m_p), m_functor(functor) {}
 
-            iterator& operator+(difference_type n) { return *(this + n); }
+            iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            //iterator& operator=(const reference& rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            iterator& operator=(const iterator& rhs) { m_p = rhs.m_p; return *this; }
+
+            iterator& operator+(difference_type n) const { return m_p + n; }
+            iterator& operator-(difference_type n) const { return m_p - n; }
+            difference_type operator+(const iterator& rhs) const { return m_p + rhs.m_p; }
+            difference_type operator-(const iterator& rhs) const { return m_p - rhs.m_p; }
+
+            iterator& operator+=(difference_type n) { m_p += n; return *this; }
+            iterator& operator-=(difference_type n) { m_p -= n; return *this; }
             iterator& operator++() { ++m_p; return *this; }
             iterator& operator++(int) { m_p++; return *this; }
-            iterator& operator+=(difference_type n) { m_p += n; return *this; }
-            iterator& operator-(difference_type n) { return *(this - n); }
             iterator& operator--() { --m_p; return *this; }
             iterator& operator--(int) { m_p--; return *this; }
-            iterator& operator-=(difference_type n) { m_p -= n; return *this; }
-            bool operator==(const iterator& rhs) { return m_p == rhs.m_p; }
-            bool operator!=(const iterator& rhs) { return m_p != rhs.m_p; }
-            reference& operator*() { return *m_p; }
-            //T* operator->() const { return *m_p; }
-            iterator& operator=(T* rhs) { *m_p = rhs; ++m_p; return *this; }
-            iterator& operator=(const iterator& rhs) { m_p = rhs.m_p; return *this; }
+
+            bool operator==(const iterator& rhs) const { return m_p == rhs.m_p; }
+            bool operator!=(const iterator& rhs) const { return m_p != rhs.m_p; }
+
+            reference operator*() const { return reference(*m_p, m_functor); }
+            operator const_iterator() const { return m_p; }
 
         private:
             T* m_p;
-        };*/
+            robust::functor &m_functor;
+        };
 
         // contructor
         array(const T &value = 0)
@@ -130,17 +143,17 @@ namespace robust {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // operator[] with range check
-        reference<T> operator[](size_type i) { rangecheck(i); return reference<T>(m_elements[i], m_func); }
+        reference operator[](size_type i) { rangecheck(i); return reference(m_elements[i], m_func); }
         const_reference operator[](size_type i) const { rangecheck(i); return m_elements[i]; }
 
         // at() with range check
-        reference<T> at(size_type i) { rangecheck(i); return reference<T>(m_elements[i], m_func); }
+        reference at(size_type i) { rangecheck(i); return reference(m_elements[i], m_func); }
         const_reference at(size_type i) const { rangecheck(i); return m_elements[i]; }
 
         // front() and back()
-        reference<T> front() { return reference<T>(m_elements[0], m_func); }
+        reference front() { return reference(m_elements[0], m_func); }
         const_reference front() const { return m_elements[0]; }
-        reference<T> back() { return reference<T>(m_elements[N - 1], m_func); }
+        reference back() { return reference(m_elements[N - 1], m_func); }
         const_reference back() const { return m_elements[N - 1]; }
 
         // size is constant
@@ -211,6 +224,7 @@ namespace robust {
     private:
         void update_checksums() {
             // compute and store CRC checksums
+            //std::cout << "robust::array<T, N>::update_checksums()" << std::endl;
             boost::crc_32_type crc;
             crc.process_bytes(&m_elements, N * sizeof(T));
             m_crc1 = crc.checksum();
