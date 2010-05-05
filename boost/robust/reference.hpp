@@ -48,7 +48,7 @@ namespace boost { namespace robust {
         * \param value TODO.
         * \param functor TODO.
         */
-        reference(T &value, robust::functor &functor = void_functor)
+        reference(T &value, functor &functor = void_functor)
             : m_value(value), m_functor(functor) {}
 
         reference& operator=(const T &rhs) { m_value = rhs; m_functor(); return *this; }
@@ -81,13 +81,13 @@ namespace boost { namespace robust {
         T& operator*() const { return m_value; }
         operator T&() const { return m_value; }
 
-        friend std::ostream &operator<<(std::ostream &os, const boost::robust::reference<T> &ref) {
+        friend std::ostream &operator<<(std::ostream &os, const reference<T> &ref) {
             return os << ref.m_value;
         }
 
     private:
         T &m_value;
-        robust::functor &m_functor;
+        functor &m_functor;
     };
 
 } } // namespace boost::robust

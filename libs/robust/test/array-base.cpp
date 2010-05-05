@@ -20,7 +20,7 @@
 
 int main()
 {
-    robust::array<int, 16> a;
+    boost::robust::array<int, 16> a;
     std::cout << "array 1: " << a << std::endl;
 
     assert(a.at(0) == 0);
@@ -28,12 +28,11 @@ int main()
 
     int i = 3;
     //TODO: move robust::reference<> test code into own test case
-    robust::reference<int> rr(i);
+    boost::robust::reference<int> rr(i);
     int j = 1 + *rr + 3;
     int k = 1 + rr + 3;
-    robust::array<int, 16>::reference ar(i);
-    robust::array<int, 16>::const_reference car(i);
-
+    boost::robust::array<int, 16>::reference ar(i);
+    boost::robust::array<int, 16>::const_reference car(i);
 
     std::cout << "sizeof(robust::reference<int>): " << sizeof(rr) << std::endl;
 
@@ -78,25 +77,25 @@ int main()
     std::copy(a.begin(), a.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
 
-    for (robust::array<int, 16>::iterator it = a.begin(); it != a.end(); it++) {
+    for (boost::robust::array<int, 16>::iterator it = a.begin(); it != a.end(); it++) {
         *it += 1;
     }
 
     std::cout << "testint iterator value assignment" << std::endl;
-    robust::array<int, 16>::iterator tmp_it = a.begin();
+    boost::robust::array<int, 16>::iterator tmp_it = a.begin();
     *tmp_it = 99;
 
-    robust::array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
+    boost::robust::array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
     //TODO: fix this, the functor is not called here !!!
     *tmp_rit = 99;
 
     std::cout << "testing const iterators" << std::endl;
     const int* cit = a.begin();
-    robust::array<int, 16>::const_iterator tmp_cit = a.begin();
-    robust::array<int, 16>::const_reverse_iterator tmp_crit = a.rbegin();
+    boost::robust::array<int, 16>::const_iterator tmp_cit = a.begin();
+    boost::robust::array<int, 16>::const_reverse_iterator tmp_crit = a.rbegin();
 
     std::cout << "array 1:  ";
-    for (std::reverse_iterator<robust::array<int, 16>::iterator> rit = a.rbegin(); rit != a.rend(); rit++) {
+    for (std::reverse_iterator<boost::robust::array<int, 16>::iterator> rit = a.rbegin(); rit != a.rend(); rit++) {
         int i = *rit;
         std:: cout << i << ",";
     }

@@ -87,14 +87,23 @@ namespace boost { namespace robust {
         *
         * \remarks TODO.
         *
-        * \see std::iterator<>
+        * \see TODO.
         */
         class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
         public:
-            explicit iterator(T *rhs, robust::functor &functor = void_functor)
+            /*! Constructor.
+            * \param rhs TODO.
+            * \param functor The functor to apply if the value is changed.
+            */
+            explicit iterator(T *rhs, functor &functor = void_functor)
                 : m_p(rhs), m_functor(functor) {}
-            iterator(const iterator &rhs, robust::functor &functor = void_functor)
+
+            /*! Copy constructor.
+            * \param rhs The other iterator instance to copy from.
+            * \param functor The functor to apply if the value is changed.
+            */
+            iterator(const iterator &rhs, functor &functor = void_functor)
                 : m_p(rhs.m_p), m_functor(functor) {}
 
             //iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
@@ -120,8 +129,8 @@ namespace boost { namespace robust {
             operator const_iterator() const { return m_p; }
 
         private:
-            T *m_p;
-            robust::functor &m_functor;
+            T *m_p;                 //!< Internal pointer to the current position in the array.
+            functor &m_functor;     //!< Internal reference to the functor to apply.
         };
 
         /*! Contructor.
@@ -181,17 +190,21 @@ namespace boost { namespace robust {
         static size_type max_size() { return N; }
         enum { static_size = N };
 
-        // swap (note: linear complexity)
-        void swap(array<T, N> &y) {
+        /*! Swap with other array (note: linear complexity).
+        * \param other The other array to swap with.
+        */
+        void swap(array<T, N> &other) {
             for (size_type i = 0; i < N; ++i) {
-                boost::swap(m_elements[i], y.m_elements[i]);
+                boost::swap(m_elements[i], other.m_elements[i]);
             }
-            boost::swap(m_crc1, y.m_crc1);
-            boost::swap(m_crc2, y.m_crc2);
+            boost::swap(m_crc1, other.m_crc1);
+            boost::swap(m_crc2, other.m_crc2);
         }
 
-        // direct access to data (read-only)
+        /*! Read-only direct access to data.
+        */
         const T* data() const { return m_elements; }
+
         //NOTE: those methods would bypass checksumming
         /*
         T* data() { return m_elements; }
@@ -200,10 +213,13 @@ namespace boost { namespace robust {
         T* c_array() { return m_elements; }
         */
 
-        // assignment with type conversion
+        /*! Assignment operator with type conversion.
+        * \param other The other array to copy contents from.
+        * \return Reference to the new array.
+        */
         template <typename T2>
-        array<T, N>& operator=(const array<T2, N> &rhs) {
-            std::copy(rhs.begin(), rhs.end(), begin());
+        array<T, N>& operator=(const array<T2, N> &other) {
+            std::copy(other.begin(), other.end(), begin());
             update_checksums();
             return *this;
         }
@@ -215,7 +231,10 @@ namespace boost { namespace robust {
             update_checksums();
         }
 
-        // check range (may be private because it is static)
+        /*! To check range (may be private because it is static).
+        * \param i The index to check.
+        * \throws std::out_of_range
+        */
         static void rangecheck(size_type i) {
             if (i >= size()) {
                 std::out_of_range e("array<>: index out of range");
@@ -271,7 +290,7 @@ namespace boost { namespace robust {
          *
          * \see Functor: functor
          */
-        class update_checksums_functor : public robust::functor
+        class update_checksums_functor : public functor
         {
         public:
             /*! Constructor.
@@ -283,12 +302,12 @@ namespace boost { namespace robust {
             void operator()() { m_parent->update_checksums(); }
 
         private:
-            array<T, N> *m_parent;
-        } m_func;                           /// functor instance to pass to robust::reference instances
+            array<T, N> *m_parent;          //!< Internal reference to owning parent array instance.
+        } m_func;                           //!< Internal functor instance to pass to reference instances.
 
-        unsigned int m_crc1;                /// first checksum
-        T m_elements[N];                    /// fixed-size array of elements of type T
-        unsigned int m_crc2;                /// second checksum (backup)
+        unsigned int m_crc1;                //!< Internal first checksum.
+        T m_elements[N];                    //!< Internal fixed-size array of elements of type T.
+        unsigned int m_crc2;                //!< Internal second checksum (backup).
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
@@ -318,7 +337,7 @@ namespace boost { namespace robust {
         typedef std::reverse_iterator<iterator> reverse_iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 #elif defined(_MSC_VER) && (_MSC_VER == 1300) && defined(BOOST_DINKUMWARE_STDLIB) && (BOOST_DINKUMWARE_STDLIB == 310)
-    // workaround for broken reverse_iterator in VC7
+        // workaround for broken reverse_iterator in VC7
         typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
                                                   reference, iterator, reference> > reverse_iterator;
         typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
@@ -420,7 +439,7 @@ namespace boost { namespace robust {
         return !(x < y);
     }
 
-    /*! \brief Global swap().
+    /*! Global swap().
     */
     template<class T, std::size_t N>
     inline void swap(array<T, N> &x, array<T, N> &y) {
@@ -430,6 +449,8 @@ namespace boost { namespace robust {
 } } // namespace boost::robust
 
 
+/*! Overload for operator<<() of std::ostream to print a vector.
+*/
 template <class T, std::size_t N>
 std::ostream &operator<<(std::ostream &os, const boost::robust::array<T, N> &array)
 {

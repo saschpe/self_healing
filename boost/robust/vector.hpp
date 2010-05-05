@@ -138,6 +138,8 @@ namespace boost { namespace robust {
     private:
         /*! \brief Element storage chunk.
         *
+        * TODO.
+        *
         * \remarks The chunk size should be chosen based on CPU cache size.
         *
         * \see Array: array
@@ -194,7 +196,7 @@ namespace boost { namespace robust {
         return !(x < y);
     }
 
-    /*! \brief Global swap().
+    /*! Global swap().
     */
     template<class T, class Allocator>
     inline void swap (vector<T, Allocator> &x, vector<T, Allocator> &y) {
@@ -204,6 +206,8 @@ namespace boost { namespace robust {
 } } // namespace boost::robust
 
 
+/*! Overload for operator<<() of std::ostream to print a vector.
+*/
 template <class T, class Allocator>
 std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, Allocator> &vector)
 {
