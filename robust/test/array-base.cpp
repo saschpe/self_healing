@@ -27,13 +27,15 @@ int main()
     assert(a1.at(a1.size() - 1) == 0);
 
     int i = 3;
-    robust::array<int, 1>::reference r(i);
+    //TODO: move reference test code into own test case
+    robust::reference<int> r(i);
 
     // testing class robust::array<>::reference assignment
     a1.front() = 3;
     a1.back() = 4;
     a1[2] = 4;
     a1.at(3) = 5;
+    a1.at(13) = a1.at(12);
 
     // testing class robust::array<>::reference comparison
     assert(a1.front() == 3);
@@ -51,11 +53,11 @@ int main()
     std::cout << a1.front() % 2 << std::endl;
 
     std::cout << a1[0];
-    /*std::cout << "a1[6] += 1: " << (a1[6] += 1) << " and a1[6]: " << a1[6].value() << std::endl;
+    std::cout << "a1[6] += 1: " << (a1[6] += 1) << std::endl;
     std::cout << (a1[7] -= 1) << std::endl;
     std::cout << (a1[7] *= 1) << std::endl;
     std::cout << (a1[7] /= 1) << std::endl;
-    std::cout << (a1[7] %= 1) << std::endl;*/
+    std::cout << (a1[7] %= 1) << std::endl;
 
     // testing class robust::array<>::reference increment and decrement operations
     a1[8]++;
