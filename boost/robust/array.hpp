@@ -1,24 +1,26 @@
-/* The following code declares class array,
- * an robust STL container (as wrapper) for arrays of constant size with
- * checksumming. This allows to monitor the validity of the array's content.
- *
- * This class is based on boost::array by Nicolai M. Josuttis.
- * See
- *      http://www.boost.org/libs/array/
- * for documentation.
- *
- * The original author site is at: http://saschpe.wordpress.com/
- *
- * (C) Copyright Sascha Peilicke 2010.
- *
- * Distributed under the Boost Software License, Version 1.0. (See
- * accompanying file LICENSE_1_0.txt or copy at
- * http://www.boost.org/LICENSE_1_0.txt)
- *
- * 20 April 2010 - Initial Revision (Sascha Peilicke)
- *
- * May 4th, 2010
- */
+/*! \file
+* \brief Array.
+*
+* This file contains the class array, an robust STL container (as wrapper) for
+* arrays of constant size with checksumming. This allows to monitor the validity
+* of the array's content.
+*
+* This class is based on boost::array by Nicolai M. Josuttis.
+* See
+*      http://www.boost.org/libs/array/
+* for documentation.
+*
+* (C) Copyright Sascha Peilicke 2010.
+*
+* Distributed under the Boost Software License, Version 1.0. (See
+* accompanying file LICENSE_1_0.txt or copy at
+* http://www.boost.org/LICENSE_1_0.txt)
+*
+* 20 April 2010 - Initial Revision (Sascha Peilicke)
+*
+* http://github.com/saschpe/robust
+*/
+
 #ifndef BOOST_ROBUST_ARRAY_HPP
 #define BOOST_ROBUST_ARRAY_HPP
 
@@ -49,11 +51,20 @@
 #include "reference.hpp"
 
 
-namespace robust {
+/// The namespace robust contains fault-tolerant data structures and utility classes.
+namespace boost { namespace robust {
 
-    /**
-     * Checksummed array of constant size.
-     */
+    /*! \brief Array.
+    *
+    * A checksummed array of constant size.
+    *
+    * \param T The data type of the stored values.
+    * \param N The size of the array.
+    *
+    * \remarks TODO.
+    *
+    * \see Functor: functor, void_functor
+    */
     template <class T, std::size_t N>
     class array
     {
@@ -68,11 +79,16 @@ namespace robust {
         typedef std::size_t          size_type;
         typedef std::ptrdiff_t       difference_type;
 
-        /**
-         * Safe iterator that calls a functor if the value at the current position
-         * is changed. Checksumms are also updated correctly if the iterator is
-         * dereferenced.
-         */
+        /*! \brief Iterator.
+        *
+        * A safe iterator that calls a functor if the value at the current
+        * position is changed. Checksumms are also updated correctly if the
+        * iterator is dereferenced.
+        *
+        * \remarks TODO.
+        *
+        * \see std::iterator<>
+        */
         class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
         public:
@@ -108,7 +124,9 @@ namespace robust {
             robust::functor &m_functor;
         };
 
-        // contructor
+        /*! Contructor.
+        * \param value An initial value that is set for all elements.
+        */
         array(const T &value = 0)
             : m_func(this) { fill(value); }
 
@@ -205,8 +223,8 @@ namespace robust {
             }
         }
 
-        /**
-         * Validity check that tries to correct minor checksum faults silently.
+        /*! Validity check that tries to correct minor checksum faults silently.
+         *
          * If one out of three checksums is wrong, this can be corrected.
          */
         bool is_valid() {
@@ -246,13 +264,19 @@ namespace robust {
             m_crc2 = m_crc1;
         }
 
-        /**
-         * Private functor implementation that calls update_checksums() for a
+        /*! \brief Update checksums functor.
+         *
+         * A private functor implementation that calls update_checksums() for a
          * given array instance if called itself.
+         *
+         * \see Functor: functor
          */
         class update_checksums_functor : public robust::functor
         {
         public:
+            /*! Constructor.
+            * \param parent The array instance that owns the functor instance.
+            */
             update_checksums_functor(array<T, N> *parent)
                 : m_parent(parent) {}
 
@@ -260,16 +284,15 @@ namespace robust {
 
         private:
             array<T, N> *m_parent;
-        } m_func;                           // functor instance to pass to robust::reference instances
+        } m_func;                           /// functor instance to pass to robust::reference instances
 
-        unsigned int m_crc1;                // first checksum
-        T m_elements[N];                    // fixed-size array of elements of type T
-        unsigned int m_crc2;                // second checksum (backup)
+        unsigned int m_crc1;                /// first checksum
+        T m_elements[N];                    /// fixed-size array of elements of type T
+        unsigned int m_crc2;                /// second checksum (backup)
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-    /**
-     * Partial template specialization for the corner case of a zero sized array.
+    /*! \brief Partial template specialization for the corner case of a zero sized array.
      */
     template<class T>
     class array<T, 0>
@@ -397,16 +420,18 @@ namespace robust {
         return !(x < y);
     }
 
-    // global swap()
+    /*! \brief Global swap().
+    */
     template<class T, std::size_t N>
     inline void swap(array<T, N> &x, array<T, N> &y) {
         x.swap(y);
     }
 
-} /* namespace robust */
+} } // namespace boost::robust
+
 
 template <class T, std::size_t N>
-std::ostream &operator<<(std::ostream &os, const robust::array<T, N> &array)
+std::ostream &operator<<(std::ostream &os, const boost::robust::array<T, N> &array)
 {
     os << "[";
     for (std::size_t i = 0; i < array.size(); i++) {
@@ -420,4 +445,4 @@ std::ostream &operator<<(std::ostream &os, const robust::array<T, N> &array)
 # pragma warning(pop)
 #endif
 
-#endif /* BOOST_ROBUST_ARRAY_HPP */
+#endif // BOOST_ROBUST_ARRAY_HPP

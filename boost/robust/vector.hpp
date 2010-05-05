@@ -1,19 +1,20 @@
-/* The following code declares class vector,
- * an robust STL vector with checksumming. This allows to monitor the validity
- * of the vector's content.
- *
- * The original author site is at: http://saschpe.wordpress.com/
- *
- * (C) Copyright Sascha Peilicke 2010.
- *
- * Distributed under the Boost Software License, Version 1.0. (See
- * accompanying file LICENSE_1_0.txt or copy at
- * http://www.boost.org/LICENSE_1_0.txt)
- *
- * 21 April 2010 - Initial Revision (Sascha Peilicke)
- *
- * May 4th, 2010
- */
+/*! \file
+* \brief Vector.
+*
+* This file contains the class vector, an robust STL vector with checksumming.
+* This allows to monitor the validity of the vector's content.
+*
+* (C) Copyright Sascha Peilicke 2010.
+*
+* Distributed under the Boost Software License, Version 1.0. (See
+* accompanying file LICENSE_1_0.txt or copy at
+* http://www.boost.org/LICENSE_1_0.txt)
+*
+* 23 April 2010 - Initial Revision (Sascha Peilicke)
+*
+* http://github.com/saschpe/robust
+*/
+
 #ifndef BOOST_ROBUST_VECTOR_HPP
 #define BOOST_ROBUST_VECTOR_HPP
 
@@ -42,11 +43,20 @@
 #include "array.hpp"
 
 
-namespace robust {
+/// The namespace robust contains fault-tolerant data structures and utility classes.
+namespace boost { namespace robust {
 
-    /**
-     *
-     */
+    /*! \brief Vector.
+    *
+    * TODO.
+    *
+    * \param T
+    * \param Allocator
+    *
+    * \remarks TODO:
+    *
+    * \see TODO.
+    */
     template <class T, class Allocator = allocator<T> >
     class vector
     {
@@ -126,11 +136,12 @@ namespace robust {
         void swap(vector<T> &);
 
     private:
-        /**
-         * Private member class
-         *
-         * NOTE: The chunk size should be chosen based on CPU cache size.
-         */
+        /*! \brief Element storage chunk.
+        *
+        * \remarks The chunk size should be chosen based on CPU cache size.
+        *
+        * \see Array: array
+        */
         template <class Size = 64>
         class chunk
         {
@@ -183,23 +194,24 @@ namespace robust {
         return !(x < y);
     }
 
-    // global swap()
+    /*! \brief Global swap().
+    */
     template<class T, class Allocator>
     inline void swap (vector<T, Allocator> &x, vector<T, Allocator> &y) {
         x.swap(y);
     }
 
-} // namespace robust
+} } // namespace boost::robust
+
 
 template <class T, class Allocator>
-std::ostream &operator<<(std::ostream &os, const robust::vector<T, Allocator> &vector)
+std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, Allocator> &vector)
 {
     os << "[";
     for (std::size_t i = 0; i < vector.size(); i++) {
         os << (i == 0 ? "" : ",") << vector[i];
     }
-    os << "]";
-    return os;
+    return os << "]";
 }
 
 
@@ -207,4 +219,4 @@ std::ostream &operator<<(std::ostream &os, const robust::vector<T, Allocator> &v
 # pragma warning(pop)
 #endif
 
-#endif /* BOOST_ROBUST_VECTOR_HPP */
+#endif // BOOST_ROBUST_VECTOR_HPP
