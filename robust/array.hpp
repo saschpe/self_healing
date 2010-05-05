@@ -218,8 +218,8 @@ namespace robust {
         }
 
         /**
-         * Private functor class that calls update_checksums() for a given
-         * array instance.
+         * Private functor implementation that calls update_checksums() for a
+         * given array instance if called itself.
          */
         class update_checksums_functor : public robust::functor
         {
