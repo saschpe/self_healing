@@ -45,7 +45,6 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include <robust/functor.hpp>
 #include <robust/reference.hpp>
 
 
