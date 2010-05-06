@@ -63,18 +63,70 @@ namespace boost { namespace robust {
     public:
         // type definitions
         typedef T                    value_type;
-        //typedef T*                 iterator;      // replaced by safe class robust::array<T, N>::iterator
-        //typedef const T*             const_iterator;
-        //typedef T&                 reference;     // replaced by safe class robust::reference<T>
+        //typedef T *                iterator;      // replaced by safe class robust::vector<T, Allocator>::iterator
+        //typedef const T *          const_iterator;// replaced by safe class robust::vector<T, Allocator>::const_iterator
+        //typedef T &                reference;     // replaced by safe class robust::reference<T>
         typedef robust::reference<T> reference;
-        typedef const T&             const_reference;
+        typedef const T &            const_reference;
         typedef std::size_t          size_type;
         typedef std::ptrdiff_t       difference_type;
 
-        explicit vector(const Allocator& = Allocator());
-        explicit vector(size_type, const Allocator& = Allocator());
-        vector(size_type, const T&, const Allocator& = Allocator());
-        vector(const vector<T, Allocator>&);
+        /*! \brief Iterator.
+        *
+        * TODO.
+        *
+        * \see TODO.
+        */
+        class iterator : public std::iterator<std::random_access_iterator_tag, T>
+        {
+        public:
+            /*! Constructor.
+            * \param rhs TODO.
+            */
+            explicit iterator(T *rhs)
+                : m_p(rhs) {}
+
+            /*! Copy constructor.
+            * \param rhs The other iterator instance to copy from.
+            */
+            iterator(const iterator &rhs)
+                : m_p(rhs.m_p) {}
+
+            //iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
+
+            iterator& operator+(difference_type n) const { return m_p + n; }
+            iterator& operator-(difference_type n) const { return m_p - n; }
+            difference_type operator+(const iterator &rhs) const { return m_p + rhs.m_p; }
+            difference_type operator-(const iterator &rhs) const { return m_p - rhs.m_p; }
+
+            iterator& operator+=(difference_type n) { m_p += n; return *this; }
+            iterator& operator-=(difference_type n) { m_p -= n; return *this; }
+            iterator& operator++() { ++m_p; return *this; }
+            iterator& operator++(int) { m_p++; return *this; }
+            iterator& operator--() { --m_p; return *this; }
+            iterator& operator--(int) { m_p--; return *this; }
+
+            bool operator==(const iterator& rhs) const { return m_p == rhs.m_p; }
+            bool operator!=(const iterator& rhs) const { return m_p != rhs.m_p; }
+
+            reference operator*() const { return reference(*m_p, m_functor); }
+            operator const_iterator() const { return m_p; }
+
+        private:
+            T *m_p;                 //!< Internal pointer to the current position in the array.
+            functor &m_functor;     //!< Internal reference to the functor to apply.
+        };
+
+        explicit vector(const Allocator & = Allocator());
+        explicit vector(size_type, const Allocator & = Allocator());
+        vector(size_type, const T &, const Allocator & = Allocator());
+
+        /*! Copy constructor.
+        * \param other The other vector to copy from.
+        */
+        vector(const vector<T, Allocator> &other);
 
         explicit vector(size_type);
         vector(const vector<T>);
@@ -134,6 +186,15 @@ namespace boost { namespace robust {
         iterator erase(iterator);
         iterator erase(iterator, iterator);*/
         void swap(vector<T> &);
+
+        /*! \brief Validity check.
+        *
+        * TODO.
+        *
+        * \return true, if the internal structure and data is valid
+        */
+        bool is_valid() {
+        }
 
     private:
         /*! \brief Element storage chunk.
