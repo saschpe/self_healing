@@ -1,8 +1,9 @@
 dist/
 build/
-.svn/
+robust.kdev4
+.directory
 .kdev4/
 .stuff/
+.svn/
 *.swp
 *~
-robust.kdev4
