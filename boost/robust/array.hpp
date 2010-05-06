@@ -71,11 +71,11 @@ namespace boost { namespace robust {
     public:
         // type definitions
         typedef T                    value_type;
-        //typedef T*                 iterator;      // replaced by safe class robust::array<T, N>::iterator
-        typedef const T*             const_iterator;
-        //typedef T&                 reference;     // replaced by safe class robust::reference<T>
+        //typedef T *                iterator;      // replaced by safe class robust::array<T, N>::iterator
+        typedef const T *            const_iterator;
+        //typedef T &                reference;     // replaced by safe class robust::reference<T>
         typedef robust::reference<T> reference;
-        typedef const T&             const_reference;
+        typedef const T &            const_reference;
         typedef std::size_t          size_type;
         typedef std::ptrdiff_t       difference_type;
 
@@ -84,8 +84,6 @@ namespace boost { namespace robust {
         * A safe iterator that calls a functor if the value at the current
         * position is changed. Checksumms are also updated correctly if the
         * iterator is dereferenced.
-        *
-        * \remarks TODO.
         *
         * \see TODO.
         */
@@ -100,11 +98,11 @@ namespace boost { namespace robust {
                 : m_p(rhs), m_functor(functor) {}
 
             /*! Copy constructor.
-            * \param rhs The other iterator instance to copy from.
+            * \param other The other iterator instance to copy from.
             * \param functor The functor to apply if the value is changed.
             */
-            iterator(const iterator &rhs, functor &functor = void_functor)
-                : m_p(rhs.m_p), m_functor(functor) {}
+            iterator(const iterator &other, functor &functor = void_functor)
+                : m_p(other.m_p), m_functor(functor) {}
 
             //iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
             iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
@@ -122,8 +120,8 @@ namespace boost { namespace robust {
             iterator& operator--() { --m_p; return *this; }
             iterator& operator--(int) { m_p--; return *this; }
 
-            bool operator==(const iterator& rhs) const { return m_p == rhs.m_p; }
-            bool operator!=(const iterator& rhs) const { return m_p != rhs.m_p; }
+            bool operator==(const iterator& other) const { return m_p == other.m_p; }
+            bool operator!=(const iterator& other) const { return m_p != other.m_p; }
 
             reference operator*() const { return reference(*m_p, m_functor); }
             operator const_iterator() const { return m_p; }
@@ -242,10 +240,15 @@ namespace boost { namespace robust {
             }
         }
 
-        /*! Validity check that tries to correct minor checksum faults silently.
-         *
-         * If one out of three checksums is wrong, this can be corrected.
-         */
+        /*! \brief Validity check that tries to correct minor checksum faults silently.
+        *
+        * If only one out of the two stored checksums is wrong, this can be corrected.
+        * If the temporary checksum computed over the current state of the data does
+        * not match the (equal) values of the stored checksums, a malicious data
+        * change happened and the data structure is no longer valid.
+        *
+        * \return true, if the internal structure and data is valid
+        */
         bool is_valid() {
             boost::crc_32_type crc3;
             crc3.process_bytes(&m_elements, N * sizeof(T));
