@@ -229,7 +229,7 @@ namespace boost { namespace robust {
             update_checksums();
         }
 
-        /*! To check range (may be private because it is static).
+        /*! Check index validity against static size.
         * \param i The index to check.
         * \throws std::out_of_range
         */
@@ -314,7 +314,7 @@ namespace boost { namespace robust {
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-    /*! \brief Partial template specialization for the corner case of a zero sized array.
+    /*! Partial template specialization for the corner case of a zero sized array.
      */
     template<class T>
     class array<T, 0>
