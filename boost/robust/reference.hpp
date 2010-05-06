@@ -23,7 +23,7 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include "functor.hpp"
+#include "./detail/functor.hpp"
 
 
 /// The namespace robust contains fault-tolerant data structures and utility classes.

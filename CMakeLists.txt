@@ -19,8 +19,8 @@ set(ROBUST_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/")
 set(ROBUST_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/robust")
 
 set(robust_HDRS
+    boost/robust/detail/functor.hpp
     boost/robust/array.hpp
-    boost/robust/functor.hpp
     boost/robust/reference.hpp
     boost/robust/vector.hpp
     boost/robust.hpp
@@ -36,10 +36,10 @@ if(ROBUST_BUILD_TESTS)
     add_test(array-base ${EXECUTABLE_OUTPUT_PATH}/test-array-base)
     add_executable(test-array-faults libs/robust/test/array-faults.cpp)
     add_test(array-faults ${EXECUTABLE_OUTPUT_PATH}/test-array-faults)
-    add_executable(test-vector-base libs/robust/test/vector-base.cpp)
-    add_test(vector-base ${EXECUTABLE_OUTPUT_PATH}/test-vector-base)
-    add_executable(test-vector-faults libs/robust/test/vector-faults.cpp)
-    add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
+    #add_executable(test-vector-base libs/robust/test/vector-base.cpp)
+    #add_test(vector-base ${EXECUTABLE_OUTPUT_PATH}/test-vector-base)
+    #add_executable(test-vector-faults libs/robust/test/vector-faults.cpp)
+    #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 endif(ROBUST_BUILD_TESTS)
 
 # Installation
