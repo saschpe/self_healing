@@ -290,7 +290,7 @@ namespace boost { namespace robust {
          *
          * \see Functor: functor
          */
-        class update_checksums_functor : public functor
+        class update_checksums_functor : public robust::functor
         {
         public:
             /*! Constructor.

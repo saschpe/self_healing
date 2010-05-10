@@ -48,7 +48,7 @@ namespace boost { namespace robust {
     *
     * \see Functor: functor
     */
-    static class void_functor : public functor
+    static class void_functor : public robust::functor
     {
     public:
         /*! TODO.
