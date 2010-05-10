@@ -70,13 +70,21 @@ namespace boost { namespace robust {
     {
     public:
         // type definitions
-        typedef T                    value_type;
-        //typedef T *                iterator;      // replaced by safe class robust::array<T, N>::iterator
+        typedef T                    value_type;        //!< The type of elements stored in the <code>array</code>.
         typedef const T *            const_iterator;
-        //typedef T &                reference;     // replaced by safe class robust::reference<T>
-        typedef robust::reference<T> reference;
-        typedef const T &            const_reference;
+        typedef robust::reference<T> reference;         //!< A reference to an element.
+        typedef const T &            const_reference;   //!< A const reference to an element.
+
+        /*! \brief The size type.
+        *
+        * An unsigned integral type that can represent any non-negative value of the container's distance type.
+        */
         typedef std::size_t          size_type;
+
+        /*! \brief The distance type.
+        *
+        * A signed integral type used to represent the distance between two iterators.
+        */
         typedef std::ptrdiff_t       difference_type;
 
         /*! \brief Iterator.
