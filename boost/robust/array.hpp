@@ -26,7 +26,6 @@
 
 #include <boost/detail/workaround.hpp>
 
-#include <iostream>
 #include <stdexcept>
 #include <boost/swap.hpp>
 #include <boost/crc.hpp>
@@ -276,7 +275,7 @@ namespace boost { namespace robust {
     private:
         void update_checksums() {
             // compute and store CRC checksums
-            std::cout << "robust::array<T, N>::update_checksums()" << std::endl;
+            //std::cout << "robust::array<T, N>::update_checksums()" << std::endl;
             boost::crc_32_type crc;
             crc.process_bytes(&m_elements, N * sizeof(T));
             m_crc1 = crc.checksum();
