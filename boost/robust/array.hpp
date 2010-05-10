@@ -1,5 +1,5 @@
 /*! \file
-* \brief Array.
+* \brief Checksummed array.
 *
 * This file contains the class array, an robust STL container (as wrapper) for
 * arrays of constant size with checksumming. This allows to monitor the validity
@@ -21,29 +21,19 @@
 * http://github.com/saschpe/robust
 */
 
-#ifndef BOOST_ROBUST_ARRAY_HPP
-#define BOOST_ROBUST_ARRAY_HPP
+#ifndef BOOST_ROBUST_CHECKSUMMED_ARRAY_HPP
+#define BOOST_ROBUST_CHECKSUMMED_ARRAY_HPP
 
 #include <boost/detail/workaround.hpp>
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-# pragma warning(push)
-# pragma warning(disable:4996) // 'std::equal': Function call with parameters that may be unsafe
-# pragma warning(disable:4510) // boost::array<T,N>' : default constructor could not be generated
-# pragma warning(disable:4610) // warning C4610: class 'boost::array<T,N>' can never be instantiated - user defined constructor required
-#endif
-
-#include <cstddef>
 #include <iostream>
 #include <stdexcept>
-#include <boost/assert.hpp>
 #include <boost/swap.hpp>
 #include <boost/crc.hpp>
 
 // Handles broken standard libraries better than <iterator>
 #include <boost/detail/iterator.hpp>
 #include <boost/throw_exception.hpp>
-#include <algorithm>
 
 // FIXES for broken compilers
 #include <boost/config.hpp>
@@ -54,7 +44,7 @@
 /// The namespace robust contains fault-tolerant data structures and utility classes.
 namespace boost { namespace robust {
 
-    /*! \brief Array.
+    /*! \brief Checksummed array.
     *
     * A checksummed array of constant size.
     *
@@ -71,7 +61,9 @@ namespace boost { namespace robust {
     public:
         // type definitions
         typedef T                    value_type;        //!< The type of elements stored in the <code>array</code>.
-        typedef const T *            const_iterator;
+        typedef const T *            const_iterator;    //!< A const (random access) iterator used to iterate through the <code>array</code>.
+        //typedef robust::pointer<T>   pointer;           //!< A pointer to the element.
+        typedef const T *            const_pointer;     //!< A const pointer to the element.
         typedef robust::reference<T> reference;         //!< A reference to an element.
         typedef const T &            const_reference;   //!< A const reference to an element.
 
@@ -87,7 +79,7 @@ namespace boost { namespace robust {
         */
         typedef std::ptrdiff_t       difference_type;
 
-        /*! \brief Iterator.
+        /*! \brief A (random access) iterator used to iterate through the <code>array</code>.
         *
         * A safe iterator that calls a functor if the value at the current
         * position is changed. Checksumms are also updated correctly if the
@@ -112,7 +104,7 @@ namespace boost { namespace robust {
             iterator(const iterator &other, functor &functor = void_functor)
                 : m_p(other.m_p), m_functor(functor) {}
 
-            //iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            //iterator& operator=(T *rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
             iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
             iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
 
@@ -139,19 +131,6 @@ namespace boost { namespace robust {
             functor &m_functor;     //!< Internal reference to the functor to apply.
         };
 
-        /*! Contructor.
-        * \param value An initial value that is set for all elements.
-        */
-        array(const T &value = 0)
-            : m_func(this) { fill(value); }
-
-        // iterator support
-        iterator begin() { return iterator(m_elements, m_func); }
-        const_iterator begin() const { return m_elements; }
-        iterator end() { return iterator(m_elements + N, m_func); }
-        const_iterator end() const { return m_elements + N; }
-
-        // reverse iterator support
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
         typedef std::reverse_iterator<iterator> reverse_iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -171,6 +150,21 @@ namespace boost { namespace robust {
         typedef std::reverse_iterator<iterator, T> reverse_iterator;
         typedef std::reverse_iterator<const_iterator, T> const_reverse_iterator;
 #endif
+
+
+        /*! Contructor.
+        * \param value An initial value that is set for all elements.
+        */
+        array(const T &value = 0)
+            : m_func(this) { fill(value); }
+
+        // iterator support
+        iterator begin() { return iterator(m_elements, m_func); }
+        const_iterator begin() const { return m_elements; }
+        iterator end() { return iterator(m_elements + N, m_func); }
+        const_iterator end() const { return m_elements + N; }
+
+        // reverse iterator support
         reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
         reverse_iterator rend() { return reverse_iterator(begin()); }
@@ -209,15 +203,10 @@ namespace boost { namespace robust {
 
         /*! Read-only direct access to data.
         */
-        const T* data() const { return m_elements; }
+        const_pointer data() const { return m_elements; }
 
-        //NOTE: those methods would bypass checksumming
-        /*
-        T* data() { return m_elements; }
-
-        // use array as C array (direct read/write access to data)
-        T* c_array() { return m_elements; }
-        */
+        //NOTE: this methods would bypass checksumming currently
+        //pointer data() { return m_elements; }
 
         /*! Assignment operator with type conversion.
         * \param other The other array to copy contents from.
@@ -329,13 +318,26 @@ namespace boost { namespace robust {
     {
     public:
         // type definitions
-        typedef T              value_type;
-        typedef T*             iterator;
-        typedef const T*       const_iterator;
-        typedef T&             reference;
-        typedef const T&       const_reference;
+        typedef T              value_type;      //!< The type of elements stored in the <code>array</code>.
+        typedef T *            iterator;        //!< A (random access) iterator used to iterate through the <code>array</code>.
+        typedef const T *      const_iterator;  //!< A const (random access) iterator used to iterate through the <code>array</code>.
+        typedef T *            pointer;         //!< A pointer to the element.
+        typedef const T *      const_pointer;   //!< A const pointer to the element.
+        typedef T &            reference;       //!< A reference to an element.
+        typedef const T &      const_reference; //!< A const reference to an element.
+
+        /*! \brief The size type.
+        *
+        * An unsigned integral type that can represent any non-negative value of the container's distance type.
+        */
         typedef std::size_t    size_type;
+
+        /*! \brief The distance type.
+        *
+        * A signed integral type used to represent the distance between two iterators.
+        */
         typedef std::ptrdiff_t difference_type;
+
 
         // iterator support
         iterator begin() { return iterator(reinterpret_cast<T *>(this)); }
@@ -393,11 +395,11 @@ namespace boost { namespace robust {
         void swap(array<T, 0> &/*y*/) {}
 
         // direct access to data (read-only)
-        const T* data() const { return 0; }
-        T* data() { return 0; }
+        const_pointer data() const { return 0; }
+        pointer data() { return 0; }
 
         // use array as C array (direct read/write access to data)
-        T* c_array() { return 0; }
+        pointer c_array() { return 0; }
 
         // assignment with type conversion
         template <typename T2>
@@ -473,8 +475,4 @@ std::ostream &operator<<(std::ostream &os, const boost::robust::array<T, N> &arr
 }
 
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-# pragma warning(pop)
-#endif
-
-#endif // BOOST_ROBUST_ARRAY_HPP
+#endif // BOOST_ROBUST_CHECKSUMMED_ARRAY_HPP
