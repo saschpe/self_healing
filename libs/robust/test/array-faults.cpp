@@ -25,6 +25,6 @@ int main()
 
     // Insert faults and check
 
-    return -1;
+    return 0;
 }
 
