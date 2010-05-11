@@ -131,6 +131,12 @@ namespace boost { namespace robust {
             reference operator*() const { return reference(*m_p, m_functor); }
             operator const_iterator() const { return m_p; }
 
+            /*! Overload for operator<<() of std::ostream to print a reference.
+            */
+            friend std::ostream &operator<<(std::ostream &os, const iterator &it) {
+                return os << it.m_p;
+            }
+
         private:
             T *m_p;                         //!< Internal pointer to the current position in the checksummed_array.
             nullary_function &m_functor;    //!< Internal reference to the function object to apply.
