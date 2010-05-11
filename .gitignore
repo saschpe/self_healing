@@ -6,4 +6,5 @@ robust.kdev4
 .stuff/
 .svn/
 *.swp
+*.user
 *~
