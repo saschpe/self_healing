@@ -90,13 +90,16 @@ namespace boost { namespace robust {
         */
         class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
-        public:
+            friend class checksummed_array;
+
             /*! Constructor.
             * \param rhs TODO.
             * \param functor The function object to apply if the value is changed.
             */
             explicit iterator(T *rhs, nullary_function &functor = empty_nullary_function)
                 : m_p(rhs), m_functor(functor) {}
+
+        public:
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
@@ -223,16 +226,16 @@ namespace boost { namespace robust {
         // assign one value to all elements
         void assign(const T &value) { fill(value); }    // A synonym for fill
         void fill(const T &value) {
-            std::fill_n(begin(), size(),value);
+            std::fill_n(begin(), size(), value);
             update_checksums();
         }
 
         /*! Check index validity against static size.
-        * \param i The index to check.
+        * \param index The index to check.
         * \throws std::out_of_range
         */
-        static void rangecheck(size_type i) {
-            if (i >= size()) {
+        static void rangecheck(size_type index) {
+            if (index >= size()) {
                 std::out_of_range e("checksummed_array<>: index out of range");
                 boost::throw_exception(e);
             }
