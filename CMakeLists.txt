@@ -9,7 +9,8 @@ project(robust)
 cmake_minimum_required(VERSION 2.6.4)
 
 set(CMAKE_MODULE_PATH "${robust_SOURCE_DIR}/cmake/modules")
-#
+set(CMAKE_BUILD_TYPE Debug)
+
 find_package(Boost 1.42.0 REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
