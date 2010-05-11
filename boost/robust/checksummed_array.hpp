@@ -61,6 +61,7 @@ namespace boost { namespace robust {
     public:
         // type definitions
         typedef T                    value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
+        class                        iterator;          //!< Forward declaration of class iterator.
         typedef const T *            const_iterator;    //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
         //typedef robust::pointer<T>   pointer;           //!< A pointer to the element.
         typedef const T *            const_pointer;     //!< A const pointer to the element.
