@@ -31,8 +31,8 @@
 #include <boost/config.hpp>
 
 #include "./detail/nullary_function.hpp"
-#include "reference.hpp"
 #include "checksummed_array.hpp"
+#include "reference.hpp"
 
 
 /// The namespace robust contains fault-tolerant data structures and utility classes.
@@ -42,21 +42,24 @@ namespace boost { namespace robust {
     *
     * TODO.
     *
-    * \param T
     * \param A
+    * \param CS The size of the internal chunks.
+    * \param T The data type of the stored values.
     *
-    * \remarks TODO:
+    * \remarks The chunk size should be chosen based on CPU cache size.
     *
-    * \see TODO.
+    * \see checksummed_array
     */
-    template <class T, class A = std::allocator<T> >
+    template <class T, std::size_t CS = 64, class A = std::allocator<T> >
     class vector
     {
+        struct chunk;                                   //!< Private forward declaration of struct chunk.
+
     public:
         // type definitions
         typedef T                    value_type;        //!< The type of elements stored in the <code>vector</code>.
-        //typedef T *                iterator;
-        //typedef const T *          const_iterator;
+        class                        iterator;          //!< Forward declaration of class iterator.
+        class                        const_iterator;    //!< Forward declaration of class const_iterator.
         //typedef robust::pointer<T>   pointer;           //!< A pointer to the element.
         typedef const T *            const_pointer;     //!< A const pointer to the element.
         typedef robust::reference<T> reference;         //!< A reference to an element.
@@ -74,35 +77,30 @@ namespace boost { namespace robust {
         */
         typedef std::ptrdiff_t       difference_type;
         typedef A                    allocator_type;    //!< The type of an allocator used in the <code>circular_buffer</code>.
-        class const_iterator;
 
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
         *
         * A safe iterator that calls a functor if the value at the current
         * position is changed. Checksumms are also updated correctly if the
         * iterator is dereferenced.
-        *
-        * \see TODO.
         */
         class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
-        public:
-            /*! Constructor.
-            * \param rhs TODO.
-            * \param functor The function object to apply if the value is changed.
-            */
-            explicit iterator(T *rhs, nullary_function &functor = empty_nullary_function)
-                : m_p(rhs), m_functor(functor) {}
+            friend class vector<T, CS, A>;
 
+            /*! Private constructor.
+            * \param rhs TODO.
+            */
+            explicit iterator(T *rhs)
+                : m_p(rhs) {}
+
+        public:
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
-            * \param functor The function object to apply if the value is changed.
             */
-            iterator(const iterator &other, nullary_function &functor = empty_nullary_function)
-                : m_p(other.m_p), m_functor(functor) {}
+            iterator(const iterator &other)
+                : m_p(other.m_p) {}
 
-            //iterator& operator=(T *rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
-            iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
             iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
 
             iterator& operator+(difference_type n) const { return m_p + n; }
@@ -120,33 +118,66 @@ namespace boost { namespace robust {
             bool operator==(const iterator& rhs) const { return m_p == rhs.m_p; }
             bool operator!=(const iterator& rhs) const { return m_p != rhs.m_p; }
 
-            reference operator*() const { return reference(*m_p, m_functor); }
+            reference operator*() const { return reference(*m_p); }
             operator const_iterator() const { return m_p; }
 
         private:
-            T *m_p;                         //!< Internal pointer to the current position in the vector.
-            nullary_function &m_functor;    //!< Internal reference to the functor to apply.
+            T *m_p; //!< Internal pointer to the current position in the vector.
         };
 
-        /*! A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
+        /*! A const (random access) iterator used to iterate through the <code>vector</code>.
         */
-        class const_iterator : public std::const_iterator<std::random_access_iterator_tag, T>
+        class const_iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
-        public:
-            /*! Constructor.
-            * \param rhs TODO.
-            */
-            explicit iterator(chunk *rhs)
-                : m_p(rhs) {}
+            friend class vector<T, CS, A>;
 
+            /*! Private constructor.
+            * \param rhs The chunk to initialize the iterator with.
+            */
+            explicit const_iterator(chunk *rhs, size_type index = 0)
+                : m_chunk(rhs), m_index(index) {}
+
+        public:
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.anged.
             */
-            iterator(const iterator &other)
-                : m_p(other.m_p) {}
+            const_iterator(const const_iterator &other)
+                : m_chunk(other.m_chunk), m_index(other.m_index) {}
+
+            const_iterator& operator=(const const_iterator &rhs) { m_chunk = rhs.m_chunk; m_index = rhs.m_index; return *this; }
+
+            const_iterator operator+(difference_type n) const { return from_current(m_index + n); }
+            const_iterator operator-(difference_type n) const { return from_current(m_index - n); }
+            /*difference_type operator+(const const_iterator &rhs) const { return 0; }
+            difference_type operator-(const const_iterator &rhs) const { return 0; }*/
+
+            const_iterator& operator+=(difference_type n) { *this = from_current(m_index + n); return *this; }
+            const_iterator& operator-=(difference_type n) { *this = from_current(m_index - n); return *this; }
+            const_iterator& operator++() { *this = from_current(m_index + 1); return *this; }
+            const_iterator& operator++(int) { *this = from_current(m_index + 1); return *this; }
+            const_iterator& operator--() { *this = from_current(m_index - 1); return *this; }
+            const_iterator& operator--(int) { *this = from_current(m_index - 1); return *this; }
+
+            bool operator==(const const_iterator& rhs) const { return m_chunk == rhs.m_chunk && m_index == rhs.m_index; }
+            bool operator!=(const const_iterator& rhs) const { return m_chunk != rhs.m_chunk || m_index != rhs.m_index; }
+
+            const_reference operator*() const { return m_chunk->elements[m_index]; }
 
         private:
-            chunk *m_p;
+            /*! Helper method.
+            */
+            const_iterator from_current(const size_type new_index) const {
+                if (new_index >= 0 && new_index < CS) { // new index is still in current chunk
+                    return const_iterator(m_chunk, new_index);
+                } else if (new_index < 0) {             // new index is in the previous chunk
+                    return const_iterator(m_chunk->previous(), CS + new_index);
+                } else {                                // new index is in the next chunk
+                    return const_iterator(m_chunk->next(), new_index % CS);
+                }
+            }
+
+            struct chunk *m_chunk;  //!< Internal pointer to the current chunk.
+            size_type m_index;      //!< Internal current element index of the current chunk.
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
@@ -170,24 +201,28 @@ namespace boost { namespace robust {
 #endif
 
 
-        explicit vector(const A & = A());
-        explicit vector(size_type, const A & = A());
-        vector(size_type, const T &, const A & = A());
+        explicit vector(const A & = A())
+            : m_head(new chunk(this)), m_tail(m_head), m_chunks(1), m_size(0), m_capacity(CS) {}
+
+        /*explicit vector(size_type, const A & = A());
+        vector(size_type, const T &, const A & = A());*/
 
         /*! Copy constructor.
         * \param other The other vector to copy from.
         */
-        vector(const vector<T, A> &other);
+        //vector(const vector<T, CS, A> &other);
 
-        explicit vector(size_type);
+        /*explicit vector(size_type);
         vector(const vector<T>);
 
         template <class InputIterator>
-        vector(InputIterator, InputIterator, const A& = A());
-        ~vector();
+        vector(InputIterator, InputIterator, const A & = A());*/
 
-        vector<T, A>& operator=(const vector<T, A>&);
+        ~vector() {
+            delete[] m_head;
+        }
 
+        /*vector<T, CS, A>& operator=(const vector<T, CS, A> &);
 
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last);
@@ -195,48 +230,44 @@ namespace boost { namespace robust {
         void assign(Size n);
         template <class Size, class TT>
         void assign(Size n, const TT&);
-        allocator_type get_allocator() const;
+        allocator_type get_allocator() const;*/
 
         // iterator support
         //TODO: Fix those
-        iterator begin() { return iterator(m_chunks, m_func); }
-        const_iterator begin() const { return const_iterator(m_chunks); }
-        iterator end() { return iterator(m_elements + N, m_func); }
-        const_iterator end() const { return const_iterator(m_chunks + N); }
+        //iterator begin() { return iterator(m_chunks); }
+        const_iterator begin() const { return const_iterator(m_head); }
+        //iterator end() { return iterator(m_chunks + N); }
+        const_iterator end() const { return const_iterator(m_tail, CS - 1); }
 
         // reverse iterator support
-        reverse_iterator rbegin() { return reverse_iterator(end()); }
+        //TODO: Fix those
+        //reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
-        reverse_iterator rend() { return reverse_iterator(begin()); }
+        //reverse_iterator rend() { return reverse_iterator(begin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // Capacity
-        size_type size() const;
-        size_type max_size() const {
-
-        }
-
-        void resize(size_type);
-        void resize(size_type, T);
-        size_type capacity() const {
-
-        }
-        bool empty() const;
-        void reserve(size_type);
+        size_type size() const { return m_size; }
+        //size_type max_size() const {}
+        /*void resize(size_type);
+        void resize(size_type, T);*/
+        size_type capacity() const { return m_capacity; }
+        bool empty() const { return m_size == 0; }
+        //void reserve(size_type);
 
         // Element Access
-        reference operator[](size_type);
+        /*reference operator[](size_type);
         const_reference operator[](size_type) const;
         reference at(size_type);
         const_reference at(size_type) const;
         reference front();
         const_reference front() const;
         reference back();
-        const_reference back() const;
+        const_reference back() const;*/
 
         // Modifiers
-        void push_back(const T &);
-        void pop_back();
+        /*void push_back(const T &);
+        void pop_back();*/
         /*iterator insert(iterator);
         iterator insert(iterator, const T &);
         void insert(iterator, size_type, const T &);
@@ -244,7 +275,7 @@ namespace boost { namespace robust {
         void insert(iterator, InputIterator, InputIterator);
         iterator erase(iterator);
         iterator erase(iterator, iterator);*/
-        void swap(vector<T> &);
+        //void swap(vector<T> &);
 
         /*! \brief Validity check.
         *
@@ -261,29 +292,37 @@ namespace boost { namespace robust {
         *
         * TODO.
         *
-        * \remarks The chunk size should be chosen based on CPU cache size.
-        *
-        * \see checksummed_array
+        * \see vector, checksummed_array
         */
-        template <class Size = 64>
-        class chunk
+        struct chunk
         {
-        public:
-            chunk(vector<T, A> *parent)
-                : m_parent(parent) {}
+            explicit chunk(vector<T, CS, A> *parent)
+                : parent(parent) {}
 
-            bool is_valid(vector<T, A> *parent) {
-                if (*m_parent != parent) {
-                    m_parent = parent;
+            bool is_valid(vector<T, CS, A> *parent) {
+                if (this->parent != parent) {
+                    this->parent = parent;
                 }
-                return m_elements.is_valid();
+                return elements.is_valid();
             }
 
-            vector<T, A> *parent() const { return m_parent; }
+            chunk *next() const {
+                if (this >= parent->m_tail) {
+                    std::out_of_range e("vector<>: index out of range");
+                    boost::throw_exception(e);
+                }
+                return const_cast<chunk *>(this + sizeof(chunk));
+            }
+            chunk *previous() const {
+                if (this <= parent->m_head) {
+                    std::out_of_range e("vector<>: index out of range");
+                    boost::throw_exception(e);
+                }
+                return const_cast<chunk *>(this - sizeof(chunk));
+            }
 
-        private:
-            vector<T, A> *m_parent;                 //!< Pointer to the paernt vector instance.
-            checksummed_array<T, Size> m_elements;  //!< The actual data store.
+            vector<T, CS, A> *parent;           //!< Pointer to the paernt vector instance.
+            checksummed_array<T, CS> elements;  //!< The actual data store.
         };
 
         chunk *m_head;          //!< Internal pointer to the first chunk.
@@ -294,36 +333,39 @@ namespace boost { namespace robust {
         size_type m_capacity;   //!< Counts how much elements can be stored in all chunks.
     };
 
+
+    //TODO: Add vector<T, 0, A>
+
     // comparisons
-    template<class T, class A>
-    inline bool operator==(const vector<T> &x, const vector<T> &y) {
+    template<class T, std::size_t CS, class A>
+    inline bool operator==(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
-    template<class T, class A>
-    inline bool operator<(const vector<T> &x, const vector<T> &y) {
+    template<class T, std::size_t CS, class A>
+    inline bool operator<(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
-    template<class T, class A>
-    inline bool operator!=(const vector<T> &x, const vector<T> &y) {
+    template<class T, std::size_t CS, class A>
+    inline bool operator!=(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
         return !(x == y);
     }
-    template<class T, class A>
-    inline bool operator>(const vector<T> &x, const vector<T> &y) {
+    template<class T, std::size_t CS, class A>
+    inline bool operator>(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
         return y < x;
     }
-    template<class T, class A>
-    inline bool operator<=(const vector<T> &x, const vector<T> &y) {
+    template<class T, std::size_t CS, class A>
+    inline bool operator<=(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
         return !(y < x);
     }
-    template<class T, class A>
-    inline bool operator>=(const vector<T>& x, const vector<T> &y) {
+    template<class T, std::size_t CS, class A>
+    inline bool operator>=(const vector<T, CS, A>& x, const vector<T, CS, A> &y) {
         return !(x < y);
     }
 
     /*! Global swap().
     */
-    template<class T, class A>
-    inline void swap (vector<T, A> &x, vector<T, A> &y) {
+    template<class T, std::size_t CS, class A>
+    inline void swap (vector<T, CS, A> &x, vector<T, CS, A> &y) {
         x.swap(y);
     }
 
@@ -332,8 +374,8 @@ namespace boost { namespace robust {
 
 /*! Overload for operator<<() of std::ostream to print a vector.
 */
-template <class T, class A>
-std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, A> &vector)
+template <class T, std::size_t CS, class A>
+std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, CS, A> &vector)
 {
     os << "[";
     for (std::size_t i = 0; i < vector.size(); i++) {
