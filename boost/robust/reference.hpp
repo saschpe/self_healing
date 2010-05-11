@@ -23,7 +23,7 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include "./detail/functor.hpp"
+#include "./detail/nullary_function.hpp"
 
 
 /// The namespace robust contains fault-tolerant data structures and utility classes.
@@ -38,7 +38,7 @@ namespace boost { namespace robust {
     *
     * \remarks TODO.
     *
-    * \see Functor: functor, void_functor
+    * \see nullary_function, empty_nullary_function
     */
     template <class T>
     class reference
@@ -48,7 +48,7 @@ namespace boost { namespace robust {
         * \param value TODO.
         * \param functor TODO.
         */
-        reference(T &value, functor &functor = void_functor)
+        reference(T &value, nullary_function &functor = empty_nullary_function)
             : m_value(value), m_functor(functor) {}
 
         reference& operator=(const T &rhs) { m_value = rhs; m_functor(); return *this; }
@@ -87,7 +87,7 @@ namespace boost { namespace robust {
 
     private:
         T &m_value;
-        functor &m_functor;
+        nullary_function &m_functor;
     };
 
 } } // namespace boost::robust

@@ -52,7 +52,7 @@ namespace boost { namespace robust {
     *
     * \remarks TODO.
     *
-    * \see Functor: functor, void_functor
+    * \see nullary_function, empty_nullary_function
     */
     template <class T, std::size_t N>
     class array
@@ -93,14 +93,14 @@ namespace boost { namespace robust {
             * \param rhs TODO.
             * \param functor The functor to apply if the value is changed.
             */
-            explicit iterator(T *rhs, functor &functor = void_functor)
+            explicit iterator(T *rhs, nullary_function &functor = empty_nullary_function)
                 : m_p(rhs), m_functor(functor) {}
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             * \param functor The functor to apply if the value is changed.
             */
-            iterator(const iterator &other, functor &functor = void_functor)
+            iterator(const iterator &other, nullary_function &functor = empty_nullary_function)
                 : m_p(other.m_p), m_functor(functor) {}
 
             //iterator& operator=(T *rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
@@ -126,8 +126,8 @@ namespace boost { namespace robust {
             operator const_iterator() const { return m_p; }
 
         private:
-            T *m_p;                 //!< Internal pointer to the current position in the array.
-            functor &m_functor;     //!< Internal reference to the functor to apply.
+            T *m_p;                         //!< Internal pointer to the current position in the array.
+            nullary_function &m_functor;    //!< Internal reference to the functor to apply.
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
@@ -287,9 +287,9 @@ namespace boost { namespace robust {
          * A private functor implementation that calls update_checksums() for a
          * given array instance if called itself.
          *
-         * \see Functor: functor
+         * \see nullary_function
          */
-        class update_checksums_functor : public robust::functor
+        class update_checksums_functor : public nullary_function
         {
         public:
             /*! Constructor.
@@ -337,13 +337,6 @@ namespace boost { namespace robust {
         */
         typedef std::ptrdiff_t difference_type;
 
-
-        // iterator support
-        iterator begin() { return iterator(reinterpret_cast<T *>(this)); }
-        const_iterator begin() const { return const_iterator(reinterpret_cast<const T *>(this)); }
-        iterator end() { return begin(); }
-        const_iterator end() const { return begin(); }
-
         // reverse iterator support
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
         typedef std::reverse_iterator<iterator> reverse_iterator;
@@ -364,6 +357,13 @@ namespace boost { namespace robust {
         typedef std::reverse_iterator<iterator, T> reverse_iterator;
         typedef std::reverse_iterator<const_iterator, T> const_reverse_iterator;
 #endif
+
+
+        // iterator support
+        iterator begin() { return iterator(reinterpret_cast<T *>(this)); }
+        const_iterator begin() const { return const_iterator(reinterpret_cast<const T *>(this)); }
+        iterator end() { return begin(); }
+        const_iterator end() const { return begin(); }
 
         reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
