@@ -92,7 +92,7 @@ namespace boost { namespace robust {
         {
             friend class checksummed_array;
 
-            /*! Constructor.
+            /*! Private constructor.
             * \param rhs TODO.
             * \param functor The function object to apply if the value is changed.
             */
@@ -100,7 +100,6 @@ namespace boost { namespace robust {
                 : m_p(rhs), m_functor(functor) {}
 
         public:
-
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             * \param functor The functor to apply if the value is changed.
@@ -467,13 +466,15 @@ namespace boost { namespace robust {
 
 
 /*! Overload for operator<<() of std::ostream to print a vector.
+* \param os TODO.
+* \param array The array instance to print.
 */
 template <class T, std::size_t N>
-std::ostream &operator<<(std::ostream &os, const boost::robust::checksummed_array<T, N> &checksummed_array)
+std::ostream &operator<<(std::ostream &os, const boost::robust::checksummed_array<T, N> &array)
 {
     os << "[";
-    for (std::size_t i = 0; i < checksummed_array.size(); i++) {
-        os << (i == 0 ? "" : ",") << checksummed_array[i];
+    for (std::size_t i = 0; i < array.size(); i++) {
+        os << (i == 0 ? "" : ",") << array[i];
     }
     return os << "]";
 }
