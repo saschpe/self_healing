@@ -35,9 +35,12 @@ namespace boost { namespace robust {
     */
     struct nullary_function
     {
+        typedef void result_type;  //!<result_type is the return type.
+
         /*! TODO.
+        * \return TODO.
         */
-        virtual void operator()() {};
+        virtual result_type operator()() {};
     };
 
     /*! \brief Empty nullary function.
