@@ -20,22 +20,12 @@
 
 #include <boost/detail/workaround.hpp>
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-# pragma warning(push)
-# pragma warning(disable:4996) // 'std::equal': Function call with parameters that may be unsafe
-# pragma warning(disable:4510) // boost::array<T,N>' : default constructor could not be generated
-# pragma warning(disable:4610) // warning C4610: class 'boost::array<T,N>' can never be instantiated - user defined constructor required
-#endif
-
-#include <cstddef>
 #include <stdexcept>
-#include <boost/assert.hpp>
 #include <boost/swap.hpp>
 
 // Handles broken standard libraries better than <iterator>
 #include <boost/detail/iterator.hpp>
 #include <boost/throw_exception.hpp>
-#include <algorithm>
 
 // FIXES for broken compilers
 #include <boost/config.hpp>
@@ -51,29 +41,44 @@ namespace boost { namespace robust {
     * TODO.
     *
     * \param T
-    * \param Allocator
+    * \param A
     *
     * \remarks TODO:
     *
     * \see TODO.
     */
-    template <class T, class Allocator = allocator<T> >
+    template <class T, class A = std::allocator<T> >
     class vector
     {
     public:
         // type definitions
-        typedef T                    value_type;
-        //typedef T *                iterator;      // replaced by safe class robust::vector<T, Allocator>::iterator
-        //typedef const T *          const_iterator;// replaced by safe class robust::vector<T, Allocator>::const_iterator
-        //typedef T &                reference;     // replaced by safe class robust::reference<T>
-        typedef robust::reference<T> reference;
-        typedef const T &            const_reference;
-        typedef std::size_t          size_type;
-        typedef std::ptrdiff_t       difference_type;
+        typedef T                    value_type;        //!< The type of elements stored in the <code>vector</code>.
+        //typedef T *                iterator;
+        //typedef const T *          const_iterator;
+        //typedef robust::pointer<T>   pointer;           //!< A pointer to the element.
+        typedef const T *            const_pointer;     //!< A const pointer to the element.
+        typedef robust::reference<T> reference;         //!< A reference to an element.
+        typedef const T &            const_reference;   //!< A const reference to an element.
 
-        /*! \brief Iterator.
+        /*! \brief The size type.
         *
-        * TODO.
+        * An unsigned integral type that can represent any non-negative value of the container's distance type.
+        */
+        typedef std::size_t          size_type;
+
+        /*! \brief The distance type.
+        *
+        * A signed integral type used to represent the distance between two iterators.
+        */
+        typedef std::ptrdiff_t       difference_type;
+        typedef A                    allocator_type;    //!< The type of an allocator used in the <code>circular_buffer</code>.
+        class const_iterator;
+
+        /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
+        *
+        * A safe iterator that calls a functor if the value at the current
+        * position is changed. Checksumms are also updated correctly if the
+        * iterator is dereferenced.
         *
         * \see TODO.
         */
@@ -82,17 +87,19 @@ namespace boost { namespace robust {
         public:
             /*! Constructor.
             * \param rhs TODO.
+            * \param functor The functor to apply if the value is changed.
             */
-            explicit iterator(T *rhs)
-                : m_p(rhs) {}
+            explicit iterator(T *rhs, functor &functor = void_functor)
+                : m_p(rhs), m_functor(functor) {}
 
             /*! Copy constructor.
-            * \param rhs The other iterator instance to copy from.
+            * \param other The other iterator instance to copy from.
+            * \param functor The functor to apply if the value is changed.
             */
-            iterator(const iterator &rhs)
-                : m_p(rhs.m_p) {}
+            iterator(const iterator &other, functor &functor = void_functor)
+                : m_p(other.m_p), m_functor(functor) {}
 
-            //iterator& operator=(T* rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            //iterator& operator=(T *rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
             iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
             iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
 
@@ -115,27 +122,69 @@ namespace boost { namespace robust {
             operator const_iterator() const { return m_p; }
 
         private:
-            T *m_p;                 //!< Internal pointer to the current position in the array.
+            T *m_p;                 //!< Internal pointer to the current position in the vector.
             functor &m_functor;     //!< Internal reference to the functor to apply.
         };
 
-        explicit vector(const Allocator & = Allocator());
-        explicit vector(size_type, const Allocator & = Allocator());
-        vector(size_type, const T &, const Allocator & = Allocator());
+        /*! A const (random access) iterator used to iterate through the <code>array</code>.
+        */
+        class const_iterator : public std::const_iterator<std::random_access_iterator_tag, T>
+        {
+        public:
+            /*! Constructor.
+            * \param rhs TODO.
+            */
+            explicit iterator(chunk *rhs)
+                : m_p(rhs) {}
+
+            /*! Copy constructor.
+            * \param other The other iterator instance to copy from.anged.
+            */
+            iterator(const iterator &other)
+                : m_p(other.m_p) {}
+
+        private:
+            chunk *m_p;
+        };
+
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+#elif defined(_MSC_VER) && (_MSC_VER == 1300) && defined(BOOST_DINKUMWARE_STDLIB) && (BOOST_DINKUMWARE_STDLIB == 310)
+        // workaround for broken reverse_iterator in VC7
+        typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
+                                                  reference, iterator, reference> > reverse_iterator;
+        typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
+                                                  const_reference, iterator, reference> > const_reverse_iterator;
+#elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
+        typedef std::reverse_iterator<iterator, std::random_access_iterator_tag,
+                                      value_type, reference, iterator, difference_type> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator, std::random_access_iterator_tag,
+                                      value_type, const_reference, const_iterator, difference_type> const_reverse_iterator;
+#else
+        // workaround for broken reverse_iterator implementations
+        typedef std::reverse_iterator<iterator, T> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator, T> const_reverse_iterator;
+#endif
+
+
+        explicit vector(const A & = A());
+        explicit vector(size_type, const A & = A());
+        vector(size_type, const T &, const A & = A());
 
         /*! Copy constructor.
         * \param other The other vector to copy from.
         */
-        vector(const vector<T, Allocator> &other);
+        vector(const vector<T, A> &other);
 
         explicit vector(size_type);
         vector(const vector<T>);
 
         template <class InputIterator>
-        vector(InputIterator, InputIterator, const Allocator& = Allocator());
+        vector(InputIterator, InputIterator, const A& = A());
         ~vector();
 
-        vector<T, Allocator>& operator=(const vector<T, Allocator>&);
+        vector<T, A>& operator=(const vector<T, A>&);
 
 
         template <class InputIterator>
@@ -146,22 +195,30 @@ namespace boost { namespace robust {
         void assign(Size n, const TT&);
         allocator_type get_allocator() const;
 
-        // Iterators
-        iterator begin();
-        const_iterator begin() const;
-        iterator end();
-        const_iterator end() const;
-        reverse_iterator rbegin();
-        const_reverse_iterator rbegin() const;
-        reverse_iterator rend();
-        const_reverse_iterator rend() const;
+        // iterator support
+        //TODO: Fix those
+        iterator begin() { return iterator(m_chunks, m_func); }
+        const_iterator begin() const { return const_iterator(m_chunks); }
+        iterator end() { return iterator(m_elements + N, m_func); }
+        const_iterator end() const { return const_iterator(m_chunks + N); }
+
+        // reverse iterator support
+        reverse_iterator rbegin() { return reverse_iterator(end()); }
+        const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+        reverse_iterator rend() { return reverse_iterator(begin()); }
+        const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // Capacity
         size_type size() const;
-        size_type max_size() const;
+        size_type max_size() const {
+
+        }
+
         void resize(size_type);
         void resize(size_type, T);
-        size_type capacity() const;
+        size_type capacity() const {
+
+        }
         bool empty() const;
         void reserve(size_type);
 
@@ -194,6 +251,7 @@ namespace boost { namespace robust {
         * \return true, if the internal structure and data is valid
         */
         bool is_valid() {
+            return false;
         }
 
     private:
@@ -209,18 +267,21 @@ namespace boost { namespace robust {
         class chunk
         {
         public:
-            chunk(vector<T, Allocator> *parent)
-                : m_parent_head(parent->m_head), m_parent_tail(m_tail), m_elements(0) {}
+            chunk(vector<T, A> *parent)
+                : m_parent(parent) {}
 
-            bool is_valid() const {
-                //TODO: implement
-                return false;
+            bool is_valid(vector<T, A> *parent) {
+                if (*m_parent != parent) {
+                    m_parent = parent;
+                }
+                return m_elements.is_valid();
             }
 
+            vector<T, A> *parent() const { return m_parent; }
+
         private:
-            robust::vector<T, Allocator> *m_parent_head;
-            robust::array<T, Size> m_elements;
-            robust::vector<T, Allocator> *m_parent_tail;
+            vector<T, A> *m_parent;
+            array<T, Size> m_elements;
         };
 
         chunk *m_head;          // Pointer to the first chunk
@@ -232,35 +293,35 @@ namespace boost { namespace robust {
     };
 
     // comparisons
-    template<class T, class Allocator>
+    template<class T, class A>
     inline bool operator==(const vector<T> &x, const vector<T> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
-    template<class T, class Allocator>
+    template<class T, class A>
     inline bool operator<(const vector<T> &x, const vector<T> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
-    template<class T, class Allocator>
+    template<class T, class A>
     inline bool operator!=(const vector<T> &x, const vector<T> &y) {
         return !(x == y);
     }
-    template<class T, class Allocator>
+    template<class T, class A>
     inline bool operator>(const vector<T> &x, const vector<T> &y) {
         return y < x;
     }
-    template<class T, class Allocator>
+    template<class T, class A>
     inline bool operator<=(const vector<T> &x, const vector<T> &y) {
         return !(y < x);
     }
-    template<class T, class Allocator>
+    template<class T, class A>
     inline bool operator>=(const vector<T>& x, const vector<T> &y) {
         return !(x < y);
     }
 
     /*! Global swap().
     */
-    template<class T, class Allocator>
-    inline void swap (vector<T, Allocator> &x, vector<T, Allocator> &y) {
+    template<class T, class A>
+    inline void swap (vector<T, A> &x, vector<T, A> &y) {
         x.swap(y);
     }
 
@@ -269,8 +330,8 @@ namespace boost { namespace robust {
 
 /*! Overload for operator<<() of std::ostream to print a vector.
 */
-template <class T, class Allocator>
-std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, Allocator> &vector)
+template <class T, class A>
+std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, A> &vector)
 {
     os << "[";
     for (std::size_t i = 0; i < vector.size(); i++) {
@@ -279,9 +340,5 @@ std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, Alloca
     return os << "]";
 }
 
-
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-# pragma warning(pop)
-#endif
 
 #endif // BOOST_ROBUST_VECTOR_HPP
