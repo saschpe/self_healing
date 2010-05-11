@@ -111,11 +111,13 @@ namespace boost { namespace robust {
 
             iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
 
+            //TODO: Do range checks
             iterator& operator+(difference_type n) const { return m_p + n; }
             iterator& operator-(difference_type n) const { return m_p - n; }
             difference_type operator+(const iterator &rhs) const { return m_p + rhs.m_p; }
             difference_type operator-(const iterator &rhs) const { return m_p - rhs.m_p; }
 
+            //TODO: Do range checks
             iterator& operator+=(difference_type n) { m_p += n; return *this; }
             iterator& operator-=(difference_type n) { m_p -= n; return *this; }
             iterator& operator++() { ++m_p; return *this; }
