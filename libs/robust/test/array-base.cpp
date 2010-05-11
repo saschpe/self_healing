@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <memory>
 
 int main()
 {
@@ -102,6 +103,13 @@ int main()
     std::cout << std::endl;
 
     std::cout << "checksummed_array 1: " << a << std::endl;
+
+    boost::robust::checksummed_array<int, 8> *pa = new boost::robust::checksummed_array<int, 8>(3);
+    std::cout << "pointer to checksummed_array: " << *pa << std::endl;
+
+    std::auto_ptr<boost::robust::checksummed_array<int, 8> > apa(pa);
+    std::cout << "auto_ptr to checksummed_array size: " << apa->size() << std::endl;
+    std::cout << "auto_ptr to checksummed_array: " << *apa << std::endl;
 
     return 0;
 }
