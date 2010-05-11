@@ -99,6 +99,8 @@ namespace boost { namespace robust {
             explicit iterator(T *rhs, nullary_function &functor = empty_nullary_function)
                 : m_p(rhs), m_functor(functor) {}
 
+            iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+
         public:
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
@@ -107,8 +109,6 @@ namespace boost { namespace robust {
             iterator(const iterator &other, nullary_function &functor = empty_nullary_function)
                 : m_p(other.m_p), m_functor(functor) {}
 
-            //iterator& operator=(T *rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
-            iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
             iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
 
             iterator& operator+(difference_type n) const { return m_p + n; }
