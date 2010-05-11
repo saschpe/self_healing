@@ -161,18 +161,32 @@ namespace boost { namespace robust {
             bool operator==(const const_iterator& rhs) const { return m_chunk == rhs.m_chunk && m_index == rhs.m_index; }
             bool operator!=(const const_iterator& rhs) const { return m_chunk != rhs.m_chunk || m_index != rhs.m_index; }
 
-            const_reference operator*() const { return m_chunk->elements[m_index]; }
+            reference operator*() const { return m_chunk->elements[m_index]; }
+
+            /*! Overload for operator<<() of std::ostream to print a reference.
+            */
+            friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) {
+                return os << it.m_chunk << "[" << it.m_index << "]";
+            }
 
         private:
             /*! Helper method.
             */
-            const_iterator from_current(const size_type new_index) const {
+            const_iterator from_current(const int new_index) const {
                 if (new_index >= 0 && new_index < CS) { // new index is still in current chunk
                     return const_iterator(m_chunk, new_index);
                 } else if (new_index < 0) {             // new index is in the previous chunk
-                    return const_iterator(m_chunk->previous(), CS + new_index);
+                    if (m_chunk->is_head()) {
+                        return const_iterator(m_chunk, CS + new_index);
+                    } else {
+                        return const_iterator(m_chunk->previous(), CS + new_index);
+                    }
                 } else {                                // new index is in the next chunk
-                    return const_iterator(m_chunk->next(), new_index % CS);
+                    if (m_chunk->is_tail()) {
+                        return const_iterator(m_chunk, new_index % CS);
+                    } else {
+                        return const_iterator(m_chunk->next(), new_index % CS);
+                    }
                 }
             }
 
@@ -200,7 +214,6 @@ namespace boost { namespace robust {
         typedef std::reverse_iterator<const_iterator, T> const_reverse_iterator;
 #endif
 
-
         explicit vector(const A & = A())
             : m_head(new chunk(this)), m_tail(m_head), m_chunks(1), m_size(0), m_capacity(CS) {}
 
@@ -211,9 +224,9 @@ namespace boost { namespace robust {
         * \param other The other vector to copy from.
         */
         //vector(const vector<T, CS, A> &other);
+        //vector(const vector<T>);
 
         /*explicit vector(size_type);
-        vector(const vector<T>);
 
         template <class InputIterator>
         vector(InputIterator, InputIterator, const A & = A());*/
@@ -233,14 +246,12 @@ namespace boost { namespace robust {
         allocator_type get_allocator() const;*/
 
         // iterator support
-        //TODO: Fix those
         //iterator begin() { return iterator(m_chunks); }
         const_iterator begin() const { return const_iterator(m_head); }
         //iterator end() { return iterator(m_chunks + N); }
-        const_iterator end() const { return const_iterator(m_tail, CS - 1); }
+        const_iterator end() const { return const_iterator(m_tail, CS); }
 
         // reverse iterator support
-        //TODO: Fix those
         //reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
         //reverse_iterator rend() { return reverse_iterator(begin()); }
@@ -307,19 +318,22 @@ namespace boost { namespace robust {
             }
 
             chunk *next() const {
-                if (this >= parent->m_tail) {
+                /*if (this >= parent->m_tail) {
                     std::out_of_range e("vector<>: index out of range");
                     boost::throw_exception(e);
-                }
+                }*/
                 return const_cast<chunk *>(this + sizeof(chunk));
             }
             chunk *previous() const {
-                if (this <= parent->m_head) {
+                /*if (this <= parent->m_head) {
                     std::out_of_range e("vector<>: index out of range");
                     boost::throw_exception(e);
-                }
+                }*/
                 return const_cast<chunk *>(this - sizeof(chunk));
             }
+
+            bool is_head() const { return this == parent->m_head; }
+            bool is_tail() const { return this == parent->m_tail; }
 
             vector<T, CS, A> *parent;           //!< Pointer to the paernt vector instance.
             checksummed_array<T, CS> elements;  //!< The actual data store.

@@ -15,18 +15,34 @@
 
 int main()
 {
-    boost::robust::vector<int> v;
-    boost::robust::vector<int>::const_iterator cit = v.begin();
-    cit == v.end();
-    cit + 1;
-    cit - 1;
+    std::cout << "testing robust::vector<>::const_iterator" << std::endl;
 
-    std::cout << "*(cit += 4) : " << *(cit += 4) << std::endl;
-    cit -= 2;
-    cit++;
-    ++cit;
-    cit--;
-    --cit;
+    boost::robust::vector<int, 2> v;
+    boost::robust::vector<int, 2>::const_iterator cit = v.begin();
+    std::cout << "cit      : " << cit << '\n';
+    std::cout << "v.end()  : " << v.end() << '\n';
+    std::cout << "cit + 1  : " << (cit + 1) << '\n';
+    std::cout << "cit - 1  : " << (cit - 1) << '\n';
+    std::cout << "cit += 2 : " << (cit += 2) << '\n';
+    std::cout << "cit -= 2 : " << (cit -= 2) << '\n';
+    std::cout << "cit++    : " << cit++ << '\n';
+    std::cout << "++cit    : " << ++cit << '\n';
+    std::cout << "cit--    : " << cit-- << '\n';
+    std::cout << "--cit    : " << --cit << '\n';
+    std::cout << std::endl;
+    std::cout << "*(cit += 4): " << *(cit += 4) << std::endl;
+
+    /*for (boost::robust::vector<int, 2>::const_iterator it = v.begin(); it != v.end(); ++it) {
+        std::cout << it << " -> "<< *it << '\n';
+    }
+    std::cout << std::endl;
+
+    std::cout << "testing robust::vector<>::const_reverse_iterator" << std::endl;
+    for (boost::robust::vector<int, 2>::const_reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
+        std::cout << *it << '\n';
+    }
+    std::cout << std::endl;*/
+
 
     int arr[4] = {1, 2, 3, 4};
 
