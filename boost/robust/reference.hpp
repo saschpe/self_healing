@@ -2,7 +2,7 @@
 * \brief Reference.
 *
 * This files contains the class reference, which defines a reference to a value
-* that calls a functor on value updates.
+* that calls a function object on value updates.
 *
 * (C) Copyright Sascha Peilicke 2010.
 *
@@ -31,8 +31,8 @@ namespace boost { namespace robust {
 
     /*! \brief Reference
     *
-    * A reference to a value which optionally takes a functor that is called
-    * every time the value changes.
+    * A reference to a value which optionally takes a function object that is
+    * called every time the value changes.
     *
     * \param T The data type of the stored value.
     *

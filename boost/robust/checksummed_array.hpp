@@ -37,6 +37,7 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
+#include "./detail/nullary_function.hpp"
 #include "reference.hpp"
 
 
@@ -80,9 +81,9 @@ namespace boost { namespace robust {
 
         /*! \brief A (random access) iterator used to iterate through the <code>checksummed_array</code>.
         *
-        * A safe iterator that calls a functor if the value at the current
-        * position is changed. Checksumms are also updated correctly if the
-        * iterator is dereferenced.
+        * A safe iterator that calls a function object if the value at the
+        * current position is changed. Checksumms are also updated correctly if
+        * the iterator is dereferenced.
         *
         * \see TODO.
         */
@@ -91,7 +92,7 @@ namespace boost { namespace robust {
         public:
             /*! Constructor.
             * \param rhs TODO.
-            * \param functor The functor to apply if the value is changed.
+            * \param functor The function object to apply if the value is changed.
             */
             explicit iterator(T *rhs, nullary_function &functor = empty_nullary_function)
                 : m_p(rhs), m_functor(functor) {}
@@ -127,7 +128,7 @@ namespace boost { namespace robust {
 
         private:
             T *m_p;                         //!< Internal pointer to the current position in the checksummed_array.
-            nullary_function &m_functor;    //!< Internal reference to the functor to apply.
+            nullary_function &m_functor;    //!< Internal reference to the function object to apply.
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)

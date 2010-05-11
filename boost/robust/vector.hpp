@@ -30,6 +30,8 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
+#include "./detail/nullary_function.hpp"
+#include "reference.hpp"
 #include "checksummed_array.hpp"
 
 
@@ -87,16 +89,16 @@ namespace boost { namespace robust {
         public:
             /*! Constructor.
             * \param rhs TODO.
-            * \param functor The functor to apply if the value is changed.
+            * \param functor The function object to apply if the value is changed.
             */
-            explicit iterator(T *rhs, functor &functor = void_functor)
+            explicit iterator(T *rhs, nullary_function &functor = empty_nullary_function)
                 : m_p(rhs), m_functor(functor) {}
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
-            * \param functor The functor to apply if the value is changed.
+            * \param functor The function object to apply if the value is changed.
             */
-            iterator(const iterator &other, functor &functor = void_functor)
+            iterator(const iterator &other, nullary_function &functor = empty_nullary_function)
                 : m_p(other.m_p), m_functor(functor) {}
 
             //iterator& operator=(T *rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
@@ -122,8 +124,8 @@ namespace boost { namespace robust {
             operator const_iterator() const { return m_p; }
 
         private:
-            T *m_p;                 //!< Internal pointer to the current position in the vector.
-            functor &m_functor;     //!< Internal reference to the functor to apply.
+            T *m_p;                         //!< Internal pointer to the current position in the vector.
+            nullary_function &m_functor;    //!< Internal reference to the functor to apply.
         };
 
         /*! A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
@@ -280,16 +282,16 @@ namespace boost { namespace robust {
             vector<T, A> *parent() const { return m_parent; }
 
         private:
-            vector<T, A> *m_parent;
-            checksummed_array<T, Size> m_elements;
+            vector<T, A> *m_parent;                 //!< Pointer to the paernt vector instance.
+            checksummed_array<T, Size> m_elements;  //!< The actual data store.
         };
 
-        chunk *m_head;          // Pointer to the first chunk
-        chunk *m_tail;          // Pointer to the last chunk
+        chunk *m_head;          //!< Internal pointer to the first chunk.
+        chunk *m_tail;          //!< Internal pointer to the last chunk.
 
-        size_type m_chunks;     // Chunk count
-        size_type m_size;       // How much elements are stored currently
-        size_type m_capacity;   // How much elements can be stored
+        size_type m_chunks;     //!< Chunk counter.
+        size_type m_size;       //!< Counts how much elements are stored currently in all chunks.
+        size_type m_capacity;   //!< Counts how much elements can be stored in all chunks.
     };
 
     // comparisons
