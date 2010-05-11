@@ -20,7 +20,7 @@ set(ROBUST_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/robust")
 
 set(robust_HDRS
     boost/robust/detail/nullary_function.hpp
-    boost/robust/array.hpp
+    boost/robust/checksummed_array.hpp
     boost/robust/reference.hpp
     boost/robust/vector.hpp
     boost/robust.hpp

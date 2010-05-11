@@ -1,4 +1,4 @@
-/* Test case for class array.
+/* Test case for class checksummed_array.
  *
  * The original author site is at: http://saschpe.wordpress.com/
  *
@@ -13,15 +13,15 @@
  * May 4th, 2010
  */
 
-#include <boost/robust/array.hpp>
+#include <boost/robust/checksummed_array.hpp>
 
 #include <iostream>
 #include <cassert>
 
 int main()
 {
-    boost::robust::array<int, 16> a;
-    std::cout << "array 1: " << a << std::endl;
+    boost::robust::checksummed_array<int, 16> a;
+    std::cout << "checksummed_array 1: " << a << std::endl;
 
     assert(a.at(0) == 0);
     assert(a.at(a.size() - 1) == 0);
@@ -31,19 +31,19 @@ int main()
     boost::robust::reference<int> rr(i);
     int j = 1 + *rr + 3;
     int k = 1 + rr + 3;
-    boost::robust::array<int, 16>::reference ar(i);
-    boost::robust::array<int, 16>::const_reference car(i);
+    boost::robust::checksummed_array<int, 16>::reference ar(i);
+    boost::robust::checksummed_array<int, 16>::const_reference car(i);
 
     std::cout << "sizeof(robust::reference<int>): " << sizeof(rr) << std::endl;
 
-    std::cout << "testing class robust::array<>::reference assignment" << std::endl;
+    std::cout << "testing class robust::checksummed_array<>::reference assignment" << std::endl;
     a.front() = 3;
     a.back() = 4;
     a[2] = 4;
     a.at(3) = 5;
     a.at(13) = a.at(12);
 
-    std::cout << "testing class robust::array<>::reference comparison" << std::endl;
+    std::cout << "testing class robust::checksummed_array<>::reference comparison" << std::endl;
     assert(a.front() == 3);
     assert(a.front() != 5);
     assert(a.front() >= 2);
@@ -51,14 +51,14 @@ int main()
     std::cout << (a.front() > 3) << std::endl;
     std::cout << (a.front() < 3) << std::endl;
 
-    std::cout << "testing class robust::array<>::reference arithmetic operations" << std::endl;
+    std::cout << "testing class robust::checksummed_array<>::reference arithmetic operations" << std::endl;
     std::cout << a.front() + 2 << std::endl;
     std::cout << a.front() - 2 << std::endl;
     std::cout << a.front() * 2 << std::endl;
     std::cout << a.front() / 2 << std::endl;
     std::cout << a.front() % 2 << std::endl;
 
-    std::cout << "testing class robust::array<>::reference arithmetic assignment operations" << std::endl;
+    std::cout << "testing class robust::checksummed_array<>::reference arithmetic assignment operations" << std::endl;
     std::cout << a[0];
     std::cout << "a1[6] += 1: " << (a[6] += 1) << std::endl;
     std::cout << (a[7] -= 1) << std::endl;
@@ -66,42 +66,42 @@ int main()
     std::cout << (a[7] /= 1) << std::endl;
     std::cout << (a[7] %= 1) << std::endl;
 
-    std::cout << "testing class robust::array<>::reference increment and decrement operations" << std::endl;
+    std::cout << "testing class robust::checksummed_array<>::reference increment and decrement operations" << std::endl;
     a[8]++;
     ++a[9];
     a[10]--;
     --a[11];
 
     std::cout << "testing iterators" << std::endl;
-    std::cout << "array 1:  ";
+    std::cout << "checksummed_array 1:  ";
     std::copy(a.begin(), a.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
 
-    for (boost::robust::array<int, 16>::iterator it = a.begin(); it != a.end(); it++) {
+    for (boost::robust::checksummed_array<int, 16>::iterator it = a.begin(); it != a.end(); it++) {
         *it += 1;
     }
 
     std::cout << "testint iterator value assignment" << std::endl;
-    boost::robust::array<int, 16>::iterator tmp_it = a.begin();
+    boost::robust::checksummed_array<int, 16>::iterator tmp_it = a.begin();
     *tmp_it = 99;
 
-    boost::robust::array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
+    boost::robust::checksummed_array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
     //TODO: fix this, the functor is not called here !!!
     *tmp_rit = 99;
 
     std::cout << "testing const iterators" << std::endl;
     const int* cit = a.begin();
-    boost::robust::array<int, 16>::const_iterator tmp_cit = a.begin();
-    boost::robust::array<int, 16>::const_reverse_iterator tmp_crit = a.rbegin();
+    boost::robust::checksummed_array<int, 16>::const_iterator tmp_cit = a.begin();
+    boost::robust::checksummed_array<int, 16>::const_reverse_iterator tmp_crit = a.rbegin();
 
-    std::cout << "array 1:  ";
-    for (std::reverse_iterator<boost::robust::array<int, 16>::iterator> rit = a.rbegin(); rit != a.rend(); rit++) {
+    std::cout << "checksummed_array 1:  ";
+    for (std::reverse_iterator<boost::robust::checksummed_array<int, 16>::iterator> rit = a.rbegin(); rit != a.rend(); rit++) {
         int i = *rit;
         std:: cout << i << ",";
     }
     std::cout << std::endl;
 
-    std::cout << "array 1: " << a << std::endl;
+    std::cout << "checksummed_array 1: " << a << std::endl;
 
     return 0;
 }

@@ -1,4 +1,4 @@
-/* Test case for class array.
+/* Test case for class checksummed_array.
  *
  * The original author site is at: http://saschpe.wordpress.com/
  *
@@ -13,15 +13,15 @@
  * May 4th, 2010
  */
 
-#include <boost/robust/array.hpp>
+#include <boost/robust/checksummed_array.hpp>
 
 #include <iostream>
 #include <cassert>
 
 int main()
 {
-    robust::array<int, 64> a1;
-    std::cout << "array 1: " << a1 << std::endl;
+    boost::robust::checksummed_array<int, 64> a1;
+    std::cout << "checksummed_array 1: " << a1 << std::endl;
 
     // Insert faults and check
 

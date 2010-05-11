@@ -30,7 +30,7 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include "array.hpp"
+#include "checksummed_array.hpp"
 
 
 /// The namespace robust contains fault-tolerant data structures and utility classes.
@@ -126,7 +126,7 @@ namespace boost { namespace robust {
             functor &m_functor;     //!< Internal reference to the functor to apply.
         };
 
-        /*! A const (random access) iterator used to iterate through the <code>array</code>.
+        /*! A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
         */
         class const_iterator : public std::const_iterator<std::random_access_iterator_tag, T>
         {
@@ -261,7 +261,7 @@ namespace boost { namespace robust {
         *
         * \remarks The chunk size should be chosen based on CPU cache size.
         *
-        * \see Array: array
+        * \see checksummed_array
         */
         template <class Size = 64>
         class chunk
@@ -281,7 +281,7 @@ namespace boost { namespace robust {
 
         private:
             vector<T, A> *m_parent;
-            array<T, Size> m_elements;
+            checksummed_array<T, Size> m_elements;
         };
 
         chunk *m_head;          // Pointer to the first chunk

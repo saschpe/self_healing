@@ -1,13 +1,13 @@
 /*! \file
 * \brief Checksummed array.
 *
-* This file contains the class array, an robust STL container (as wrapper) for
-* arrays of constant size with checksumming. This allows to monitor the validity
-* of the array's content.
+* This file contains the class checksummed_array, a robust STL container (as
+* wrapper) for arrays of constant size with checksumming. This allows to
+* monitor the validity of the array's content.
 *
-* This class is based on boost::array by Nicolai M. Josuttis.
+* This class is based on boost::checksummed_array by Nicolai M. Josuttis.
 * See
-*      http://www.boost.org/libs/array/
+*      http://www.boost.org/libs/checksummed_array/
 * for documentation.
 *
 * (C) Copyright Sascha Peilicke 2010.
@@ -48,19 +48,19 @@ namespace boost { namespace robust {
     * A checksummed array of constant size.
     *
     * \param T The data type of the stored values.
-    * \param N The size of the array.
+    * \param N The size of the checksummed_array.
     *
     * \remarks TODO.
     *
     * \see nullary_function, empty_nullary_function
     */
     template <class T, std::size_t N>
-    class array
+    class checksummed_array
     {
     public:
         // type definitions
-        typedef T                    value_type;        //!< The type of elements stored in the <code>array</code>.
-        typedef const T *            const_iterator;    //!< A const (random access) iterator used to iterate through the <code>array</code>.
+        typedef T                    value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef const T *            const_iterator;    //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
         //typedef robust::pointer<T>   pointer;           //!< A pointer to the element.
         typedef const T *            const_pointer;     //!< A const pointer to the element.
         typedef robust::reference<T> reference;         //!< A reference to an element.
@@ -78,7 +78,7 @@ namespace boost { namespace robust {
         */
         typedef std::ptrdiff_t       difference_type;
 
-        /*! \brief A (random access) iterator used to iterate through the <code>array</code>.
+        /*! \brief A (random access) iterator used to iterate through the <code>checksummed_array</code>.
         *
         * A safe iterator that calls a functor if the value at the current
         * position is changed. Checksumms are also updated correctly if the
@@ -126,7 +126,7 @@ namespace boost { namespace robust {
             operator const_iterator() const { return m_p; }
 
         private:
-            T *m_p;                         //!< Internal pointer to the current position in the array.
+            T *m_p;                         //!< Internal pointer to the current position in the checksummed_array.
             nullary_function &m_functor;    //!< Internal reference to the functor to apply.
         };
 
@@ -151,10 +151,10 @@ namespace boost { namespace robust {
 #endif
 
 
-        /*! Contructor.
+        /*! Constructor.
         * \param value An initial value that is set for all elements.
         */
-        array(const T &value = 0)
+        checksummed_array(const T &value = 0)
             : m_func(this) { fill(value); }
 
         // iterator support
@@ -189,10 +189,10 @@ namespace boost { namespace robust {
         static size_type max_size() { return N; }
         enum { static_size = N };
 
-        /*! Swap with other array (note: linear complexity).
-        * \param other The other array to swap with.
+        /*! Swap with other checksummed array (note: linear complexity).
+        * \param other The other checksummed array to swap with.
         */
-        void swap(array<T, N> &other) {
+        void swap(checksummed_array<T, N> &other) {
             for (size_type i = 0; i < N; ++i) {
                 boost::swap(m_elements[i], other.m_elements[i]);
             }
@@ -208,11 +208,11 @@ namespace boost { namespace robust {
         //pointer data() { return m_elements; }
 
         /*! Assignment operator with type conversion.
-        * \param other The other array to copy contents from.
-        * \return Reference to the new array.
+        * \param other The other checksummed_array to copy contents from.
+        * \return Reference to the new checksummed_array.
         */
         template <typename T2>
-        array<T, N>& operator=(const array<T2, N> &other) {
+        checksummed_array<T, N>& operator=(const checksummed_array<T2, N> &other) {
             std::copy(other.begin(), other.end(), begin());
             update_checksums();
             return *this;
@@ -231,7 +231,7 @@ namespace boost { namespace robust {
         */
         static void rangecheck(size_type i) {
             if (i >= size()) {
-                std::out_of_range e("array<>: index out of range");
+                std::out_of_range e("checksummed_array<>: index out of range");
                 boost::throw_exception(e);
             }
         }
@@ -266,7 +266,7 @@ namespace boost { namespace robust {
             if (equal_12) {
                 // The computed checksum over the content is not the same as
                 // the stored onces, thus the content was maliciously changed
-                // and the array is invalid.
+                // and the checksummed_array is invalid.
                 return false;
             }
             return false;           // checksum mismatch, fail
@@ -275,7 +275,7 @@ namespace boost { namespace robust {
     private:
         void update_checksums() {
             // compute and store CRC checksums
-            //std::cout << "robust::array<T, N>::update_checksums()" << std::endl;
+            //std::cout << "robust::checksummed_array<T, N>::update_checksums()" << std::endl;
             boost::crc_32_type crc;
             crc.process_bytes(&m_elements, N * sizeof(T));
             m_crc1 = crc.checksum();
@@ -285,7 +285,7 @@ namespace boost { namespace robust {
         /*! \brief Update checksums functor.
          *
          * A private functor implementation that calls update_checksums() for a
-         * given array instance if called itself.
+         * given checksummed_array instance if called itself.
          *
          * \see nullary_function
          */
@@ -293,33 +293,33 @@ namespace boost { namespace robust {
         {
         public:
             /*! Constructor.
-            * \param parent The array instance that owns the functor instance.
+            * \param parent The checksummed_array instance that owns the functor instance.
             */
-            update_checksums_functor(array<T, N> *parent)
+            update_checksums_functor(checksummed_array<T, N> *parent)
                 : m_parent(parent) {}
 
             void operator()() { m_parent->update_checksums(); }
 
         private:
-            array<T, N> *m_parent;          //!< Internal reference to owning parent array instance.
-        } m_func;                           //!< Internal functor instance to pass to reference instances.
+            checksummed_array<T, N> *m_parent;  //!< Internal reference to owning parent checksummed_array instance.
+        } m_func;                               //!< Internal functor instance to pass to reference instances.
 
-        unsigned int m_crc1;                //!< Internal first checksum.
-        T m_elements[N];                    //!< Internal fixed-size array of elements of type T.
-        unsigned int m_crc2;                //!< Internal second checksum (backup).
+        unsigned int m_crc1;                    //!< Internal first checksum.
+        T m_elements[N];                        //!< Internal fixed-size checksummed_array of elements of type T.
+        unsigned int m_crc2;                    //!< Internal second checksum (backup).
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-    /*! Partial template specialization for the corner case of a zero sized array.
+    /*! Partial template specialization for the corner case of a zero sized checksummed_array.
      */
     template<class T>
-    class array<T, 0>
+    class checksummed_array<T, 0>
     {
     public:
         // type definitions
-        typedef T              value_type;      //!< The type of elements stored in the <code>array</code>.
-        typedef T *            iterator;        //!< A (random access) iterator used to iterate through the <code>array</code>.
-        typedef const T *      const_iterator;  //!< A const (random access) iterator used to iterate through the <code>array</code>.
+        typedef T              value_type;      //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef T *            iterator;        //!< A (random access) iterator used to iterate through the <code>checksummed_array</code>.
+        typedef const T *      const_iterator;  //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
         typedef T *            pointer;         //!< A pointer to the element.
         typedef const T *      const_pointer;   //!< A const pointer to the element.
         typedef T &            reference;       //!< A reference to an element.
@@ -391,18 +391,18 @@ namespace boost { namespace robust {
         static size_type max_size() { return 0; }
         enum { static_size = 0 };
 
-        void swap(array<T, 0> &/*y*/) {}
+        void swap(checksummed_array<T, 0> &/*y*/) {}
 
         // direct access to data (read-only)
         const_pointer data() const { return 0; }
         pointer data() { return 0; }
 
-        // use array as C array (direct read/write access to data)
-        pointer c_array() { return 0; }
+        // use checksummed_array as C checksummed_array (direct read/write access to data)
+        pointer c_checksummed_array() { return 0; }
 
         // assignment with type conversion
         template <typename T2>
-        array<T, 0>& operator=(const array<T2, 0> &) { return *this; }
+        checksummed_array<T, 0>& operator=(const checksummed_array<T2, 0> &) { return *this; }
 
         // assign one value to all elements
         void assign(const T &value) { fill(value); }
@@ -410,7 +410,7 @@ namespace boost { namespace robust {
 
         // check range (may be private because it is static)
         static reference failed_rangecheck() {
-            std::out_of_range e("attempt to access element of an empty array");
+            std::out_of_range e("attempt to access element of an empty checksummed_array");
             boost::throw_exception(e);
 #if defined(BOOST_NO_EXCEPTIONS) || !defined(BOOST_MSVC)
             //
@@ -427,34 +427,34 @@ namespace boost { namespace robust {
 
     // comparisons
     template<class T, std::size_t N>
-    bool operator==(const array<T, N> &x, const array<T, N> &y) {
+    bool operator==(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
     template<class T, std::size_t N>
-    bool operator<(const array<T, N> &x, const array<T, N> &y) {
+    bool operator<(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
     template<class T, std::size_t N>
-    bool operator!=(const array<T, N> &x, const array<T, N> &y) {
+    bool operator!=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return !(x == y);
     }
     template<class T, std::size_t N>
-    bool operator>(const array<T, N> &x, const array<T, N> &y) {
+    bool operator>(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return y < x;
     }
     template<class T, std::size_t N>
-    bool operator<=(const array<T, N> &x, const array<T, N> &y) {
+    bool operator<=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return !(y < x);
     }
     template<class T, std::size_t N>
-    bool operator>=(const array<T, N> &x, const array<T, N> &y) {
+    bool operator>=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return !(x < y);
     }
 
     /*! Global swap().
     */
     template<class T, std::size_t N>
-    inline void swap(array<T, N> &x, array<T, N> &y) {
+    inline void swap(checksummed_array<T, N> &x, checksummed_array<T, N> &y) {
         x.swap(y);
     }
 
@@ -464,11 +464,11 @@ namespace boost { namespace robust {
 /*! Overload for operator<<() of std::ostream to print a vector.
 */
 template <class T, std::size_t N>
-std::ostream &operator<<(std::ostream &os, const boost::robust::array<T, N> &array)
+std::ostream &operator<<(std::ostream &os, const boost::robust::checksummed_array<T, N> &checksummed_array)
 {
     os << "[";
-    for (std::size_t i = 0; i < array.size(); i++) {
-        os << (i == 0 ? "" : ",") << array[i];
+    for (std::size_t i = 0; i < checksummed_array.size(); i++) {
+        os << (i == 0 ? "" : ",") << checksummed_array[i];
     }
     return os << "]";
 }
