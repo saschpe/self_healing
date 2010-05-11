@@ -15,10 +15,23 @@
 
 int main()
 {
+    boost::robust::vector<int> v;
+    boost::robust::vector<int>::const_iterator cit = v.begin();
+    cit == v.end();
+    cit + 1;
+    cit - 1;
+
+    std::cout << "*(cit += 4) : " << *(cit += 4) << std::endl;
+    cit -= 2;
+    cit++;
+    ++cit;
+    cit--;
+    --cit;
+
     int arr[4] = {1, 2, 3, 4};
 
-    std::cout << "initialize a vector from an array" << std::endl;
-    robust::vector<int> numbers(arr, arr+4);
+    /*std::cout << "initialize a vector from an array" << std::endl;
+    boost::robust::vector<int> numbers(arr, arr + 4);
 
     std::cout << "insert more numbers into the vector" << std::endl;
     numbers.push_back(5);
@@ -33,7 +46,7 @@ int main()
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "locate the largest element, O(n)" << std::endl;
-    robust::vector<int>::const_iterator largest = std::max_element(numbers.begin(), numbers.end());
+    boost::robust::vector<int>::const_iterator largest = std::max_element(numbers.begin(), numbers.end());
 
     std::cout << "The largest number is " << *largest << "\n";
     std::cout << "It is located at index " << largest - numbers.begin() << "\n";
@@ -43,7 +56,7 @@ int main()
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "find the position of the number 5 in the vector, O(log n)" << std::endl;
-    robust::vector<int>::const_iterator five = std::lower_bound(numbers.begin(), numbers.end(), 5);
+    boost::robust::vector<int>::const_iterator five = std::lower_bound(numbers.begin(), numbers.end(), 5);
 
     std::cout << "The number 5 is located at index " << five - numbers.begin() << "\n";
 
@@ -52,10 +65,10 @@ int main()
                   std::bind2nd(std::greater<int>(), 4)), numbers.end());
 
     std::cout << "print all the remaining numbers" << std::endl;
-    for (robust::vector<int>::const_iterator it = numbers.begin(); it != numbers.end(); ++it) {
+    for (boost::robust::vector<int>::const_iterator it = numbers.begin(); it != numbers.end(); ++it) {
         std::cout << *it << ",";
     }
-    std::cout << std::endl;
+    std::cout << std::endl;*/
 
     return 0;
 }
