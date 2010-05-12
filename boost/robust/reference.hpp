@@ -46,59 +46,54 @@ namespace boost { namespace robust {
     public:
         /*! Constructor.
         * \param value The value to initialize the reference with.
-        * \param functor The functor to apply if the value is changed.
+        * \param update The function to apply if the value is changed.
         */
-        explicit reference(T &value, nullary_function &functor = empty_nullary_function)
-            : m_value(value), m_functor(functor) {}
+        explicit reference(T &value, nullary_function &update = empty_nullary_function)
+            : value(value), update(update) {}
 
         /*! Copy constructor.
         * \param other The other reference instance to copy from.
-        * \param functor The functor to apply if the value is changed.
         */
-        reference(const reference &other, nullary_function &functor = empty_nullary_function)
-            : m_value(other.m_value), m_functor(functor) {}
+        reference(const reference &other)
+            : value(other.value), update(other.update) {}
 
-        reference& operator=(const T &rhs) { m_value = rhs; m_functor(); return *this; }
-        reference& operator=(const reference &rhs) { m_value = rhs.m_value; m_functor(); return *this; }
+        reference& operator=(const T &rhs) { value = rhs; update(); return *this; }
+        reference& operator=(const reference &rhs) { value = rhs.value; update = rhs.update; return *this; }
 
-        T operator+(const T &rhs) const { return m_value + rhs; }
-        T operator-(const T &rhs) const { return m_value - rhs; }
-        T operator*(const T &rhs) const { return m_value * rhs; }
-        T operator/(const T &rhs) const { return m_value / rhs; }
-        T operator%(const T &rhs) const { return m_value % rhs; }
+        T operator+(const T &rhs) const { return value + rhs; }
+        T operator-(const T &rhs) const { return value - rhs; }
+        T operator*(const T &rhs) const { return value * rhs; }
+        T operator/(const T &rhs) const { return value / rhs; }
+        T operator%(const T &rhs) const { return value % rhs; }
 
-        reference& operator+=(const T &rhs) { m_value += rhs; m_functor(); return *this; }
-        reference& operator-=(const T &rhs) { m_value -= rhs; m_functor(); return *this; }
-        reference& operator*=(const T &rhs) { m_value *= rhs; m_functor(); return *this; }
-        reference& operator/=(const T &rhs) { m_value /= rhs; m_functor(); return *this; }
-        reference& operator%=(const T &rhs) { m_value %= rhs; m_functor(); return *this; }
+        reference& operator+=(const T &rhs) { value += rhs; update(); return *this; }
+        reference& operator-=(const T &rhs) { value -= rhs; update(); return *this; }
+        reference& operator*=(const T &rhs) { value *= rhs; update(); return *this; }
+        reference& operator/=(const T &rhs) { value /= rhs; update(); return *this; }
+        reference& operator%=(const T &rhs) { value %= rhs; update(); return *this; }
 
-        reference& operator++() { ++m_value; m_functor(); return *this; }
-        reference& operator++(int) { m_value++; m_functor(); return *this; }
-        reference& operator--() { --m_value; m_functor(); return *this; }
-        reference& operator--(int) { m_value--; m_functor(); return *this; }
+        reference& operator++() { ++value; update(); return *this; }
+        reference& operator++(int) { value++; update(); return *this; }
+        reference& operator--() { --value; update(); return *this; }
+        reference& operator--(int) { value--; update(); return *this; }
 
-        bool operator==(const T &rhs) const { return m_value == rhs; }
-        bool operator!=(const T &rhs) const { return m_value != rhs; }
-        bool operator>(const T &rhs) const { return m_value > rhs; }
-        bool operator>=(const T &rhs) const { return m_value >= rhs; }
-        bool operator<(const T &rhs) const { return m_value < rhs; }
-        bool operator<=(const T &rhs) const { return m_value <= rhs; }
+        bool operator==(const T &rhs) const { return value == rhs; }
+        bool operator!=(const T &rhs) const { return value != rhs; }
+        bool operator>(const T &rhs) const { return value > rhs; }
+        bool operator>=(const T &rhs) const { return value >= rhs; }
+        bool operator<(const T &rhs) const { return value < rhs; }
+        bool operator<=(const T &rhs) const { return value <= rhs; }
 
-        T& operator*() const { return m_value; }
-        operator T&() const { return m_value; }
+        T& operator*() const { return value; }
+        operator T&() const { return value; }
 
-        /*! Overload for operator<<() of std::ostream to print a reference.
-        * \param os TODO.
-        * \param ref The reference instance to print.
+        /*! Overload for operator<<() of std::ostream to print an iterator
         */
-        friend std::ostream &operator<<(std::ostream &os, const reference<T> &ref) {
-            return os << ref.m_value;
-        }
+        friend std::ostream &operator<<(std::ostream &os, const reference<T> &ref) { return os << ref.value; }
 
     private:
-        T &m_value;
-        nullary_function &m_functor;
+        T &value;
+        nullary_function &update;
     };
 
 } } // namespace boost::robust
