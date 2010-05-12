@@ -36,10 +36,10 @@ like this (in a terminal session)::
 
     $ mkdir build/
     $ cd build/
-    $ cmake -DCMAKE_INSTALL_PREFIX=../dist ..
+    $ cmake ..
 
-If you want to specify an optimised build, the following commands could be used
-instead::
+If you want to specify an optimised build or set an installation target, the
+following commands could be used instead::
 
     $ mkdir build/ dist/
     $ cd build/
