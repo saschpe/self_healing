@@ -44,6 +44,15 @@
 /// The namespace robust contains fault-tolerant data structures and utility classes.
 namespace boost { namespace robust {
 
+    /*! Exception that is thrown when a checksum error happened.
+    */
+    class checksum_error : public std::runtime_error
+    {
+    public:
+        explicit checksum_error(const std::string &what_arg)
+            : std::runtime_error(what_arg) {}
+    };
+
     /*! \brief Checksummed array.
     *
     * A checksummed array of constant size.
@@ -62,6 +71,7 @@ namespace boost { namespace robust {
         // type definitions
         typedef T                    value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
         class                        iterator;          //!< Forward declaration of class iterator.
+        //TODO: Write own const iterator
         typedef const T *            const_iterator;    //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
         //typedef robust::pointer<T>   pointer;           //!< A pointer to the element.
         typedef const T *            const_pointer;     //!< A const pointer to the element.
@@ -86,7 +96,7 @@ namespace boost { namespace robust {
         * current position is changed. Checksumms are also updated correctly if
         * the iterator is dereferenced.
         *
-        * \see TODO.
+        * \see std::iterator, std::random_access_iterator_tag, nullary_function, empty_nullary_function
         */
         class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
@@ -94,52 +104,54 @@ namespace boost { namespace robust {
 
             /*! Private constructor.
             * \param rhs TODO.
-            * \param functor The function object to apply if the value is changed.
+            * \param check TODO.
+            * \param update TODO.
             */
-            explicit iterator(T *rhs, nullary_function &functor = empty_nullary_function)
-                : m_p(rhs), m_functor(functor) {}
+            explicit iterator(T *rhs, nullary_function &check = empty_nullary_function,
+                                      nullary_function &update = empty_nullary_function)
+                : p(rhs), check(check), update(update) {}
 
-            iterator& operator=(const reference &rhs) { *m_p = rhs; m_functor(); ++m_p; return *this; }
+            iterator& operator=(const reference &rhs) { check(); *p = rhs; update(); ++p; return *this; }
 
         public:
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
-            * \param functor The functor to apply if the value is changed.
             */
-            iterator(const iterator &other, nullary_function &functor = empty_nullary_function)
-                : m_p(other.m_p), m_functor(functor) {}
+            iterator(const iterator &other)
+                : p(other.p), check(other.check), update(other.update) {}
 
-            iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
+            iterator& operator=(const iterator &rhs) { p = rhs.p; check = rhs.check; update = rhs.update; return *this; }
 
-            //TODO: Do range checks
-            iterator& operator+(difference_type n) const { return m_p + n; }
-            iterator& operator-(difference_type n) const { return m_p - n; }
-            difference_type operator+(const iterator &rhs) const { return m_p + rhs.m_p; }
-            difference_type operator-(const iterator &rhs) const { return m_p - rhs.m_p; }
+            iterator& operator+(difference_type n) const { return p + n; }
+            iterator& operator-(difference_type n) const { return p - n; }
+            difference_type operator+(const iterator &rhs) const { return p + rhs.p; }
+            difference_type operator-(const iterator &rhs) const { return p - rhs.p; }
 
-            //TODO: Do range checks
-            iterator& operator+=(difference_type n) { m_p += n; return *this; }
-            iterator& operator-=(difference_type n) { m_p -= n; return *this; }
-            iterator& operator++() { ++m_p; return *this; }
-            iterator& operator++(int) { m_p++; return *this; }
-            iterator& operator--() { --m_p; return *this; }
-            iterator& operator--(int) { m_p--; return *this; }
+            iterator& operator+=(difference_type n) { p += n; return *this; }
+            iterator& operator-=(difference_type n) { p -= n; return *this; }
+            iterator& operator++() { ++p; return *this; }
+            iterator& operator++(int) { p++; return *this; }
+            iterator& operator--() { --p; return *this; }
+            iterator& operator--(int) { p--; return *this; }
 
-            bool operator==(const iterator& other) const { return m_p == other.m_p; }
-            bool operator!=(const iterator& other) const { return m_p != other.m_p; }
+            // Comparison
+            bool operator<(const iterator &other) const { return p < other.p; }
+            bool operator>(const iterator &other) const { return p > other.p; }
+            bool operator>=(const iterator &other) const { return p >= other.p; }
+            bool operator==(const iterator& other) const { return p == other.p; }
+            bool operator!=(const iterator& other) const { return p != other.p; }
 
-            reference operator*() const { return reference(*m_p, m_functor); }
-            operator const_iterator() const { return m_p; }
+            reference operator*() const { check(); return reference(*p, update); }
+            operator const_iterator() const { return p; }
 
-            /*! Overload for operator<<() of std::ostream to print a reference.
+            /*! Overload for operator<<() of std::ostream to print an iterator.
             */
-            friend std::ostream &operator<<(std::ostream &os, const iterator &it) {
-                return os << it.m_p;
-            }
+            friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.p; }
 
         private:
-            T *m_p;                         //!< Internal pointer to the current position in the checksummed_array.
-            nullary_function &m_functor;    //!< Internal reference to the function object to apply.
+            T *p;                       //!< Internal pointer to the current position in the checksummed_array.
+            nullary_function &check;    //!< TODO.
+            nullary_function &update;   //!< TODO.
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
@@ -167,13 +179,13 @@ namespace boost { namespace robust {
         * \param value An initial value that is set for all elements.
         */
         checksummed_array(const T &value = 0)
-            : m_func(this) { fill(value); }
+            : check(this), update(this) { fill(value); }
 
         // iterator support
-        iterator begin() { return iterator(m_elements, m_func); }
-        const_iterator begin() const { return m_elements; }
-        iterator end() { return iterator(m_elements + N, m_func); }
-        const_iterator end() const { return m_elements + N; }
+        iterator begin() {  return iterator(elements, check, update); }
+        const_iterator begin() const { return elements; }
+        iterator end() { return iterator(elements + N, check, update); }
+        const_iterator end() const { return elements + N; }
 
         // reverse iterator support
         reverse_iterator rbegin() { return reverse_iterator(end()); }
@@ -182,18 +194,18 @@ namespace boost { namespace robust {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // operator[] with range check
-        reference operator[](size_type i) { rangecheck(i); return reference(m_elements[i], m_func); }
-        const_reference operator[](size_type i) const { rangecheck(i); return m_elements[i]; }
+        reference operator[](size_type i) { rangecheck(i); check_and_repair_checksums(); return reference(elements[i], update); }
+        const_reference operator[](size_type i) const { rangecheck(i); check_and_repair_checksums(); return elements[i]; }
 
         // at() with range check
-        reference at(size_type i) { rangecheck(i); return reference(m_elements[i], m_func); }
-        const_reference at(size_type i) const { rangecheck(i); return m_elements[i]; }
+        reference at(size_type i) { rangecheck(i); check_and_repair_checksums(); return reference(elements[i], update); }
+        const_reference at(size_type i) const { rangecheck(i); check_and_repair_checksums(); return elements[i]; }
 
         // front() and back()
-        reference front() { return reference(m_elements[0], m_func); }
-        const_reference front() const { return m_elements[0]; }
-        reference back() { return reference(m_elements[N - 1], m_func); }
-        const_reference back() const { return m_elements[N - 1]; }
+        reference front() { check_and_repair_checksums(); return reference(elements[0], update); }
+        const_reference front() const { check_and_repair_checksums(); return elements[0]; }
+        reference back() { check_and_repair_checksums(); return reference(elements[N - 1], update); }
+        const_reference back() const { check_and_repair_checksums(); return elements[N - 1]; }
 
         // size is constant
         static size_type size() { return N; }
@@ -206,18 +218,19 @@ namespace boost { namespace robust {
         */
         void swap(checksummed_array<T, N> &other) {
             for (size_type i = 0; i < N; ++i) {
-                boost::swap(m_elements[i], other.m_elements[i]);
+                boost::swap(elements[i], other.elements[i]);
             }
-            boost::swap(m_crc1, other.m_crc1);
-            boost::swap(m_crc2, other.m_crc2);
+            boost::swap(crc1, other.crc1);
+            boost::swap(crc2, other.crc2);
+            check_and_repair_checksums();
         }
 
         /*! Read-only direct access to data.
         */
-        const_pointer data() const { return m_elements; }
+        const_pointer data() const { check_and_repair_checksums(); return elements; }
 
         //NOTE: this methods would bypass checksumming currently
-        //pointer data() { return m_elements; }
+        //pointer data() { return elements; }
 
         /*! Assignment operator with type conversion.
         * \param other The other checksummed_array to copy contents from.
@@ -250,75 +263,121 @@ namespace boost { namespace robust {
 
         /*! \brief Validity check that tries to correct minor checksum faults silently.
         *
+        * \return true, if the internal structure and data is valid.
+        *
+        * \see check_and_repair_checksums()
+        */
+        bool is_valid() {
+            try {
+                check_and_repair_checksums();
+                return true;
+            } catch (checksum_error const & e) {
+                return false;
+            };
+        }
+
+    private:
+        /*! \brief Validity check that tries to correct minor checksum faults silently.
+        *
         * If only one out of the two stored checksums is wrong, this can be corrected.
         * If the temporary checksum computed over the current state of the data does
         * not match the (equal) values of the stored checksums, a malicious data
         * change happened and the data structure is no longer valid.
         *
-        * \return true, if the internal structure and data is valid
+        * \remark This method is defined const to make it easier to call by other methods,
+        *         it may change internal state nonetheless.
+        *
+        * \throws checksum_error Thrown if the data was damaged and checksums mismatch.
         */
-        bool is_valid() {
+        void check_and_repair_checksums() const {
+            //std::cout << "boost::robust::checksummed_array<T, N>::check_and_repair_checksums()" << std::endl;
             boost::crc_32_type crc3;
-            crc3.process_bytes(&m_elements, N * sizeof(T));
-            const bool equal_13 = m_crc1 == crc3.checksum();
-            const bool equal_23 = m_crc2 == crc3.checksum();
-            const bool equal_12 = m_crc1 == m_crc2;
+            crc3.process_bytes(&elements, N * sizeof(T));
+            const bool equal_13 = crc1 == crc3.checksum();
+            const bool equal_23 = crc2 == crc3.checksum();
+            const bool equal_12 = crc1 == crc2;
 
             if (equal_12 && equal_13 && equal_23) {
-                return true;        // all fine
+                return;             // all fine
             }
             if (equal_13) {
-                m_crc2 = m_crc1;    // fix m_crc2 as the others are equal
-                return true;        // all fine
+                const_cast<unsigned int &>(crc2) = crc1;    // fix crc2 as the others are equal
+                return;             // all fine
             }
             if (equal_23) {
-                m_crc1 = m_crc2;    // fix m_crc1 as the others are equal
-                return true;        // all fine
+                const_cast<unsigned int &>(crc1) = crc2;    // fix crc1 as the others are equal
+                return;             // all fine
             }
             if (equal_12) {
                 // The computed checksum over the content is not the same as
                 // the stored onces, thus the content was maliciously changed
                 // and the checksummed_array is invalid.
-                return false;
+                checksum_error e("checksummed_array<>: data error");
+                boost::throw_exception(e);
             }
-            return false;           // checksum mismatch, fail
+            // All three checksums differ
+            checksum_error e("checksummed_array<>: checksum error");
+            boost::throw_exception(e);
         }
 
-    private:
+        /*! \brief Check and repair checksums functor.
+        *
+        * A private functor implementation that calls check_and_repair_checksums() for a
+        * given checksummed_array instance if called itself.
+        *
+        * \see nullary_function
+        */
+        class check_and_repair_checksums_functor : public nullary_function
+        {
+        public:
+            /*! Constructor.
+            * \param parent The checksummed_array instance that owns the functor instance.
+            */
+            explicit check_and_repair_checksums_functor(checksummed_array<T, N> *parent)
+                : m_parent(parent) {}
+
+            void operator()() { m_parent->check_and_repair_checksums(); }
+
+        private:
+            checksummed_array<T, N> *m_parent;  //!< Internal reference to owning parent checksummed_array instance.
+        } check;                                //!< Internal functor instance to pass to reference instances.
+
+
+        /*! Compute and store CRC checksums.
+        */
         void update_checksums() {
-            // compute and store CRC checksums
-            //std::cout << "robust::checksummed_array<T, N>::update_checksums()" << std::endl;
+            //std::cout << "boost::robust::checksummed_array<T, N>::update_checksums()" << std::endl;
             boost::crc_32_type crc;
-            crc.process_bytes(&m_elements, N * sizeof(T));
-            m_crc1 = crc.checksum();
-            m_crc2 = m_crc1;
+            crc.process_bytes(&elements, N * sizeof(T));
+            crc1 = crc.checksum();
+            crc2 = crc1;
         }
 
         /*! \brief Update checksums functor.
-         *
-         * A private functor implementation that calls update_checksums() for a
-         * given checksummed_array instance if called itself.
-         *
-         * \see nullary_function
-         */
+        *
+        * A private functor implementation that calls update_checksums() for a
+        * given checksummed_array instance if called itself.
+        *
+        * \see nullary_function
+        */
         class update_checksums_functor : public nullary_function
         {
         public:
             /*! Constructor.
             * \param parent The checksummed_array instance that owns the functor instance.
             */
-            update_checksums_functor(checksummed_array<T, N> *parent)
+            explicit update_checksums_functor(checksummed_array<T, N> *parent)
                 : m_parent(parent) {}
 
             void operator()() { m_parent->update_checksums(); }
 
         private:
             checksummed_array<T, N> *m_parent;  //!< Internal reference to owning parent checksummed_array instance.
-        } m_func;                               //!< Internal functor instance to pass to reference instances.
+        } update;                               //!< Internal functor instance to pass to reference instances.
 
-        unsigned int m_crc1;                    //!< Internal first checksum.
-        T m_elements[N];                        //!< Internal fixed-size checksummed_array of elements of type T.
-        unsigned int m_crc2;                    //!< Internal second checksum (backup).
+        unsigned int crc1;      //!< Internal first checksum.
+        T elements[N];          //!< Internal fixed-size checksummed_array of elements of type T.
+        unsigned int crc2;      //!< Internal second checksum (backup).
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
