@@ -30,7 +30,6 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include "./detail/nullary_function.hpp"
 #include "checksummed_array.hpp"
 #include "reference.hpp"
 
@@ -134,64 +133,71 @@ namespace boost { namespace robust {
             /*! Private constructor.
             * \param rhs The chunk to initialize the iterator with.
             */
-            explicit const_iterator(chunk *rhs, size_type index = 0)
-                : m_chunk(rhs), m_index(index) {}
+            explicit const_iterator(chunk *rhs, const typename checksummed_array<T, CS>::iterator &it)
+                : m_chunk(rhs), m_it(it), m_begin(rhs->elements.begin()), m_end(rhs->elements.end()) {}
 
         public:
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.anged.
             */
             const_iterator(const const_iterator &other)
-                : m_chunk(other.m_chunk), m_index(other.m_index) {}
+                : m_chunk(other.m_chunk), m_it(other.m_it), m_begin(other.m_begin), m_end(other.m_end) {}
 
-            const_iterator& operator=(const const_iterator &rhs) { m_chunk = rhs.m_chunk; m_index = rhs.m_index; return *this; }
+            const_iterator& operator=(const const_iterator &rhs) { m_chunk = rhs.m_chunk; m_it = rhs.m_it; return *this; }
 
-            const_iterator operator+(difference_type n) const { return from_current(m_index + n); }
-            const_iterator operator-(difference_type n) const { return from_current(m_index - n); }
+            const_iterator operator+(difference_type n) const {
+                typename checksummed_array<T, CS>::const_iterator tmp_new = m_it + n;
+
+                if (tmp_new >= m_begin && tmp_new < m_end) {
+                    return const_iterator(m_chunk, tmp_new);
+                } else if (tmp_new < m_begin) {
+                    chunk *previous_chunk;
+                    /*do {
+                        previous_chunk = m_chunk->previous();
+                        m_begin = previous_chunk->elements.begin();
+                        m_end = previous_chunk->elements.end();
+                        //tmp_new += CS;
+                    } while (tmp_new < m_begin);*/
+                    //return const_iterator(previous_chunk, tmp_new);
+                } else {
+                    chunk *next_chunk;
+                    /*do {
+                        next_chunk = m_chunk->next();
+                        m_begin = next_chunk->elements.begin();
+                        m_end = next_chunk->elements.end();
+                        tmp_new -= CS;
+                    } while (tmp_new >= m_end);*/
+                    //return const_iterator(next_chunk, tmp_new);
+                }
+            }
+
+            //const_iterator operator-(difference_type n) const { return from_current(m_index - n); }
             /*difference_type operator+(const const_iterator &rhs) const { return 0; }
             difference_type operator-(const const_iterator &rhs) const { return 0; }*/
 
-            const_iterator& operator+=(difference_type n) { *this = from_current(m_index + n); return *this; }
+            /*const_iterator& operator+=(difference_type n) { *this = from_current(m_index + n); return *this; }
             const_iterator& operator-=(difference_type n) { *this = from_current(m_index - n); return *this; }
             const_iterator& operator++() { *this = from_current(m_index + 1); return *this; }
             const_iterator& operator++(int) { *this = from_current(m_index + 1); return *this; }
             const_iterator& operator--() { *this = from_current(m_index - 1); return *this; }
-            const_iterator& operator--(int) { *this = from_current(m_index - 1); return *this; }
+            const_iterator& operator--(int) { *this = from_current(m_index - 1); return *this; }*/
 
-            bool operator==(const const_iterator& rhs) const { return m_chunk == rhs.m_chunk && m_index == rhs.m_index; }
-            bool operator!=(const const_iterator& rhs) const { return m_chunk != rhs.m_chunk || m_index != rhs.m_index; }
+            bool operator==(const const_iterator& rhs) const { return m_chunk == rhs.m_chunk && m_it == rhs.m_it; }
+            bool operator!=(const const_iterator& rhs) const { return m_chunk != rhs.m_chunk || m_it != rhs.m_it; }
 
-            reference operator*() const { return m_chunk->elements[m_index]; }
+            const_reference operator*() const { return *m_it; }
 
             /*! Overload for operator<<() of std::ostream to print a reference.
             */
             friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) {
-                return os << it.m_chunk << "[" << it.m_index << "]";
+                return os << it.m_it;
             }
 
         private:
-            /*! Helper method.
-            */
-            const_iterator from_current(const int new_index) const {
-                if (new_index >= 0 && new_index < CS) { // new index is still in current chunk
-                    return const_iterator(m_chunk, new_index);
-                } else if (new_index < 0) {             // new index is in the previous chunk
-                    if (m_chunk->is_head()) {
-                        return const_iterator(m_chunk, CS + new_index);
-                    } else {
-                        return const_iterator(m_chunk->previous(), CS + new_index);
-                    }
-                } else {                                // new index is in the next chunk
-                    if (m_chunk->is_tail()) {
-                        return const_iterator(m_chunk, new_index % CS);
-                    } else {
-                        return const_iterator(m_chunk->next(), new_index % CS);
-                    }
-                }
-            }
-
-            struct chunk *m_chunk;  //!< Internal pointer to the current chunk.
-            size_type m_index;      //!< Internal current element index of the current chunk.
+            struct chunk *m_chunk;                                      //!< Internal pointer to the current chunk.
+            typename checksummed_array<T, CS>::const_iterator m_it;     //!< Iterator of the current chunk
+            typename checksummed_array<T, CS>::const_iterator m_begin;  //!<
+            typename checksummed_array<T, CS>::const_iterator m_end;
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
@@ -247,9 +253,9 @@ namespace boost { namespace robust {
 
         // iterator support
         //iterator begin() { return iterator(m_chunks); }
-        const_iterator begin() const { return const_iterator(m_head); }
+        const_iterator begin() const { return const_iterator(m_head, m_head->elements.begin()); }
         //iterator end() { return iterator(m_chunks + N); }
-        const_iterator end() const { return const_iterator(m_tail, CS); }
+        const_iterator end() const { return const_iterator(m_tail, m_tail->elements.end()); }
 
         // reverse iterator support
         //reverse_iterator rbegin() { return reverse_iterator(end()); }
