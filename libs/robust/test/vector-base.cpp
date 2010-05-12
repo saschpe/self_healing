@@ -22,7 +22,7 @@ int main()
     std::cout << "cit      : " << cit << '\n';
     std::cout << "v.end()  : " << v.end() << '\n';
     std::cout << "cit + 1  : " << (cit + 1) << '\n';
-    std::cout << "cit - 1  : " << (cit - 1) << '\n';
+    /*std::cout << "cit - 1  : " << (cit - 1) << '\n';
     std::cout << "cit += 2 : " << (cit += 2) << '\n';
     std::cout << "cit -= 2 : " << (cit -= 2) << '\n';
     std::cout << "cit++    : " << cit++ << '\n';
@@ -30,7 +30,7 @@ int main()
     std::cout << "cit--    : " << cit-- << '\n';
     std::cout << "--cit    : " << --cit << '\n';
     std::cout << std::endl;
-    std::cout << "*(cit += 4): " << *(cit += 4) << std::endl;
+    std::cout << "*(cit += 4): " << *(cit += 4) << std::endl;*/
 
     /*for (boost::robust::vector<int, 2>::const_iterator it = v.begin(); it != v.end(); ++it) {
         std::cout << it << " -> "<< *it << '\n';
