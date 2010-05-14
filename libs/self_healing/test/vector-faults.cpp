@@ -17,5 +17,9 @@
 
 int main()
 {
+    std::cout << "testing class boost::self_healing::vector<> fault injection" << std::endl;
+
+    boost::self_healing::vector<short> v;
+
     return 0;
 }
