@@ -62,7 +62,7 @@ namespace boost { namespace robust {
     *
     * \remarks TODO.
     *
-    * \see nullary_function, empty_nullary_function
+    * \see nullary_function
     */
     template <class T, std::size_t N>
     class checksummed_array
@@ -96,7 +96,7 @@ namespace boost { namespace robust {
         * current position is changed. Checksumms are also updated correctly if
         * the iterator is dereferenced.
         *
-        * \see std::iterator, std::random_access_iterator_tag, nullary_function, empty_nullary_function
+        * \see std::iterator, std::random_access_iterator_tag, nullary_function
         */
         class iterator : public std::iterator<std::random_access_iterator_tag, T>
         {
@@ -107,11 +107,11 @@ namespace boost { namespace robust {
             * \param check TODO.
             * \param update TODO.
             */
-            explicit iterator(T *rhs, nullary_function &check = empty_nullary_function,
-                                      nullary_function &update = empty_nullary_function)
+            explicit iterator(T *rhs, nullary_function &check, nullary_function &update)
                 : p(rhs), check(check), update(update) {}
 
-            iterator& operator=(const reference &rhs) { check(); *p = rhs; update(); ++p; return *this; }
+            /*iterator& operator=(const T &rhs) { check(); *p = rhs; update(); ++p; return *this; }
+            iterator& operator=(const reference &rhs) { check(); *p = rhs; update(); ++p; return *this; }*/
 
         public:
             /*! Copy constructor.
@@ -135,11 +135,12 @@ namespace boost { namespace robust {
             iterator& operator--(int) { p--; return *this; }
 
             // Comparison
-            bool operator<(const iterator &other) const { return p < other.p; }
-            bool operator>(const iterator &other) const { return p > other.p; }
-            bool operator>=(const iterator &other) const { return p >= other.p; }
             bool operator==(const iterator& other) const { return p == other.p; }
             bool operator!=(const iterator& other) const { return p != other.p; }
+            bool operator>(const iterator &other) const { return p > other.p; }
+            bool operator>=(const iterator &other) const { return p >= other.p; }
+            bool operator<(const iterator &other) const { return p < other.p; }
+            bool operator<=(const iterator &other) const { return p <= other.p; }
 
             reference operator*() const { check(); return reference(*p, update); }
             operator const_iterator() const { return p; }
@@ -179,7 +180,11 @@ namespace boost { namespace robust {
         * \param value An initial value that is set for all elements.
         */
         checksummed_array(const T &value = 0)
-            : check(this), update(this) { fill(value); }
+            : check(this), update(this) { update_checksums(); fill(value); }
+
+        /*! Empty virtual descructor to allow sub-classing.
+        */
+        virtual ~checksummed_array() {}
 
         // iterator support
         iterator begin() {  return iterator(elements, check, update); }
