@@ -13,7 +13,7 @@ Functionality
 -------------
 
  - Implement class vector
+ - Implement class b_tree
  - Implement more unit-tests
-   - Separate tests for boost::self_healing::reference from test-checksummed_array-base.cpp
- - Implement class tree
+   - Tests for partial template specializations
  - Bugfixing
