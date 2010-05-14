@@ -259,15 +259,13 @@ namespace boost { namespace self_healing {
         */
         static void rangecheck(size_type index) {
             if (index >= size()) {
-                std::out_of_range e("checksummed_array<>: index out of range");
+                std::out_of_range e("index out of range");
                 boost::throw_exception(e);
             }
         }
 
-        /*! \brief Validity check that tries to correct minor checksum faults silently.
-        *
+        /*! Validity check that tries to correct minor faults silently.
         * \return true, if the internal structure and data is valid.
-        *
         * \see check_and_repair_checksums()
         */
         virtual bool is_valid() const {
@@ -315,11 +313,11 @@ namespace boost { namespace self_healing {
                 // The computed checksum over the content is not the same as
                 // the stored onces, thus the content was maliciously changed
                 // and the checksummed_array is invalid.
-                checksum_error e("checksummed_array<>: data error");
+                checksum_error e("data error");
                 boost::throw_exception(e);
             }
             // All three checksums differ
-            checksum_error e("checksummed_array<>: checksum error");
+            checksum_error e("checksum error");
             boost::throw_exception(e);
         }
 
