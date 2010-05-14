@@ -9,8 +9,6 @@
  * http://www.boost.org/LICENSE_1_0.txt)
  *
  * 27 April 2010 - Initial Revision (Sascha Peilicke)
- *
- * May 4th, 2010
  */
 
 #include <boost/self_healing/checksummed_array.hpp>
@@ -26,16 +24,6 @@ int main()
 
     assert(a.at(0) == 0);
     assert(a.at(a.size() - 1) == 0);
-
-    int i = 3;
-    //TODO: move self_healing::reference<> test code into own test case
-    boost::self_healing::reference<int> rr(i);
-    int j = 1 + *rr + 3;
-    int k = 1 + rr + 3;
-    boost::self_healing::checksummed_array<int, 16>::reference ar(i);
-    boost::self_healing::checksummed_array<int, 16>::const_reference car(i);
-
-    std::cout << "sizeof(self_healing::reference<int>): " << sizeof(rr) << std::endl;
 
     std::cout << "testing class self_healing::checksummed_array<>::reference assignment" << std::endl;
     a.front() = 3;
@@ -73,36 +61,9 @@ int main()
     a[10]--;
     --a[11];
 
-    std::cout << "testing iterators" << std::endl;
     std::cout << "checksummed_array 1:  ";
     std::copy(a.begin(), a.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
-
-    for (boost::self_healing::checksummed_array<int, 16>::iterator it = a.begin(); it != a.end(); it++) {
-        *it += 1;
-    }
-
-    std::cout << "testint iterator value assignment" << std::endl;
-    boost::self_healing::checksummed_array<int, 16>::iterator tmp_it = a.begin();
-    *tmp_it = 99;
-
-    boost::self_healing::checksummed_array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
-    //TODO: fix this, the functor is not called here !!!
-    *tmp_rit = 99;
-
-    std::cout << "testing const iterators" << std::endl;
-    const int* cit = a.begin();
-    boost::self_healing::checksummed_array<int, 16>::const_iterator tmp_cit = a.begin();
-    boost::self_healing::checksummed_array<int, 16>::const_reverse_iterator tmp_crit = a.rbegin();
-
-    std::cout << "checksummed_array 1:  ";
-    for (std::reverse_iterator<boost::self_healing::checksummed_array<int, 16>::iterator> rit = a.rbegin(); rit != a.rend(); rit++) {
-        int i = *rit;
-        std:: cout << i << ",";
-    }
-    std::cout << std::endl;
-
-    std::cout << "checksummed_array 1: " << a << std::endl;
 
     boost::self_healing::checksummed_array<int, 8> *pa = new boost::self_healing::checksummed_array<int, 8>(3);
     std::cout << "pointer to checksummed_array: " << *pa << std::endl;

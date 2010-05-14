@@ -33,12 +33,22 @@ set(self_healing_LIB_SRCS
 if(BOOST_SELF_HEALING_BUILD_TESTS)
     enable_testing()
     include_directories(.) # to allow global #include
+
+    add_executable(test-reference-base libs/self_healing/test/reference-base.cpp)
+    add_test(reference-base ${EXECUTABLE_OUTPUT_PATH}/test-reference-base)
+
     add_executable(test-checksummed_array-base libs/self_healing/test/checksummed_array-base.cpp)
     add_test(checksummed_array-base ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-base)
+    
+    add_executable(test-checksummed_array-iterators libs/self_healing/test/checksummed_array-iterators.cpp)
+    add_test(checksummed_array-iterators ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-iterators)
+    
     add_executable(test-checksummed_array-faults libs/self_healing/test/checksummed_array-faults.cpp)
     add_test(checksummed_array-faults ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-faults)
+    
     #add_executable(test-vector-base libs/self_healing/test/vector-base.cpp)
     #add_test(vector-base ${EXECUTABLE_OUTPUT_PATH}/test-vector-base)
+    
     #add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
     #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 endif(BOOST_SELF_HEALING_BUILD_TESTS)
