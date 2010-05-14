@@ -274,7 +274,7 @@ namespace boost { namespace self_healing {
             try {
                 check_and_repair_checksums();
                 return true;
-            } catch (checksum_error const & e) {
+            } catch (const checksum_error &e) {
                 return false;
             };
         }
