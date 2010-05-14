@@ -33,7 +33,7 @@ namespace boost { namespace self_healing {
     */
     struct nullary_function
     {
-        typedef void result_type;  //!<result_type is the return type.
+        typedef void result_type;  //!< result_type is the return type.
 
         /*! TODO.
         * \return TODO.

@@ -51,24 +51,21 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T                    value_type;        //!< The type of elements stored in the <code>vector</code>.
-        class                        iterator;          //!< Forward declaration of class iterator.
-        class                        const_iterator;    //!< Forward declaration of class const_iterator.
-        typedef reference_wrapper<T> reference;         //!< A reference to an element.
-        typedef const T &            const_reference;   //!< A const reference to an element.
+        typedef T                           value_type;        //!< The type of elements stored in the <code>vector</code>.
+        typedef A                           allocator_type;    //!< The type of an allocator used in the <code>circular_buffer</code>.
+        class                               iterator;          //!< Forward declaration of class iterator.
+        class                               const_iterator;    //!< Forward declaration of class const_iterator.
+        typedef reference_wrapper<T>        reference;         //!< A reference to an element.
+        typedef typename A::const_reference const_reference;   //!< A const reference to an element.
 
-        /*! \brief The size type.
-        *
-        * An unsigned integral type that can represent any non-negative value of the container's distance type.
+        /*! An unsigned integral type that can represent any non-negative value of the container's distance type.
         */
-        typedef std::size_t          size_type;
+        typedef typename A::size_type       size_type;
 
-        /*! \brief The distance type.
-        *
-        * A signed integral type used to represent the distance between two iterators.
+        /*! A signed integral type used to represent the distance between two iterators.
         */
-        typedef std::ptrdiff_t       difference_type;
-        typedef A                    allocator_type;    //!< The type of an allocator used in the <code>circular_buffer</code>.
+        typedef typename A::difference_type difference_type;
+
 
         //TODO: reinsert iterator stuff
 
@@ -279,16 +276,10 @@ namespace boost { namespace self_healing {
         typedef T &            reference;       //!< A reference to an element.
         typedef const T &      const_reference; //!< A const reference to an element.
 
-        /*! \brief The size type.
-        *
-        * An unsigned integral type that can represent any non-negative value of the container's distance type.
-        */
+        /// An unsigned integral type that can represent any non-negative value of the container's distance type.
         typedef std::size_t    size_type;
 
-        /*! \brief The distance type.
-        *
-        * A signed integral type used to represent the distance between two iterators.
-        */
+        /// A signed integral type used to represent the distance between two iterators.
         typedef std::ptrdiff_t difference_type;
 
         // reverse iterator support

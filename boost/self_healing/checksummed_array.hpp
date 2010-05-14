@@ -65,15 +65,11 @@ namespace boost { namespace self_healing {
         typedef const T &            const_reference;   //!< A const reference to an element.
         typedef unsigned int         checksum_type;     //!< The type of the internal checksums
 
-        /*! \brief The size type.
-        *
-        * An unsigned integral type that can represent any non-negative value of the container's distance type.
+        /*! An unsigned integral type that can represent any non-negative value of the container's distance type.
         */
         typedef std::size_t          size_type;
 
-        /*! \brief The distance type.
-        *
-        * A signed integral type used to represent the distance between two iterators.
+        /*! A signed integral type used to represent the distance between two iterators.
         */
         typedef std::ptrdiff_t       difference_type;
 
@@ -381,15 +377,11 @@ namespace boost { namespace self_healing {
         typedef T &            reference;       //!< A reference to an element.
         typedef const T &      const_reference; //!< A const reference to an element.
 
-        /*! \brief The size type.
-        *
-        * An unsigned integral type that can represent any non-negative value of the container's distance type.
+        /*! An unsigned integral type that can represent any non-negative value of the container's distance type.
         */
         typedef std::size_t    size_type;
 
-        /*! \brief The distance type.
-        *
-        * A signed integral type used to represent the distance between two iterators.
+        /*! A signed integral type used to represent the distance between two iterators.
         */
         typedef std::ptrdiff_t difference_type;
 
