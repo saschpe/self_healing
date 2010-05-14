@@ -11,7 +11,7 @@
  * 14 May 2010 - Initial Revision (Sascha Peilicke)
  */
 
-#include <boost/self_healing/reference_wrapper.hpp>
+#include <boost/self_healing/detail/reference_wrapper.hpp>
 
 #include <iostream>
 

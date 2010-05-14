@@ -29,7 +29,7 @@
 #include <boost/config.hpp>
 
 #include "./detail/chunk.hpp"
-#include "reference_wrapper.hpp"
+#include "./detail/reference_wrapper.hpp"
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.

@@ -22,8 +22,8 @@ set(BOOST_SELF_HEALING_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/self_h
 set(self_healing_HDRS
     boost/self_healing/detail/chunk.hpp
     boost/self_healing/detail/nullary_function.hpp
+    boost/self_healing/detail/reference_wrapper.hpp
     boost/self_healing/checksummed_array.hpp
-    boost/self_healing/reference_wrapper.hpp
     boost/self_healing/vector.hpp
     boost/self_healing.hpp
 )
@@ -52,8 +52,8 @@ if(BOOST_SELF_HEALING_BUILD_TESTS)
     #add_test(vector ${EXECUTABLE_OUTPUT_PATH}/test-vector)
     #add_executable(test-vector-iterators libs/self_healing/test/vector-iterators.cpp)
     #add_test(vector-iterators ${EXECUTABLE_OUTPUT_PATH}/test-vector-iterators)
-    #add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
-    #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
+    add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
+    add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 endif(BOOST_SELF_HEALING_BUILD_TESTS)
 
 # Installation

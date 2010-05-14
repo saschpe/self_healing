@@ -21,7 +21,7 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include "./detail/nullary_function.hpp"
+#include "./nullary_function.hpp"
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
