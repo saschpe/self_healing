@@ -62,8 +62,6 @@ namespace boost { namespace self_healing {
         typedef T                    value_type;        //!< The type of elements stored in the <code>vector</code>.
         class                        iterator;          //!< Forward declaration of class iterator.
         class                        const_iterator;    //!< Forward declaration of class const_iterator.
-        //typedef self_healing::pointer<T>   pointer;   //!< A pointer to the element.
-        typedef const T *            const_pointer;     //!< A const pointer to the element.
         typedef reference_wrapper<T> reference;         //!< A reference to an element.
         typedef const T &            const_reference;   //!< A const reference to an element.
 
@@ -82,7 +80,8 @@ namespace boost { namespace self_healing {
 
 
         explicit vector(const allocator_type & = A())
-            : m_head(new chunk<value_type, vector<value_type, CS, allocator_type>, CS>(this)), m_tail(m_head), m_chunks(1), m_size(0) {}
+            : m_head(new chunk<value_type, vector<value_type, CS, allocator_type>, CS>(this))
+            , m_tail(m_head), m_chunks(1), m_size(0) {}
 
         /*explicit vector(size_type, const allocator_type & = A());
         vector(size_type, const_reference, const allocator_type & = A());*/
@@ -125,7 +124,7 @@ namespace boost { namespace self_healing {
         //const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // Capacity
-        size_type size() const { check_and_repair_size(); return m_size; }
+        size_type size() const { check_size(); return m_size; }
 
         /*! \brief Get the largest possible size or capacity of the <code>vector</code>. (It depends on
         *          allocator's %max_size()).
@@ -144,11 +143,11 @@ namespace boost { namespace self_healing {
             return (std::min<size_type>)(/*m_alloc.max_size()*/999999999, (std::numeric_limits<difference_type>::max)());
         }
 
-        size_type capacity() const { check_and_repair_chunks(); return m_chunks * CS; }
+        size_type capacity() const { check_chunks(); return m_chunks * CS; }
         bool empty() const { return size() == 0; }
 
         void resize(size_type new_size, value_type fill = T()) {
-            check_and_repair_size();
+            check_size();
             if (new_size > m_size) {
                 const int old_size = m_size;
                 reserve(new_size);
@@ -171,7 +170,7 @@ namespace boost { namespace self_healing {
             }*/
         }
         void reserve(size_type new_size) {
-            check_and_repair_size();
+            check_size();
             if (new_size > m_size) {
                 //TODO: Do something actually
             }
@@ -191,8 +190,8 @@ namespace boost { namespace self_healing {
         const_reference at(size_type i) const { return operator[](i); }
         reference front() { return operator[](0); }
         const_reference front() const { return operator[](0); }
-        reference back() { check_and_repair_size(); return operator[](m_size - 1); }
-        const_reference back() const { check_and_repair_size(); return operator[](m_size - 1); }
+        reference back() { check_size(); return operator[](m_size - 1); }
+        const_reference back() const { check_size(); return operator[](m_size - 1); }
 
         // Modifiers
         /*void push_back(const_reference value);
@@ -219,13 +218,12 @@ namespace boost { namespace self_healing {
 
         /*! Validity check that tries to correct minor faults silently.
         * \return true, if the internal structure and data is valid
-        * \see check_and_repair_size
+        * \see check_size
         */
         bool is_valid() const {
             try {
-                check_and_repair_chunks();
-                check_and_repair_size();
-                //TODO: Add more checks here
+                check_chunks();
+                check_size();
                 return true;
             } catch (const size_error &e) {
                 return false;
@@ -234,13 +232,13 @@ namespace boost { namespace self_healing {
 
     private:
 
-        void check_and_repair_chunks() const {
+        void check_chunks() const {
             //TODO: Check and repair chunk count
             size_error e("chunk count error");
             boost::throw_exception(e);
         }
 
-        void check_and_repair_size() const {
+        void check_size() const {
             //TODO: check and repair size
             size_error e("size error");
             boost::throw_exception(e);
@@ -259,9 +257,8 @@ namespace boost { namespace self_healing {
                 boost::throw_exception(e);
             }
             //return const_cast<chunk *>(this - sizeof(chunk));
-        }*/
-
-        /*bool is_head(const chunk<T, CS> *chunk) const { return this == parent->m_head; }
+        }
+        bool is_head(const chunk<T, CS> *chunk) const { return this == parent->m_head; }
         bool is_tail(const chunk<T, CS> *chunk) const { return this == parent->m_tail; }*/
 
         chunk<value_type, vector<value_type, CS, allocator_type>, CS> *m_head;  //!< Internal pointer to the first chunk.

@@ -191,18 +191,18 @@ namespace boost { namespace self_healing {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // operator[] with range check
-        reference operator[](size_type i) { rangecheck(i); check_and_repair_checksums(); return reference(elements[i], update); }
-        const_reference operator[](size_type i) const { rangecheck(i); check_and_repair_checksums(); return elements[i]; }
+        reference operator[](size_type i) { rangecheck(i); check_checksums(); return reference(elements[i], update); }
+        const_reference operator[](size_type i) const { rangecheck(i); check_checksums(); return elements[i]; }
 
         // at() with range check
         reference at(size_type i) { return operator[](i); }
         const_reference at(size_type i) const { return operator[](i); }
 
         // front() and back()
-        reference front() { check_and_repair_checksums(); return reference(elements[0], update); }
-        const_reference front() const { check_and_repair_checksums(); return elements[0]; }
-        reference back() { check_and_repair_checksums(); return reference(elements[N - 1], update); }
-        const_reference back() const { check_and_repair_checksums(); return elements[N - 1]; }
+        reference front() { check_checksums(); return reference(elements[0], update); }
+        const_reference front() const { check_checksums(); return elements[0]; }
+        reference back() { check_checksums(); return reference(elements[N - 1], update); }
+        const_reference back() const { check_checksums(); return elements[N - 1]; }
 
         // size is constant
         static size_type size() { return N; }
@@ -219,12 +219,12 @@ namespace boost { namespace self_healing {
             }
             boost::swap(crc1, other.crc1);
             boost::swap(crc2, other.crc2);
-            check_and_repair_checksums();
+            check_checksums();
         }
 
         /*! Read-only direct access to data.
         */
-        const_pointer data() const { check_and_repair_checksums(); return elements; }
+        const_pointer data() const { check_checksums(); return elements; }
 
         //NOTE: this methods would bypass checksumming currently
         //pointer data() { return elements; }
@@ -260,11 +260,11 @@ namespace boost { namespace self_healing {
 
         /*! Validity check that tries to correct minor faults silently.
         * \return true, if the internal structure and data is valid.
-        * \see check_and_repair_checksums()
+        * \see check_checksums()
         */
         bool is_valid() const {
             try {
-                check_and_repair_checksums();
+                check_checksums();
                 return true;
             } catch (const checksum_error &e) {
                 return false;
@@ -283,8 +283,8 @@ namespace boost { namespace self_healing {
         *          it may change internal state nonetheless.
         * \throws checksum_error Thrown if the data was damaged and checksums mismatch.
         */
-        void check_and_repair_checksums() const {
-            //std::cout << "boost::self_healing::checksummed_array<value_type, N>::check_and_repair_checksums()" << std::endl;
+        void check_checksums() const {
+            //std::cout << "boost::self_healing::checksummed_array<value_type, N>::check_checksums()" << std::endl;
             boost::crc_32_type crc3;
             crc3.process_bytes(&elements, N * sizeof(value_type));
             const bool equal_13 = crc1 == crc3.checksum();
@@ -316,21 +316,21 @@ namespace boost { namespace self_healing {
 
         /*! \brief Check and repair checksums functor.
         *
-        * A private functor implementation that calls check_and_repair_checksums() for a
+        * A private functor implementation that calls check_checksums() for a
         * given checksummed_array instance if called itself.
         *
         * \see nullary_function
         */
-        class check_and_repair_checksums_functor : public nullary_function
+        class check_checksums_functor : public nullary_function
         {
         public:
             /*! Constructor.
             * \param parent The checksummed_array instance that owns the functor instance.
             */
-            explicit check_and_repair_checksums_functor(checksummed_array<value_type, N> *parent)
+            explicit check_checksums_functor(checksummed_array<value_type, N> *parent)
                 : m_parent(parent) {}
 
-            void operator()() { m_parent->check_and_repair_checksums(); }
+            void operator()() { m_parent->check_checksums(); }
 
         private:
             checksummed_array<value_type, N> *m_parent; //!< Internal reference to owning parent checksummed_array instance.
