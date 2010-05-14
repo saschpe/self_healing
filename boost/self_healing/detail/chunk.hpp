@@ -50,9 +50,18 @@ namespace boost { namespace self_healing {
     class chunk : public checksummed_array<T, N>
     {
     public:
+        /*! Constructor.
+        * \param parent The parent.
+        * \param value An initial value that is set for all elements.
+        */
         explicit chunk(P * const parent, const T &value = 0)
             : checksummed_array<T, N>(value), m_parent(parent) {}
 
+        /*! Validity check that tries to correct minor faults silently.
+        * \param parent An optional pointer to the parent to check against.
+        * \return true, if the internal structure and data is valid.
+        * \see check_and_repair_parent()
+        */
         virtual bool is_valid(P * const parent = NULL) const {
             try {
                 check_and_repair_parent(parent);
@@ -62,14 +71,30 @@ namespace boost { namespace self_healing {
             };
         }
 
-        void setParent(P * const parent) { m_parent = parent; }
+        /*! Set a new parent.
+        * \param parent Pointer to the new parent.
+        */
+        void setParent(P * const parent) { check_and_repair_parent(parent); }
+
+        /*! Accessor to get the chunk's parent.
+        * \return Pointer to the parent.
+        */
         P *parent() const { return m_parent; }
 
     private:
         void check_and_repair_parent(P * const parent) const {
             if (parent) {
+                // If a valid parent pointer was given we simply check against
+                // it and fix the internal pointer if needed.
                 if (m_parent != parent) {
                     const_cast<P *&>(m_parent) = parent;
+                }
+            } else {
+                // No pointer was given to check against, so we can do only
+                // limited checks
+                if (!m_parent) {
+                    parent_error e("parent is NULL");
+                    boost::throw_exception(e);
                 }
             }
         }
