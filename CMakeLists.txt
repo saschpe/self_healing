@@ -23,7 +23,7 @@ set(self_healing_HDRS
     boost/self_healing/detail/chunk.hpp
     boost/self_healing/detail/nullary_function.hpp
     boost/self_healing/checksummed_array.hpp
-    boost/self_healing/reference.hpp
+    boost/self_healing/reference_wrapper.hpp
     boost/self_healing/vector.hpp
     boost/self_healing.hpp
 )
@@ -35,8 +35,8 @@ if(BOOST_SELF_HEALING_BUILD_TESTS)
     enable_testing()
     include_directories(.) # to allow global #include
 
-    add_executable(test-reference libs/self_healing/test/reference.cpp)
-    add_test(reference ${EXECUTABLE_OUTPUT_PATH}/test-reference)
+    add_executable(test-reference_wrapper libs/self_healing/test/reference_wrapper.cpp)
+    add_test(reference_wrapper ${EXECUTABLE_OUTPUT_PATH}/test-reference_wrapper)
 
     add_executable(test-checksummed_array libs/self_healing/test/checksummed_array.cpp)
     add_test(checksummed_array ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array)
@@ -50,6 +50,8 @@ if(BOOST_SELF_HEALING_BUILD_TESTS)
 
     #add_executable(test-vector libs/self_healing/test/vector.cpp)
     #add_test(vector ${EXECUTABLE_OUTPUT_PATH}/test-vector)
+    #add_executable(test-vector-iterators libs/self_healing/test/vector-iterators.cpp)
+    #add_test(vector-iterators ${EXECUTABLE_OUTPUT_PATH}/test-vector-iterators)
     #add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
     #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 endif(BOOST_SELF_HEALING_BUILD_TESTS)
