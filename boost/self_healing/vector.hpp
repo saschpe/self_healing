@@ -123,8 +123,9 @@ namespace boost { namespace self_healing {
         //reverse_iterator rend() { return reverse_iterator(begin()); }
         //const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
-        // Capacity
+        // capacity
         size_type size() const { check_size(); return m_size; }
+        bool empty() const { return size() == 0; }
 
         /*! \brief Get the largest possible size or capacity of the <code>vector</code>. (It depends on
         *          allocator's %max_size()).
@@ -144,7 +145,6 @@ namespace boost { namespace self_healing {
         }
 
         size_type capacity() const { check_chunks(); return m_chunks * CS; }
-        bool empty() const { return size() == 0; }
 
         void resize(size_type new_size, value_type fill = T()) {
             check_size();
@@ -177,7 +177,7 @@ namespace boost { namespace self_healing {
             // vector throws a length_error if resized above max_size
         }
 
-        // Element Access
+        // operator[] with range check
         reference operator[](size_type i) {
             rangecheck(i);
 
@@ -186,14 +186,17 @@ namespace boost { namespace self_healing {
             rangecheck(i);
         }
 
+        // at() with range check
         reference at(size_type i) { return operator[](i); }
         const_reference at(size_type i) const { return operator[](i); }
+
+        // front() and back()
         reference front() { return operator[](0); }
         const_reference front() const { return operator[](0); }
         reference back() { check_size(); return operator[](m_size - 1); }
         const_reference back() const { check_size(); return operator[](m_size - 1); }
 
-        // Modifiers
+        // modifiers
         /*void push_back(const_reference value);
         void pop_back();*/
         /*iterator insert(iterator it);
@@ -231,7 +234,6 @@ namespace boost { namespace self_healing {
         }
 
     private:
-
         void check_chunks() const {
             //TODO: Check and repair chunk count
             size_error e("chunk count error");
@@ -268,8 +270,137 @@ namespace boost { namespace self_healing {
         size_type m_size;                           //!< Counts how much elements are stored currently in all chunks.
     };
 
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+    /*! Partial template specialization for the corner case of a vector with zero sized chunks.
+     */
+    template <class T>
+    class vector<T, 0>
+    {
+        // type definitions
+        typedef T              value_type;      //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef T *            iterator;        //!< A (random access) iterator used to iterate through the <code>checksummed_array</code>.
+        typedef const T *      const_iterator;  //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
+        typedef T *            pointer;         //!< A pointer to the element.
+        typedef const T *      const_pointer;   //!< A const pointer to the element.
+        typedef T &            reference;       //!< A reference to an element.
+        typedef const T &      const_reference; //!< A const reference to an element.
 
-    //TODO: Add vector<T, 0, A> template specialization
+        /*! \brief The size type.
+        *
+        * An unsigned integral type that can represent any non-negative value of the container's distance type.
+        */
+        typedef std::size_t    size_type;
+
+        /*! \brief The distance type.
+        *
+        * A signed integral type used to represent the distance between two iterators.
+        */
+        typedef std::ptrdiff_t difference_type;
+
+        // reverse iterator support
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+#elif defined(_MSC_VER) && (_MSC_VER == 1300) && defined(BOOST_DINKUMWARE_STDLIB) && (BOOST_DINKUMWARE_STDLIB == 310)
+        // workaround for broken reverse_iterator in VC7
+        typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
+                                                  reference, iterator, reference> > reverse_iterator;
+        typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
+                                                  const_reference, iterator, reference> > const_reverse_iterator;
+#elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
+        typedef std::reverse_iterator<iterator, std::random_access_iterator_tag,
+                                      value_type, reference, iterator, difference_type> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator, std::random_access_iterator_tag,
+                                      value_type, const_reference, const_iterator, difference_type> const_reverse_iterator;
+#else
+        // workaround for broken reverse_iterator implementations
+        typedef std::reverse_iterator<iterator, value_type> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator, value_type> const_reverse_iterator;
+#endif
+
+        // assignment
+        vector<value_type, 0>& operator=(const vector<value_type, 0> &) { return *this; }
+
+        // assign one value to all elements
+        template <class InputIterator>
+        void assign(InputIterator, InputIterator) {}
+        template <class Size, class TT>
+        void assign(Size) {}
+        template <class Size, class TT>
+        void assign(Size, const TT &) {}
+
+        // iterator support
+        iterator begin() { return iterator(reinterpret_cast<pointer>(this)); }
+        const_iterator begin() const { return const_iterator(reinterpret_cast<const_pointer>(this)); }
+        iterator end() { return begin(); }
+        const_iterator end() const { return begin(); }
+
+        // reverse iterator support
+        reverse_iterator rbegin() { return reverse_iterator(end()); }
+        const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+        reverse_iterator rend() { return reverse_iterator(begin()); }
+        const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+
+        // size is constant
+        static size_type size() { return 0; }
+        static bool empty() { return true; }
+        static size_type max_size() { return 0; }
+        static size_type capacity() { return 0; }
+        enum { static_size = 0 };
+
+        void resize(size_type, value_type = T()) {
+            std::length_error e("attempt to resize a zero sized vector");
+            boost::throw_exception(e);
+        }
+        void reserve(size_type) {
+            std::length_error e("attempt to resize a zero sized vector");
+            boost::throw_exception(e);
+        }
+
+        // operator[]
+        reference operator[](size_type) { return failed_rangecheck(); }
+        const_reference operator[](size_type) const { return failed_rangecheck(); }
+
+        // at() with range check
+        reference at(size_type) { return failed_rangecheck(); }
+        const_reference at(size_type) const { return failed_rangecheck(); }
+
+        // front() and back()
+        reference front() { return failed_rangecheck(); }
+        const_reference front() const { return failed_rangecheck(); }
+        reference back() { return failed_rangecheck(); }
+        const_reference back() const { return failed_rangecheck(); }
+
+        // modifiers
+        void push_back(const_reference value) {}
+        void pop_back() {}
+        iterator insert(iterator) { return iterator(reinterpret_cast<pointer>(this)); }
+        iterator insert(iterator, const_reference) { return iterator(reinterpret_cast<pointer>(this)); }
+        void insert(iterator, size_type, const_reference) {}
+        template <class InputIterator>
+        void insert(iterator, InputIterator, InputIterator) {}
+        iterator erase(iterator) { return iterator(reinterpret_cast<pointer>(this)); }
+        iterator erase(iterator, iterator) { return iterator(reinterpret_cast<pointer>(this)); }
+
+        void swap(vector<value_type, 0> &) {}
+
+        // check range (may be private because it is static)
+        static reference failed_rangecheck() {
+            std::out_of_range e("attempt to access element of an empty vector");
+            boost::throw_exception(e);
+#if defined(BOOST_NO_EXCEPTIONS) || !defined(BOOST_MSVC)
+            //
+            // We need to return something here to keep
+            // some compilers happy: however we will never
+            // actually get here....
+            //
+            static value_type placeholder;
+            return placeholder;
+#endif
+        }
+
+    };
+#endif
 
     // comparisons
     template<class T, std::size_t CS, class A>
