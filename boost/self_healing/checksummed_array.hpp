@@ -57,9 +57,7 @@ namespace boost { namespace self_healing {
     *
     * \param T The data type of the stored values.
     * \param N The size of the checksummed_array.
-    *
     * \remarks TODO.
-    *
     * \see nullary_function
     */
     template <class T, std::size_t N>
@@ -251,7 +249,7 @@ namespace boost { namespace self_healing {
 
         /*! Check index validity against static size.
         * \param index The index to check.
-        * \throws std::out_of_range
+        * \throws std::out_of_range Thrown if index is out of range.
         */
         static void rangecheck(size_type index) {
             if (index >= size()) {
@@ -281,9 +279,8 @@ namespace boost { namespace self_healing {
         * not match the (equal) values of the stored checksums, a malicious data
         * change happened and the data structure is no longer valid.
         *
-        * \remark This method is defined const to make it easier to call by other methods,
-        *         it may change internal state nonetheless.
-        *
+        * \remarks This method is defined const to make it easier to call by other methods,
+        *          it may change internal state nonetheless.
         * \throws checksum_error Thrown if the data was damaged and checksums mismatch.
         */
         void check_and_repair_checksums() const {
