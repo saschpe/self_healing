@@ -180,10 +180,6 @@ namespace boost { namespace self_healing {
         checksummed_array(const T &value = 0)
             : check(this), update(this) { update_checksums(); fill(value); }
 
-        /*! Empty virtual descructor to allow sub-classing.
-        */
-        virtual ~checksummed_array() {}
-
         // iterator support
         iterator begin() {  return iterator(elements, check, update); }
         const_iterator begin() const { return elements; }
@@ -268,7 +264,7 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_and_repair_checksums()
         */
-        virtual bool is_valid() const {
+        bool is_valid() const {
             try {
                 check_and_repair_checksums();
                 return true;

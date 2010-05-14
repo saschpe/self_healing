@@ -62,7 +62,7 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_and_repair_parent()
         */
-        virtual bool is_valid(P * const parent = NULL) const {
+        bool is_valid(P * const parent = NULL) const {
             try {
                 check_and_repair_parent(parent);
                 return static_cast<const checksummed_array<T, N> *>(this)->is_valid();
