@@ -18,6 +18,7 @@
 
 
 #include "./self_healing/checksummed_array.hpp"
+#include "./self_healing/reference.hpp"
 #include "./self_healing/vector.hpp"
 
 
