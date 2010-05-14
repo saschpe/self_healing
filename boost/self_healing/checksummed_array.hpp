@@ -181,9 +181,9 @@ namespace boost { namespace self_healing {
         reverse_iterator rend() { return reverse_iterator(begin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
-        // operator[] with range check
-        reference operator[](size_type i) { rangecheck(i); check_checksums(); return reference(elements[i], update); }
-        const_reference operator[](size_type i) const { rangecheck(i); check_checksums(); return elements[i]; }
+        // operator[]
+        reference operator[](size_type i) { check_checksums(); return reference(elements[i], update); }
+        const_reference operator[](size_type i) const { check_checksums(); return elements[i]; }
 
         // at() with range check
         reference at(size_type i) { return operator[](i); }

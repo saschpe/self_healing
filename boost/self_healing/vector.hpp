@@ -172,18 +172,17 @@ namespace boost { namespace self_healing {
             // vector throws a length_error if resized above max_size
         }
 
-        // operator[] with range check
+        // operator[]
         reference operator[](size_type i) {
-            rangecheck(i);
 
         }
         const_reference operator[](size_type i) const {
-            rangecheck(i);
+
         }
 
         // at() with range check
-        reference at(size_type i) { return operator[](i); }
-        const_reference at(size_type i) const { return operator[](i); }
+        reference at(size_type i) { rangecheck(i); return operator[](i); }
+        const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
 
         // front() and back()
         reference front() { return operator[](0); }
