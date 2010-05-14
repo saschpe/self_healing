@@ -19,6 +19,7 @@
 #include <boost/detail/workaround.hpp>
 
 #include <stdexcept>
+#include <vector>
 #include <boost/swap.hpp>
 
 // Handles broken standard libraries better than <iterator>
@@ -78,7 +79,10 @@ namespace boost { namespace self_healing {
         typedef std::ptrdiff_t       difference_type;
         typedef A                    allocator_type;    //!< The type of an allocator used in the <code>circular_buffer</code>.
 
+        //TODO: reinsert iterator stuff
 
+
+        // constructors
         explicit vector(const allocator_type & = A())
             : m_head(new chunk<value_type, vector<value_type, CS, allocator_type>, CS>(this))
             , m_tail(m_head), m_chunks(1), m_size(0) {}
@@ -317,6 +321,15 @@ namespace boost { namespace self_healing {
         typedef std::reverse_iterator<iterator, value_type> reverse_iterator;
         typedef std::reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
+
+
+        // constructors
+        vector(size_type, const_reference) {}
+        vector(const vector<value_type, 0> &) {}
+        vector(const std::vector<value_type>) {}
+        explicit vector(size_type) {}
+        template <class InputIterator>
+        vector(InputIterator, InputIterator) {}
 
         // assignment
         vector<value_type, 0>& operator=(const vector<value_type, 0> &) { return *this; }
