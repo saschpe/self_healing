@@ -36,15 +36,6 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    /*! Exception that is thrown when a size error happened.
-    */
-    class size_error : public std::runtime_error
-    {
-    public:
-        explicit size_error(const std::string &what_arg)
-            : std::runtime_error(what_arg) {}
-    };
-
     /*! \brief Vector.
     *
     * TODO.
@@ -232,7 +223,7 @@ namespace boost { namespace self_healing {
                 check_chunks();
                 check_size();
                 return true;
-            } catch (const size_error &e) {
+            } catch (const std::runtime_error &e) {
                 return false;
             };
         }
@@ -240,13 +231,13 @@ namespace boost { namespace self_healing {
     private:
         void check_chunks() const {
             //TODO: Check and repair chunk count
-            size_error e("chunk count error");
+            std::runtime_error e("chunk count error");
             boost::throw_exception(e);
         }
 
         void check_size() const {
             //TODO: check and repair size
-            size_error e("size error");
+            std::runtime_error e("size error");
             boost::throw_exception(e);
         }
 

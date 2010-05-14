@@ -26,15 +26,6 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    /*! Exception that is thrown when a parent error happened.
-    */
-    class parent_error : public std::runtime_error
-    {
-    public:
-        explicit parent_error(const std::string &what_arg)
-            : std::runtime_error(what_arg) {}
-    };
-
     /*! \brief Element storage chunk.
     *
     * A chunk is a checksummed_array with a pointer to it's parent and to be
@@ -77,7 +68,7 @@ namespace boost { namespace self_healing {
             try {
                 check_parent(parent);
                 return static_cast<const checksummed_array<value_type, N> *>(this)->is_valid();
-            } catch (const parent_error &e) {
+            } catch (const std::runtime_error &e) {
                 return false;
             };
         }
@@ -103,7 +94,7 @@ namespace boost { namespace self_healing {
             } else {
                 // No pointer was given to check against, so we can do only limited checks
                 if (!m_parent) {
-                    parent_error e("parent is NULL");
+                    std::runtime_error e("parent is NULL");
                     boost::throw_exception(e);
                 }
             }

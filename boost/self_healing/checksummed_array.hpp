@@ -42,15 +42,6 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    /*! Exception that is thrown when a checksum error happened.
-    */
-    class checksum_error : public std::runtime_error
-    {
-    public:
-        explicit checksum_error(const std::string &what_arg)
-            : std::runtime_error(what_arg) {}
-    };
-
     /*! \brief Checksummed array.
     *
     * A checksummed array of constant size.
@@ -266,7 +257,7 @@ namespace boost { namespace self_healing {
             try {
                 check_checksums();
                 return true;
-            } catch (const checksum_error &e) {
+            } catch (const std::runtime_error &e) {
                 return false;
             };
         }
@@ -281,7 +272,7 @@ namespace boost { namespace self_healing {
         *
         * \remarks This method is defined const to make it easier to call by other methods,
         *          it may change internal state nonetheless.
-        * \throws checksum_error Thrown if the data was damaged and checksums mismatch.
+        * \throws std::runtime_error Thrown if the data was damaged and checksums mismatch.
         */
         void check_checksums() const {
             //std::cout << "boost::self_healing::checksummed_array<value_type, N>::check_checksums()" << std::endl;
@@ -306,11 +297,11 @@ namespace boost { namespace self_healing {
                 // The computed checksum over the content is not the same as
                 // the stored onces, thus the content was maliciously changed
                 // and the checksummed_array is invalid.
-                checksum_error e("data error");
+                std::runtime_error e("data error");
                 boost::throw_exception(e);
             }
             // All three checksums differ
-            checksum_error e("checksum error");
+            std::runtime_error e("checksum error");
             boost::throw_exception(e);
         }
 
