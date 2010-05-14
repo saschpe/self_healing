@@ -40,60 +40,210 @@ namespace boost { namespace self_healing {
     *
     * TODO.
     *
-    * \param A
-    * \param CS The size of the internal chunks.
     * \param T The data type of the stored values.
+    * \param CS The size of the internal chunks.
     * \remarks The chunk size should be chosen based on CPU cache size.
     * \see chunk
     */
-    template <class T, std::size_t CS = 64, class A = std::allocator<T> >
+    template <class T, std::size_t CS = 64>
     class vector
     {
     public:
         // type definitions
-        typedef T                           value_type;        //!< The type of elements stored in the <code>vector</code>.
-        typedef A                           allocator_type;    //!< The type of an allocator used in the <code>circular_buffer</code>.
-        class                               iterator;          //!< Forward declaration of class iterator.
-        class                               const_iterator;    //!< Forward declaration of class const_iterator.
-        typedef reference_wrapper<T>        reference;         //!< A reference to an element.
-        typedef typename A::const_reference const_reference;   //!< A const reference to an element.
+        typedef T                    value_type;        //!< The type of elements stored in the <code>vector</code>.
+        typedef A                    allocator_type;    //!< The type of an allocator used in the <code>vector</code>.
+        class                        iterator;          //!< Forward declaration of class iterator.
+        class                        const_iterator;    //!< Forward declaration of class const_iterator.
+        typedef reference_wrapper<T> reference;         //!< A reference to an element.
+        typedef const T &            const_reference;   //!< A const reference to an element.
 
         /*! An unsigned integral type that can represent any non-negative value of the container's distance type.
         */
-        typedef typename A::size_type       size_type;
+        typedef std::size_t          size_type;
 
         /*! A signed integral type used to represent the distance between two iterators.
         */
-        typedef typename A::difference_type difference_type;
+        typedef std::ptrdiff_t       difference_type;
 
+        /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
+        *
+        * A safe iterator that calls a functor if the value at the current
+        * position is changed. Checksumms are also updated correctly if the
+        * iterator is dereferenced.
+        */
+        class iterator : public std::iterator<std::random_access_iterator_tag, T>
+        {
+            friend class vector<T, CS, A>;
 
-        //TODO: reinsert iterator stuff
+            /*! Private constructor.
+            * \param rhs TODO.
+            */
+            explicit iterator(T *rhs)
+                : m_p(rhs) {}
+
+        public:
+            /*! Copy constructor.
+            * \param other The other iterator instance to copy from.
+            */
+            iterator(const iterator &other)
+                : m_p(other.m_p) {}
+
+            iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
+
+            iterator& operator+(difference_type n) const { return m_p + n; }
+            iterator& operator-(difference_type n) const { return m_p - n; }
+            difference_type operator+(const iterator &rhs) const { return m_p + rhs.m_p; }
+            difference_type operator-(const iterator &rhs) const { return m_p - rhs.m_p; }
+
+            iterator& operator+=(difference_type n) { m_p += n; return *this; }
+            iterator& operator-=(difference_type n) { m_p -= n; return *this; }
+            iterator& operator++() { ++m_p; return *this; }
+            iterator& operator++(int) { m_p++; return *this; }
+            iterator& operator--() { --m_p; return *this; }
+            iterator& operator--(int) { m_p--; return *this; }
+
+            bool operator==(const iterator& rhs) const { return m_p == rhs.m_p; }
+            bool operator!=(const iterator& rhs) const { return m_p != rhs.m_p; }
+
+            reference operator*() const { return reference(*m_p); }
+            operator const_iterator() const { return m_p; }
+
+        private:
+            T *m_p; //!< Internal pointer to the current position in the vector.
+        };
+
+        /*! A const (random access) iterator used to iterate through the <code>vector</code>.
+        */
+        class const_iterator : public std::iterator<std::random_access_iterator_tag, T>
+        {
+            friend class vector<T, CS, A>;
+
+            /*! Private constructor.
+            * \param rhs The chunk to initialize the iterator with.
+            */
+            explicit const_iterator(chunk *rhs, const typename checksummed_array<T, CS>::iterator &it)
+                : m_chunk(rhs), m_it(it), m_begin(rhs->elements.begin()), m_end(rhs->elements.end()) {}
+
+        public:
+            /*! Copy constructor.
+            * \param other The other iterator instance to copy from.anged.
+            */
+            const_iterator(const const_iterator &other)
+                : m_chunk(other.m_chunk), m_it(other.m_it), m_begin(other.m_begin), m_end(other.m_end) {}
+
+            const_iterator& operator=(const const_iterator &rhs) { m_chunk = rhs.m_chunk; m_it = rhs.m_it; return *this; }
+
+            const_iterator operator+(difference_type n) const {
+                typename checksummed_array<T, CS>::const_iterator tmp_new = m_it + n;
+
+                if (tmp_new >= m_begin && tmp_new < m_end) {
+                    return const_iterator(m_chunk, tmp_new);
+                } else if (tmp_new < m_begin) {
+                    chunk *previous_chunk;
+                    /*do {
+                        previous_chunk = m_chunk->previous();
+                        m_begin = previous_chunk->elements.begin();
+                        m_end = previous_chunk->elements.end();
+                        //tmp_new += CS;
+                    } while (tmp_new < m_begin);*/
+                    //return const_iterator(previous_chunk, tmp_new);
+                } else {
+                    chunk *next_chunk;
+                    /*do {
+                        next_chunk = m_chunk->next();
+                        m_begin = next_chunk->elements.begin();
+                        m_end = next_chunk->elements.end();
+                        tmp_new -= CS;
+                    } while (tmp_new >= m_end);*/
+                    //return const_iterator(next_chunk, tmp_new);
+                }
+            }
+
+            //const_iterator operator-(difference_type n) const { return from_current(m_index - n); }
+            /*difference_type operator+(const const_iterator &rhs) const { return 0; }
+            difference_type operator-(const const_iterator &rhs) const { return 0; }*/
+
+            /*const_iterator& operator+=(difference_type n) { *this = from_current(m_index + n); return *this; }
+            const_iterator& operator-=(difference_type n) { *this = from_current(m_index - n); return *this; }
+            const_iterator& operator++() { *this = from_current(m_index + 1); return *this; }
+            const_iterator& operator++(int) { *this = from_current(m_index + 1); return *this; }
+            const_iterator& operator--() { *this = from_current(m_index - 1); return *this; }
+            const_iterator& operator--(int) { *this = from_current(m_index - 1); return *this; }*/
+
+            bool operator==(const const_iterator& rhs) const { return m_chunk == rhs.m_chunk && m_it == rhs.m_it; }
+            bool operator!=(const const_iterator& rhs) const { return m_chunk != rhs.m_chunk || m_it != rhs.m_it; }
+
+            const_reference operator*() const { return *m_it; }
+
+            /*! Overload for operator<<() of std::ostream to print a reference.
+            */
+            friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) {
+                return os << it.m_it;
+            }
+
+        private:
+            struct chunk *m_chunk;                                      //!< Internal pointer to the current chunk.
+            typename checksummed_array<T, CS>::const_iterator m_it;     //!< Iterator of the current chunk
+            typename checksummed_array<T, CS>::const_iterator m_begin;  //!<
+            typename checksummed_array<T, CS>::const_iterator m_end;
+        };
+
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
+        typedef typename A::reverse_iterator<iterator> reverse_iterator;
+        typedef typename A::reverse_iterator<const_iterator> const_reverse_iterator;
+#elif defined(_MSC_VER) && (_MSC_VER == 1300) && defined(BOOST_DINKUMWARE_STDLIB) && (BOOST_DINKUMWARE_STDLIB == 310)
+        // workaround for broken reverse_iterator in VC7
+        typedef typename A::reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
+                                                         reference, iterator, reference> > reverse_iterator;
+        typedef typename A::reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
+                                                         const_reference, iterator, reference> > const_reverse_iterator;
+#elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
+        typedef typename A::reverse_iterator<iterator, std::random_access_iterator_tag,
+                                             value_type, reference, iterator, difference_type> reverse_iterator;
+        typedef typename A::reverse_iterator<const_iterator, std::random_access_iterator_tag,
+                                             value_type, const_reference, const_iterator, difference_type> const_reverse_iterator;
+#else
+        // workaround for broken reverse_iterator implementations
+        typedef typename A::reverse_iterator<iterator, T> reverse_iterator;
+        typedef typename A::reverse_iterator<const_iterator, T> const_reverse_iterator;
+#endif
 
 
         // constructors
-        explicit vector(const allocator_type & = A())
-            : m_head(new chunk<value_type, vector<value_type, CS, allocator_type>, CS>(this))
-            , m_tail(m_head), m_chunks(1), m_size(0) {}
+        explicit vector(const allocator_type &alloc = A())
+            : m_alloc(alloc) {}
 
-        /*explicit vector(size_type, const allocator_type & = A());
-        vector(size_type, const_reference, const allocator_type & = A());*/
-
-        /*! Copy constructor.
-        * \param other The other vector to copy from.
-        */
-        //vector(const vector<value_type, CS, allocator_type> &other);
-        //vector(const std::vector<value_type>);
-
-        /*explicit vector(size_type);
-
-        template <class InputIterator>
-        vector(InputIterator, InputIterator, const allocator_type & = A());*/
-
-        ~vector() {
-            delete[] m_head;
+        vector(size_type n, const_reference x = value_type(), const allocator_type &alloc = A())
+            : m_alloc(alloc) {
+            assign(n, x);
         }
 
-        /*vector<value_type, CS, allocator_type>& operator=(const vector<value_type, CS, allocator_type> &);
+        template <class InputIterator>
+        vector(InputIterator first, InputIterator last, const allocator_type &alloc = A())
+            : m_alloc(alloc) {
+            assign(first, last);
+        }
+
+        /*! Copy constructor.
+        * \param other The other <code>boost::self_healing::vector</code> to copy from.
+        */
+        vector(const vector<value_type, CS, allocator_type> &rhs)
+            : m_alloc(rhs.get_allocator()) {
+            assign(rhs.begin(), rhs.end());
+        }
+        /*! Copy constructor.
+        * \param other The other <code>std::vector</code> to copy from.
+        */
+        vector(const std::vector<value_type> &rhs);
+            : m_alloc(rhs.get_allocator()) {
+            assign(rhs.begin(), rhs.end());
+        }
+
+        ~vector() {
+            //m_alloc.deallocate(m_alloc.head, TODO);
+        }
+
+        vector<value_type, CS, allocator_type>& operator=(const vector<value_type, CS, allocator_type> &);
 
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last);
@@ -101,7 +251,8 @@ namespace boost { namespace self_healing {
         void assign(Size n);
         template <class Size, class TT>
         void assign(Size n, const TT&);
-        allocator_type get_allocator() const;*/
+
+        allocator_type get_allocator() const { return m_alloc; }
 
         // iterator support
         //iterator begin() { return iterator(m_chunks); }
@@ -116,7 +267,7 @@ namespace boost { namespace self_healing {
         //const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // capacity
-        size_type size() const { check_size(); return m_size; }
+        size_type size() const { check_size(); return m_alloc.size; }
         bool empty() const { return size() == 0; }
 
         /*! \brief Get the largest possible size or capacity of the <code>vector</code>. (It depends on
@@ -140,13 +291,13 @@ namespace boost { namespace self_healing {
 
         void resize(size_type new_size, value_type fill = T()) {
             check_size();
-            if (new_size > m_size) {
-                const int old_size = m_size;
+            if (new_size > size()) {
+                //const int old_size = m_size;
                 reserve(new_size);
                 // TODO: fill new elelemts with provide value
                 /*for (int i = old_size; i < size; i++) {
                 }*/
-            } else if (new_size < m_size) {
+            } else if (new_size < size()) {
 
             }
             // vector throws a length_error if resized above max_size
@@ -163,7 +314,7 @@ namespace boost { namespace self_healing {
         }
         void reserve(size_type new_size) {
             check_size();
-            if (new_size > m_size) {
+            if (new_size > size()) {
                 //TODO: Do something actually
             }
             // vector throws a length_error if resized above max_size
@@ -237,6 +388,12 @@ namespace boost { namespace self_healing {
             boost::throw_exception(e);
         }
 
+        void check_allocator() const {
+            //TODO: check and repair allocator pointer
+            std::runtime_error e("allocator error");
+            boost::throw_exception(e);
+        }
+
         /*chunk<T, CS> *next_chunk(const chunk<T, CS> *chunk) const {
             if (this >= parent->m_tail) {
                 std::out_of_range e("vector<>: index out of range");
@@ -254,11 +411,20 @@ namespace boost { namespace self_healing {
         bool is_head(const chunk<T, CS> *chunk) const { return this == parent->m_head; }
         bool is_tail(const chunk<T, CS> *chunk) const { return this == parent->m_tail; }*/
 
-        chunk<value_type, vector<value_type, CS, allocator_type>, CS> *m_head;  //!< Internal pointer to the first chunk.
-        chunk<value_type, vector<value_type, CS, allocator_type>, CS> *m_tail;  //!< Internal pointer to the last chunk.
+        //TODO: make this one fault-tolerant
+        struct vector_allocator : public allocator_type
+        {
+            vector(const allocator_type &alloc)
+                : allocator_type(alloc), head(NULL), tail(NULL), m_chunks(0);
 
-        size_type m_chunks;                         //!< Chunk counter.
-        size_type m_size;                           //!< Counts how much elements are stored currently in all chunks.
+            chunk<value_type, vector<value_type, CS, allocator_type>, CS> *head;  //!< Pointer to the first chunk.
+            chunk<value_type, vector<value_type, CS, allocator_type>, CS> *tail;  //!< Pointer to the last chunk.
+            size_type chunks;                   //!< Chunk counter.
+            size_type size;                     //!< Counts how much elements are stored currently in all chunks.
+            size_type capacity;
+        };
+
+        vector_allocator m_alloc;
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
