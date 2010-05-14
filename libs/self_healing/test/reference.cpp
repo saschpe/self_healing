@@ -17,6 +17,8 @@
 
 int main()
 {
+    std::cout << "testing class boost::self_healing::vector<>" << std::endl;
+
     int i = 3;
     boost::self_healing::reference<int> rr(i);
     int j = 1 + *rr + 3;
