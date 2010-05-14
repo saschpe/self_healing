@@ -17,6 +17,8 @@
 
 int main()
 {
+    std::cout << "testing class boost::self_healing::vector<> iterators" << std::endl;
+
     boost::self_healing::checksummed_array<int, 16> a;
 
     std::cout << "checksummed_array 1: " << a << std::endl;

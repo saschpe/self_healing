@@ -19,20 +19,22 @@
 
 int main()
 {
+    std::cout << "testing class boost::self_healing::checksummed_array<>" << std::endl;
+
     boost::self_healing::checksummed_array<int, 16> a;
     std::cout << "checksummed_array 1: " << a << std::endl;
 
     assert(a.at(0) == 0);
     assert(a.at(a.size() - 1) == 0);
 
-    std::cout << "testing class self_healing::checksummed_array<>::reference assignment" << std::endl;
+    std::cout << "testing checksummed_array<>::reference assignment" << std::endl;
     a.front() = 3;
     a.back() = 4;
     a[2] = 4;
     a.at(3) = 5;
     a.at(13) = a.at(12);
 
-    std::cout << "testing class self_healing::checksummed_array<>::reference comparison" << std::endl;
+    std::cout << "testing checksummed_array<>::reference comparison" << std::endl;
     assert(a.front() == 3);
     assert(a.front() != 5);
     assert(a.front() >= 2);
@@ -40,14 +42,14 @@ int main()
     std::cout << (a.front() > 3) << std::endl;
     std::cout << (a.front() < 3) << std::endl;
 
-    std::cout << "testing class self_healing::checksummed_array<>::reference arithmetic operations" << std::endl;
+    std::cout << "testing checksummed_array<>::reference arithmetic operations" << std::endl;
     std::cout << a.front() + 2 << std::endl;
     std::cout << a.front() - 2 << std::endl;
     std::cout << a.front() * 2 << std::endl;
     std::cout << a.front() / 2 << std::endl;
     std::cout << a.front() % 2 << std::endl;
 
-    std::cout << "testing class self_healing::checksummed_array<>::reference arithmetic assignment operations" << std::endl;
+    std::cout << "testing checksummed_array<>::reference arithmetic assignment operations" << std::endl;
     std::cout << a[0];
     std::cout << "a1[6] += 1: " << (a[6] += 1) << std::endl;
     std::cout << (a[7] -= 1) << std::endl;
@@ -55,7 +57,7 @@ int main()
     std::cout << (a[7] /= 1) << std::endl;
     std::cout << (a[7] %= 1) << std::endl;
 
-    std::cout << "testing class self_healing::checksummed_array<>::reference increment and decrement operations" << std::endl;
+    std::cout << "testing checksummed_array<>::reference increment and decrement operations" << std::endl;
     a[8]++;
     ++a[9];
     a[10]--;

@@ -20,6 +20,8 @@
 
 int main()
 {
+    std::cout << "testing class boost::self_healing::vector<> fault injection" << std::endl;
+
     boost::self_healing::checksummed_array<int, 64> a1;
     std::cout << "checksummed_array 1: " << a1 << std::endl;
 
