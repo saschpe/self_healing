@@ -72,6 +72,7 @@ namespace boost { namespace self_healing {
         typedef const T *            const_pointer;     //!< A const pointer to the element.
         typedef reference_wrapper<T> reference;         //!< A reference to an element.
         typedef const T &            const_reference;   //!< A const reference to an element.
+        typedef unsigned int         checksum_type;     //!< The type of the internal checksums
 
         /*! \brief The size type.
         *
@@ -283,7 +284,7 @@ namespace boost { namespace self_healing {
         * \throws checksum_error Thrown if the data was damaged and checksums mismatch.
         */
         void check_and_repair_checksums() const {
-            //std::cout << "boost::self_healing::checksummed_array<T, N>::check_and_repair_checksums()" << std::endl;
+            //std::cout << "boost::self_healing::checksummed_array<value_type, N>::check_and_repair_checksums()" << std::endl;
             boost::crc_32_type crc3;
             crc3.process_bytes(&elements, N * sizeof(value_type));
             const bool equal_13 = crc1 == crc3.checksum();
@@ -294,11 +295,11 @@ namespace boost { namespace self_healing {
                 return;             // all fine
             }
             if (equal_13) {
-                const_cast<unsigned int &>(crc2) = crc1;    // fix crc2 as the others are equal
+                const_cast<checksum_type &>(crc2) = crc1;   // fix crc2 as the others are equal
                 return;             // all fine
             }
             if (equal_23) {
-                const_cast<unsigned int &>(crc1) = crc2;    // fix crc1 as the others are equal
+                const_cast<checksum_type &>(crc1) = crc2;   // fix crc1 as the others are equal
                 return;             // all fine
             }
             if (equal_12) {
@@ -326,7 +327,7 @@ namespace boost { namespace self_healing {
             /*! Constructor.
             * \param parent The checksummed_array instance that owns the functor instance.
             */
-            explicit check_and_repair_checksums_functor(checksummed_array<T, N> *parent)
+            explicit check_and_repair_checksums_functor(checksummed_array<value_type, N> *parent)
                 : m_parent(parent) {}
 
             void operator()() { m_parent->check_and_repair_checksums(); }
@@ -339,7 +340,7 @@ namespace boost { namespace self_healing {
         /*! Compute and store CRC checksums.
         */
         void update_checksums() {
-            //std::cout << "boost::self_healing::checksummed_array<T, N>::update_checksums()" << std::endl;
+            //std::cout << "boost::self_healing::checksummed_array<value_type, N>::update_checksums()" << std::endl;
             boost::crc_32_type crc;
             crc.process_bytes(&elements, N * sizeof(value_type));
             crc1 = crc.checksum();
@@ -368,9 +369,9 @@ namespace boost { namespace self_healing {
             checksummed_array<value_type, N> *m_parent; //!< Internal reference to owning parent checksummed_array instance.
         } update;                                       //!< Internal functor instance to pass to reference instances.
 
-        unsigned int crc1;      //!< Internal first checksum.
-        value_type elements[N]; //!< Internal fixed-size checksummed_array of elements of type T.
-        unsigned int crc2;      //!< Internal second checksum (backup).
+        checksum_type crc1;         //!< Internal first checksum.
+        value_type elements[N];     //!< Internal fixed-size checksummed_array of elements of type T.
+        checksum_type crc2;         //!< Internal second checksum (backup).
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
