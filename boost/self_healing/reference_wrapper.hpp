@@ -48,7 +48,7 @@ namespace boost { namespace self_healing {
         * \param value The value to initialize the reference with.
         * \param update The function to apply if the value is changed.
         */
-        explicit reference_wrapper(value_type &value, nullary_function &update = empty_nullary_function)
+        explicit reference_wrapper(reference value, nullary_function &update = empty_nullary_function)
             : value(value), update(update) {}
 
         /*! Copy constructor.
