@@ -20,6 +20,7 @@ set(BOOST_SELF_HEALING_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/")
 set(BOOST_SELF_HEALING_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/self_healing")
 
 set(self_healing_HDRS
+    boost/self_healing/detail/chunk.hpp
     boost/self_healing/detail/nullary_function.hpp
     boost/self_healing/checksummed_array.hpp
     boost/self_healing/reference.hpp
@@ -39,16 +40,19 @@ if(BOOST_SELF_HEALING_BUILD_TESTS)
 
     add_executable(test-checksummed_array-base libs/self_healing/test/checksummed_array-base.cpp)
     add_test(checksummed_array-base ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-base)
-    
+
     add_executable(test-checksummed_array-iterators libs/self_healing/test/checksummed_array-iterators.cpp)
     add_test(checksummed_array-iterators ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-iterators)
-    
+
     add_executable(test-checksummed_array-faults libs/self_healing/test/checksummed_array-faults.cpp)
     add_test(checksummed_array-faults ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-faults)
-    
+
+    add_executable(test-chunk-base libs/self_healing/test/chunk-base.cpp)
+    add_test(chunk-base ${EXECUTABLE_OUTPUT_PATH}/test-chunk-base)
+
     #add_executable(test-vector-base libs/self_healing/test/vector-base.cpp)
     #add_test(vector-base ${EXECUTABLE_OUTPUT_PATH}/test-vector-base)
-    
+
     #add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
     #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 endif(BOOST_SELF_HEALING_BUILD_TESTS)
