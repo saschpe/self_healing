@@ -5,50 +5,50 @@
 # accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 #
-project(robust)
+project(self_healing)
 cmake_minimum_required(VERSION 2.6.4)
 
-set(CMAKE_MODULE_PATH "${robust_SOURCE_DIR}/cmake/modules")
+set(CMAKE_MODULE_PATH "${self_healing_SOURCE_DIR}/cmake/modules")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Boost 1.42.0 REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
-option(ROBUST_BUILD_TESTS "Build the tests" on)
-set(ROBUST_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include/")
-set(ROBUST_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/")
-set(ROBUST_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/robust")
+option(BOOST_SELF_HEALING_BUILD_TESTS "Build the tests" on)
+set(BOOST_SELF_HEALING_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include/")
+set(BOOST_SELF_HEALING_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/")
+set(BOOST_SELF_HEALING_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/self_healing")
 
-set(robust_HDRS
-    boost/robust/detail/nullary_function.hpp
-    boost/robust/checksummed_array.hpp
-    boost/robust/reference.hpp
-    boost/robust/vector.hpp
-    boost/robust.hpp
+set(self_healing_HDRS
+    boost/self_healing/detail/nullary_function.hpp
+    boost/self_healing/checksummed_array.hpp
+    boost/self_healing/reference.hpp
+    boost/self_healing/vector.hpp
+    boost/self_healing.hpp
 )
 
-set(robust_LIB_SRCS
+set(self_healing_LIB_SRCS
 )
 
-if(ROBUST_BUILD_TESTS)
+if(BOOST_SELF_HEALING_BUILD_TESTS)
     enable_testing()
     include_directories(.) # to allow global #include
-    add_executable(test-array-base libs/robust/test/array-base.cpp)
-    add_test(array-base ${EXECUTABLE_OUTPUT_PATH}/test-array-base)
-    add_executable(test-array-faults libs/robust/test/array-faults.cpp)
-    add_test(array-faults ${EXECUTABLE_OUTPUT_PATH}/test-array-faults)
-    add_executable(test-vector-base libs/robust/test/vector-base.cpp)
-    add_test(vector-base ${EXECUTABLE_OUTPUT_PATH}/test-vector-base)
-    add_executable(test-vector-faults libs/robust/test/vector-faults.cpp)
-    add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
-endif(ROBUST_BUILD_TESTS)
+    add_executable(test-checksummed_array-base libs/self_healing/test/checksummed_array-base.cpp)
+    add_test(checksummed_array-base ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-base)
+    add_executable(test-checksummed_array-faults libs/self_healing/test/checksummed_array-faults.cpp)
+    add_test(checksummed_array-faults ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-faults)
+    #add_executable(test-vector-base libs/self_healing/test/vector-base.cpp)
+    #add_test(vector-base ${EXECUTABLE_OUTPUT_PATH}/test-vector-base)
+    #add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
+    #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
+endif(BOOST_SELF_HEALING_BUILD_TESTS)
 
 # Installation
 #if(WIN32 AND NOT UNIX)
     #install(DIRECTORY docs/ DESTINATION ${CMAKE_INSTALL_PREFIX}/docs)
     #install(FILES AUTHORS.txt README.txt LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX})
 #else()
-    #install(FILES ${robust_HDRS} DESTINATION ${ROBUST_INCLUDE_INSTALL_DIR}/robust COMPONENT Devel)
+    #install(FILES ${self_healing_HDRS} DESTINATION ${BOOST_SELF_HEALING_INCLUDE_INSTALL_DIR}/self_healing COMPONENT Devel)
     #install(FILES AUTHORS LICENSE README DESTINATION ${CMAKE_INSTALL_PREFIX})
     #install(DIRECTORY docs/ DESTINATION share/doc/masonry)
     #install(FILES AUTHORS.txt README.txt LICENSE.txt DESTINATION share/doc/masonry)

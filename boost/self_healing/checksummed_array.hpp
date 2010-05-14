@@ -1,8 +1,8 @@
 /*! \file
 * \brief Checksummed array.
 *
-* This file contains the class checksummed_array, a robust STL container (as
-* wrapper) for arrays of constant size with checksumming. This allows to
+* This file contains the class checksummed_array, a self-healing STL container
+* (as wrapper) for arrays of constant size with checksumming. This allows to
 * monitor the validity of the array's content.
 *
 * This class is based on boost::checksummed_array by Nicolai M. Josuttis.
@@ -17,12 +17,10 @@
 * http://www.boost.org/LICENSE_1_0.txt)
 *
 * 20 April 2010 - Initial Revision (Sascha Peilicke)
-*
-* http://github.com/saschpe/robust
 */
 
-#ifndef BOOST_ROBUST_CHECKSUMMED_ARRAY_HPP
-#define BOOST_ROBUST_CHECKSUMMED_ARRAY_HPP
+#ifndef BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
+#define BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
 
 #include <boost/detail/workaround.hpp>
 
@@ -41,8 +39,8 @@
 #include "reference.hpp"
 
 
-/// The namespace robust contains fault-tolerant data structures and utility classes.
-namespace boost { namespace robust {
+/// The namespace self_healing contains fault-tolerant data structures and utility classes.
+namespace boost { namespace self_healing {
 
     /*! Exception that is thrown when a checksum error happened.
     */
@@ -73,9 +71,9 @@ namespace boost { namespace robust {
         class                        iterator;          //!< Forward declaration of class iterator.
         //TODO: Write own const iterator
         typedef const T *            const_iterator;    //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
-        //typedef robust::pointer<T>   pointer;           //!< A pointer to the element.
+        //typedef self_healing::pointer<T>   pointer;   //!< A pointer to the element.
         typedef const T *            const_pointer;     //!< A const pointer to the element.
-        typedef robust::reference<T> reference;         //!< A reference to an element.
+        typedef self_healing::reference<T> reference;   //!< A reference to an element.
         typedef const T &            const_reference;   //!< A const reference to an element.
 
         /*! \brief The size type.
@@ -295,7 +293,7 @@ namespace boost { namespace robust {
         * \throws checksum_error Thrown if the data was damaged and checksums mismatch.
         */
         void check_and_repair_checksums() const {
-            //std::cout << "boost::robust::checksummed_array<T, N>::check_and_repair_checksums()" << std::endl;
+            //std::cout << "boost::self_healing::checksummed_array<T, N>::check_and_repair_checksums()" << std::endl;
             boost::crc_32_type crc3;
             crc3.process_bytes(&elements, N * sizeof(T));
             const bool equal_13 = crc1 == crc3.checksum();
@@ -351,7 +349,7 @@ namespace boost { namespace robust {
         /*! Compute and store CRC checksums.
         */
         void update_checksums() {
-            //std::cout << "boost::robust::checksummed_array<T, N>::update_checksums()" << std::endl;
+            //std::cout << "boost::self_healing::checksummed_array<T, N>::update_checksums()" << std::endl;
             boost::crc_32_type crc;
             crc.process_bytes(&elements, N * sizeof(T));
             crc1 = crc.checksum();
@@ -534,7 +532,7 @@ namespace boost { namespace robust {
         x.swap(y);
     }
 
-} } // namespace boost::robust
+} } // namespace boost::self_healing
 
 
 /*! Overload for operator<<() of std::ostream to print a vector.
@@ -542,7 +540,7 @@ namespace boost { namespace robust {
 * \param array The array instance to print.
 */
 template <class T, std::size_t N>
-std::ostream &operator<<(std::ostream &os, const boost::robust::checksummed_array<T, N> &array)
+std::ostream &operator<<(std::ostream &os, const boost::self_healing::checksummed_array<T, N> &array)
 {
     os << "[";
     for (std::size_t i = 0; i < array.size(); i++) {
@@ -552,4 +550,4 @@ std::ostream &operator<<(std::ostream &os, const boost::robust::checksummed_arra
 }
 
 
-#endif // BOOST_ROBUST_CHECKSUMMED_ARRAY_HPP
+#endif // BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP

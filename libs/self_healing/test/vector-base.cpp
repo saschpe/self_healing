@@ -5,7 +5,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/robust/vector.hpp>
+#include <boost/self_healing/vector.hpp>
 
 #include <iostream>
 #include <cassert>
@@ -15,10 +15,10 @@
 
 int main()
 {
-    std::cout << "testing robust::vector<>::const_iterator" << std::endl;
+    std::cout << "testing self_healing::vector<>::const_iterator" << std::endl;
 
-    boost::robust::vector<int, 2> v;
-    boost::robust::vector<int, 2>::const_iterator cit = v.begin();
+    boost::self_healing::vector<int, 2> v;
+    boost::self_healing::vector<int, 2>::const_iterator cit = v.begin();
     std::cout << "cit      : " << cit << '\n';
     std::cout << "v.end()  : " << v.end() << '\n';
     std::cout << "cit + 1  : " << (cit + 1) << '\n';
@@ -32,13 +32,13 @@ int main()
     std::cout << std::endl;
     std::cout << "*(cit += 4): " << *(cit += 4) << std::endl;*/
 
-    /*for (boost::robust::vector<int, 2>::const_iterator it = v.begin(); it != v.end(); ++it) {
+    /*for (boost::self_healing::vector<int, 2>::const_iterator it = v.begin(); it != v.end(); ++it) {
         std::cout << it << " -> "<< *it << '\n';
     }
     std::cout << std::endl;
 
-    std::cout << "testing robust::vector<>::const_reverse_iterator" << std::endl;
-    for (boost::robust::vector<int, 2>::const_reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
+    std::cout << "testing self_healing::vector<>::const_reverse_iterator" << std::endl;
+    for (boost::self_healing::vector<int, 2>::const_reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
         std::cout << *it << '\n';
     }
     std::cout << std::endl;*/
@@ -47,7 +47,7 @@ int main()
     int arr[4] = {1, 2, 3, 4};
 
     /*std::cout << "initialize a vector from an array" << std::endl;
-    boost::robust::vector<int> numbers(arr, arr + 4);
+    boost::self_healing::vector<int> numbers(arr, arr + 4);
 
     std::cout << "insert more numbers into the vector" << std::endl;
     numbers.push_back(5);
@@ -62,7 +62,7 @@ int main()
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "locate the largest element, O(n)" << std::endl;
-    boost::robust::vector<int>::const_iterator largest = std::max_element(numbers.begin(), numbers.end());
+    boost::self_healing::vector<int>::const_iterator largest = std::max_element(numbers.begin(), numbers.end());
 
     std::cout << "The largest number is " << *largest << "\n";
     std::cout << "It is located at index " << largest - numbers.begin() << "\n";
@@ -72,7 +72,7 @@ int main()
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "find the position of the number 5 in the vector, O(log n)" << std::endl;
-    boost::robust::vector<int>::const_iterator five = std::lower_bound(numbers.begin(), numbers.end(), 5);
+    boost::self_healing::vector<int>::const_iterator five = std::lower_bound(numbers.begin(), numbers.end(), 5);
 
     std::cout << "The number 5 is located at index " << five - numbers.begin() << "\n";
 
@@ -81,7 +81,7 @@ int main()
                   std::bind2nd(std::greater<int>(), 4)), numbers.end());
 
     std::cout << "print all the remaining numbers" << std::endl;
-    for (boost::robust::vector<int>::const_iterator it = numbers.begin(); it != numbers.end(); ++it) {
+    for (boost::self_healing::vector<int>::const_iterator it = numbers.begin(); it != numbers.end(); ++it) {
         std::cout << *it << ",";
     }
     std::cout << std::endl;*/

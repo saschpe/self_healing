@@ -1,8 +1,8 @@
 /*! \file
 * \brief Vector.
 *
-* This file contains the class vector, an robust STL vector with checksumming.
-* This allows to monitor the validity of the vector's content.
+* This file contains the class vector, an self-healing STL vector with
+* checksumming. This allows to monitor the validity of the vector's content.
 *
 * (C) Copyright Sascha Peilicke 2010.
 *
@@ -11,12 +11,10 @@
 * http://www.boost.org/LICENSE_1_0.txt)
 *
 * 23 April 2010 - Initial Revision (Sascha Peilicke)
-*
-* http://github.com/saschpe/robust
 */
 
-#ifndef BOOST_ROBUST_VECTOR_HPP
-#define BOOST_ROBUST_VECTOR_HPP
+#ifndef BOOST_SELF_HEALING_VECTOR_HPP
+#define BOOST_SELF_HEALING_VECTOR_HPP
 
 #include <boost/detail/workaround.hpp>
 
@@ -34,8 +32,8 @@
 #include "reference.hpp"
 
 
-/// The namespace robust contains fault-tolerant data structures and utility classes.
-namespace boost { namespace robust {
+/// The namespace self_healing contains fault-tolerant data structures and utility classes.
+namespace boost { namespace self_healing {
 
     /*! \brief Vector.
     *
@@ -59,9 +57,9 @@ namespace boost { namespace robust {
         typedef T                    value_type;        //!< The type of elements stored in the <code>vector</code>.
         class                        iterator;          //!< Forward declaration of class iterator.
         class                        const_iterator;    //!< Forward declaration of class const_iterator.
-        //typedef robust::pointer<T>   pointer;           //!< A pointer to the element.
+        //typedef self_healing::pointer<T>   pointer;   //!< A pointer to the element.
         typedef const T *            const_pointer;     //!< A const pointer to the element.
-        typedef robust::reference<T> reference;         //!< A reference to an element.
+        typedef self_healing::reference<T> reference;   //!< A reference to an element.
         typedef const T &            const_reference;   //!< A const reference to an element.
 
         /*! \brief The size type.
@@ -389,13 +387,13 @@ namespace boost { namespace robust {
         x.swap(y);
     }
 
-} } // namespace boost::robust
+} } // namespace boost::self_healing
 
 
 /*! Overload for operator<<() of std::ostream to print a vector.
 */
 template <class T, std::size_t CS, class A>
-std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, CS, A> &vector)
+std::ostream &operator<<(std::ostream &os, const boost::self_healing::vector<T, CS, A> &vector)
 {
     os << "[";
     for (std::size_t i = 0; i < vector.size(); i++) {
@@ -405,4 +403,4 @@ std::ostream &operator<<(std::ostream &os, const boost::robust::vector<T, CS, A>
 }
 
 
-#endif // BOOST_ROBUST_VECTOR_HPP
+#endif // BOOST_SELF_HEALING_VECTOR_HPP

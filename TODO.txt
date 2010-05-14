@@ -1,6 +1,5 @@
-==================
-Robust to-do items
-==================
+To-Do Items
+===========
 
 Documentation
 -------------
@@ -12,5 +11,9 @@ Documentation
 
 Functionality
 -------------
-- Implement class vector
-- Implement more unit tests
+
+ - Implement class vector
+ - Implement more unit-tests
+   - Separate tests for boost::self_healing::reference from test-checksummed_array-base.cpp
+ - Implement class tree
+ - Bugfixing

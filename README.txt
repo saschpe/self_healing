@@ -1,16 +1,18 @@
-Robust
-======
+Self-healing Data Structures
+============================
 
 (C) Copyright Sascha Peilicke 2010.
 
-Robust is a cross-platform C++ library for fault-rolerant data structures with
+This is a cross-platform C++ library for fault-rolerant data structures with
 an STL-compatible interface and released under the Boost Software License.
 
 See doc/index.html for information on:
 
  - API documentation and a tutorial
  - External dependencies
- - Using robust library
+ - Using the library
+
+The public Git_ repository is at: http://github.com/saschpe/self_healing
 
 ----
 

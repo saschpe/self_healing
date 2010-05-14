@@ -2,7 +2,7 @@
 * \brief Main include.
 *
 * This is the only file you have to include in order to use the
-* complete robust library.
+* complete self-healing data structures library.
 *
 * (C) Copyright Sascha Peilicke 2010.
 *
@@ -11,16 +11,14 @@
 * http://www.boost.org/LICENSE_1_0.txt)
 *
 * 5 May 2010 - Initial Revision (Sascha Peilicke)
-*
-* http://github.com/saschpe/robust
 */
 
-#ifndef BOOST_ROBUST_HPP
-#define BOOST_ROBUST_HPP
+#ifndef BOOST_SELF_HEALING_HPP
+#define BOOST_SELF_HEALING_HPP
 
 
-#include "./robust/array.hpp"
-#include "./robust/vector.hpp"
+#include "./self_healing/checksummed_array.hpp"
+#include "./self_healing/vector.hpp"
 
 
-#endif // BOOST_ROBUST_HPP
+#endif // BOOST_SELF_HEALING_HPP

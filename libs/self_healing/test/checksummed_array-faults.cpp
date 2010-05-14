@@ -13,14 +13,14 @@
  * May 4th, 2010
  */
 
-#include <boost/robust/checksummed_array.hpp>
+#include <boost/self_healing/checksummed_array.hpp>
 
 #include <iostream>
 #include <cassert>
 
 int main()
 {
-    boost::robust::checksummed_array<int, 64> a1;
+    boost::self_healing::checksummed_array<int, 64> a1;
     std::cout << "checksummed_array 1: " << a1 << std::endl;
 
     // Insert faults and check

@@ -11,12 +11,10 @@
 * http://www.boost.org/LICENSE_1_0.txt)
 *
 * 5 May 2010 - Initial Revision (Sascha Peilicke)
-*
-* http://github.com/saschpe/robust
 */
 
-#ifndef BOOST_ROBUST_REFERENCE_HPP
-#define BOOST_ROBUST_REFERENCE_HPP
+#ifndef BOOST_SELF_HEALING_REFERENCE_HPP
+#define BOOST_SELF_HEALING_REFERENCE_HPP
 
 #include <ostream>
 
@@ -26,8 +24,8 @@
 #include "./detail/nullary_function.hpp"
 
 
-/// The namespace robust contains fault-tolerant data structures and utility classes.
-namespace boost { namespace robust {
+/// The namespace self_healing contains fault-tolerant data structures and utility classes.
+namespace boost { namespace self_healing {
 
     /*! \brief Reference
     *
@@ -96,7 +94,7 @@ namespace boost { namespace robust {
         nullary_function &update;
     };
 
-} } // namespace boost::robust
+} } // namespace boost::self_healing
 
 
-#endif // BOOST_ROBUST_REFERENCE_HPP
+#endif // BOOST_SELF_HEALING_REFERENCE_HPP
