@@ -270,7 +270,7 @@ namespace boost { namespace self_healing {
         *
         * \see check_and_repair_checksums()
         */
-        bool is_valid() {
+        virtual bool is_valid() const {
             try {
                 check_and_repair_checksums();
                 return true;
