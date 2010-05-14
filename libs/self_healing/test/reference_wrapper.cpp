@@ -1,4 +1,4 @@
-/* Test case for class reference.
+/* Test case for class reference_wrapper.
  *
  * The original author site is at: http://saschpe.wordpress.com/
  *
@@ -11,19 +11,19 @@
  * 14 May 2010 - Initial Revision (Sascha Peilicke)
  */
 
-#include <boost/self_healing/reference.hpp>
+#include <boost/self_healing/reference_wrapper.hpp>
 
 #include <iostream>
 
 int main()
 {
-    std::cout << "testing class boost::self_healing::vector<>" << std::endl;
+    std::cout << "testing class boost::self_healing::reference_wrapper<>" << std::endl;
 
     int i = 3;
-    boost::self_healing::reference<int> rr(i);
+    boost::self_healing::reference_wrapper<int> rr(i);
     int j = 1 + *rr + 3;
     int k = 1 + rr + 3;
 
-    std::cout << "sizeof(self_healing::reference<int>): " << sizeof(rr) << std::endl;
+    std::cout << "sizeof(self_healing::reference_wrapper<int>): " << sizeof(rr) << std::endl;
     return 0;
 }
