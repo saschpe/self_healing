@@ -3,7 +3,6 @@ build/
 self_healing.kdev4
 .directory
 .kdev4/
-.stuff/
 .svn/
 *.swp
 *.user
