@@ -430,23 +430,23 @@ namespace boost { namespace self_healing {
         iterator end() { return begin(); }
         const_iterator end() const { return begin(); }
 
+        // reverse iterator support
         reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
         reverse_iterator rend() { return reverse_iterator(begin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // operator[]
-        reference operator[](size_type /*i*/) { return failed_rangecheck(); }
-        const_reference operator[](size_type /*i*/) const { return failed_rangecheck(); }
+        reference operator[](size_type) { return failed_rangecheck(); }
+        const_reference operator[](size_type) const { return failed_rangecheck(); }
 
         // at() with range check
-        reference at(size_type /*i*/) { return failed_rangecheck(); }
-        const_reference at(size_type /*i*/) const { return failed_rangecheck(); }
+        reference at(size_type) { return failed_rangecheck(); }
+        const_reference at(size_type) const { return failed_rangecheck(); }
 
         // front() and back()
         reference front() { return failed_rangecheck(); }
         const_reference front() const { return failed_rangecheck(); }
-
         reference back() { return failed_rangecheck(); }
         const_reference back() const { return failed_rangecheck(); }
 
@@ -456,14 +456,14 @@ namespace boost { namespace self_healing {
         static size_type max_size() { return 0; }
         enum { static_size = 0 };
 
-        void swap(checksummed_array<value_type, 0> &/*y*/) {}
+        void swap(checksummed_array<value_type, 0> &) {}
 
         // direct access to data (read-only)
         const_pointer data() const { return 0; }
         pointer data() { return 0; }
 
         // use checksummed_array as C checksummed_array (direct read/write access to data)
-        pointer c_checksummed_array() { return 0; }
+        pointer c_array() { return 0; }
 
         // assignment with type conversion
         template <typename T2>
@@ -471,7 +471,7 @@ namespace boost { namespace self_healing {
 
         // assign one value to all elements
         void assign(const_reference value) { fill(value); }
-        void fill(const_reference /*value*/) {}
+        void fill(const_reference) {}
 
         // check range (may be private because it is static)
         static reference failed_rangecheck() {
