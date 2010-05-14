@@ -50,12 +50,18 @@ namespace boost { namespace self_healing {
     class chunk : public checksummed_array<T, N>
     {
     public:
+        // type definitions
+        typedef T                    value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef const T &            const_reference;   //!< A const reference to an element.
+        typedef P                    parent_type;       //!<
+        typedef P *                  parent_pointer;    //!<
+
         /*! Constructor.
         * \param parent The parent.
         * \param value An initial value that is set for all elements.
         */
-        explicit chunk(P * const parent, const T &value = 0)
-            : checksummed_array<T, N>(value), m_parent(parent) {
+        explicit chunk(parent_pointer const parent, const_reference value = 0)
+            : checksummed_array<value_type, N>(value), m_parent(parent) {
             if (!parent) {
                 std::invalid_argument e("parent is NULL");
                 boost::throw_exception(e);
@@ -67,10 +73,10 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_and_repair_parent()
         */
-        bool is_valid(P * const parent = NULL) const {
+        bool is_valid(parent_pointer const parent = NULL) const {
             try {
                 check_and_repair_parent(parent);
-                return static_cast<const checksummed_array<T, N> *>(this)->is_valid();
+                return static_cast<const checksummed_array<value_type, N> *>(this)->is_valid();
             } catch (const parent_error &e) {
                 return false;
             };
@@ -79,20 +85,20 @@ namespace boost { namespace self_healing {
         /*! Set a new parent.
         * \param parent Pointer to the new parent.
         */
-        void setParent(P * const parent) { check_and_repair_parent(parent); }
+        void setParent(parent_pointer const parent) { check_and_repair_parent(parent); }
 
         /*! Accessor to get the chunk's parent.
         * \return Pointer to the parent.
         */
-        P *parent() const { return m_parent; }
+        parent_pointer parent() const { return m_parent; }
 
     private:
-        void check_and_repair_parent(P * const parent) const {
+        void check_and_repair_parent(parent_pointer const parent) const {
             if (parent) {
                 // If a valid parent pointer was given we simply check against
                 // it and fix the internal pointer if needed.
                 if (m_parent != parent) {
-                    const_cast<P *&>(m_parent) = parent;
+                    const_cast<parent_pointer &>(m_parent) = parent;
                 }
             } else {
                 // No pointer was given to check against, so we can do only
@@ -104,7 +110,7 @@ namespace boost { namespace self_healing {
             }
         }
 
-        P *m_parent;  //!< Pointer to the parent class instance.
+        parent_pointer m_parent;    //!< Pointer to the parent class instance.
     };
 
 } } // namespace boost::self_healing
