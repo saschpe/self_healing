@@ -253,7 +253,7 @@ namespace boost { namespace self_healing {
             try {
                 check_checksums();
                 return true;
-            } catch (const std::runtime_error &e) {
+            } catch (const std::runtime_error &) {
                 return false;
             };
         }
