@@ -33,12 +33,12 @@ namespace boost { namespace self_healing {
     *
     * \param T The data type of the stored values.
     * \param P The type of the parent data structure.
-    * \param N The size of the chunk.
+    * \param CS The size of the chunk.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see checksummed_array
     */
-    template <class T, class P, std::size_t N = 64>
-    class chunk : public checksummed_array<T, N>
+    template <class T, class P, std::size_t CS = 64>
+    class chunk : public checksummed_array<T, CS>
     {
     public:
         // type definitions
@@ -52,7 +52,7 @@ namespace boost { namespace self_healing {
         * \param value An initial value that is set for all elements.
         */
         explicit chunk(parent_pointer const parent, const_reference value = 0)
-            : checksummed_array<value_type, N>(value), m_parent(parent) {
+            : checksummed_array<value_type, CS>(value), m_parent(parent) {
             if (!parent) {
                 std::invalid_argument e("parent is NULL");
                 boost::throw_exception(e);
@@ -67,7 +67,7 @@ namespace boost { namespace self_healing {
         bool is_valid(parent_pointer const parent = NULL) const {
             try {
                 check_parent(parent);
-                return static_cast<const checksummed_array<value_type, N> *>(this)->is_valid();
+                return static_cast<const checksummed_array<value_type, CS> *>(this)->is_valid();
             } catch (const std::runtime_error &e) {
                 return false;
             };
