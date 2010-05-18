@@ -5,11 +5,13 @@
 # accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 #
-project(boost_self_healing)
+project(self_healing)
 cmake_minimum_required(VERSION 2.6.4)
 
 set(CMAKE_MODULE_PATH "${self_healing_SOURCE_DIR}/cmake/modules")
 set(CMAKE_BUILD_TYPE Debug)
+set(NAME "self_healing")
+set(VERSION "0.1.0")
 
 find_package(Boost 1.42.0 REQUIRED)
 find_package(Doxygen)
@@ -20,8 +22,9 @@ option(BUILD_TESTS "Build tests" on)
 
 # add doxygen source code documentation as target
 if(DOXYGEN_FOUND)
+    #TODO: This is not platform independent!
     # add doxygen as target
-    add_custom_target(doxygen COMMAND mkdir ${CMAKE_CURRENT_SOURCE_DIR}/doc
+    add_custom_target(doxygen COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc
                               COMMAND ${DOXYGEN_EXECUTABLE} reference.dox
                               WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/self_healing/doc/
                               COMMENT "Generating code documentation")
