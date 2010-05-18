@@ -5,33 +5,38 @@
 # accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 #
-project(self_healing)
+project(boost_self_healing)
 cmake_minimum_required(VERSION 2.6.4)
 
 set(CMAKE_MODULE_PATH "${self_healing_SOURCE_DIR}/cmake/modules")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Boost 1.42.0 REQUIRED)
+find_package(Doxygen)
+
 include_directories(${Boost_INCLUDE_DIRS})
 
-option(BOOST_SELF_HEALING_BUILD_TESTS "Build the tests" on)
-set(BOOST_SELF_HEALING_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include/")
-set(BOOST_SELF_HEALING_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/")
-set(BOOST_SELF_HEALING_DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/self_healing")
+option(BUILD_TESTS "Build tests" on)
 
-set(self_healing_HDRS
-    boost/self_healing/detail/chunk.hpp
-    boost/self_healing/detail/nullary_function.hpp
-    boost/self_healing/detail/reference_wrapper.hpp
-    boost/self_healing/checksummed_array.hpp
-    boost/self_healing/vector.hpp
-    boost/self_healing.hpp
-)
+# add doxygen source code documentation as target
+if(DOXYGEN_FOUND)
+    # add doxygen as target
+    add_custom_target(doxygen COMMAND mkdir ${CMAKE_CURRENT_SOURCE_DIR}/doc
+                              COMMAND ${DOXYGEN_EXECUTABLE} reference.dox
+                              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/self_healing/doc/
+                              COMMENT "Generating code documentation")
+    # cleanup $build/doc on "make clean"
+    set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+    # add doxygen as dependency to doc-target
+    get_target_property(DOC_TARGET doc TYPE)
+    if(NOT DOC_TARGET)
+        add_custom_target(doc)
+    endif()
+    add_dependencies(doc doxygen)
+endif()
 
-set(self_healing_LIB_SRCS
-)
-
-if(BOOST_SELF_HEALING_BUILD_TESTS)
+# several unit-test targets
+if(BUILD_TESTS)
     enable_testing()
     include_directories(.) # to allow global #include
 
@@ -52,17 +57,12 @@ if(BOOST_SELF_HEALING_BUILD_TESTS)
     #add_test(vector ${EXECUTABLE_OUTPUT_PATH}/test-vector)
     #add_executable(test-vector-iterators libs/self_healing/test/vector-iterators.cpp)
     #add_test(vector-iterators ${EXECUTABLE_OUTPUT_PATH}/test-vector-iterators)
-    add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
-    add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
-endif(BOOST_SELF_HEALING_BUILD_TESTS)
+    #add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
+    #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
+endif()
 
-# Installation
-#if(WIN32 AND NOT UNIX)
-    #install(DIRECTORY docs/ DESTINATION ${CMAKE_INSTALL_PREFIX}/docs)
-    #install(FILES AUTHORS.txt README.txt LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX})
-#else()
-    #install(FILES ${self_healing_HDRS} DESTINATION ${BOOST_SELF_HEALING_INCLUDE_INSTALL_DIR}/self_healing COMPONENT Devel)
-    #install(FILES AUTHORS LICENSE README DESTINATION ${CMAKE_INSTALL_PREFIX})
-    #install(DIRECTORY docs/ DESTINATION share/doc/masonry)
-    #install(FILES AUTHORS.txt README.txt LICENSE.txt DESTINATION share/doc/masonry)
-#endif()
+# installation
+set(DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/boost/self_healing")
+install(DIRECTORY boost DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.hpp")
+install(FILES AUTHORS.txt COPYING.txt LICENSE_1_0.txt README.txt TODO.txt DESTINATION ${DOC_INSTALL_DIR})
+install(DIRECTORY doc/ DESTINATION ${DOC_INSTALL_DIR} OPTIONAL)
