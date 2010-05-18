@@ -10,8 +10,6 @@ cmake_minimum_required(VERSION 2.6.4)
 
 set(CMAKE_MODULE_PATH "${self_healing_SOURCE_DIR}/cmake/modules")
 set(CMAKE_BUILD_TYPE Debug)
-set(NAME "self_healing")
-set(VERSION "0.1.0")
 
 find_package(Boost 1.42.0 REQUIRED)
 find_package(Doxygen)
