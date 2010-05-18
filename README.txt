@@ -44,7 +44,7 @@ like this (in a terminal session)::
 If you want to specify an optimised build or set an installation target, the
 following commands could be used instead::
 
-    $ mkdir build/ dist/
+    $ mkdir build/
     $ cd build/
     $ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../dist ..
 
@@ -52,7 +52,14 @@ You should now have either a Makefile on Unix-like operating systems or a
 Visual Studio project on Windows. You can now build and install the project by
 using Visual Studio (on Windows) or by issuing these commands (on Unix)::
 
+    $ make
+    $ make install
+
+If you also want to build and execute the provided unit-tests as well as
+generate useful code documentation, you can do the following::
+
     $ make && make test
+    $ make doc
     $ make install
 
 The exact build procedure may differ slightly on your platform. Have a look at
