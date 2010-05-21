@@ -51,9 +51,8 @@ if(BUILD_TESTS)
     add_executable(test-checksummed_array-faults libs/self_healing/test/checksummed_array-faults.cpp)
     add_test(checksummed_array-faults ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-faults)
 
-    add_executable(test-chunk libs/self_healing/test/chunk.cpp)
-    add_test(chunk ${EXECUTABLE_OUTPUT_PATH}/test-chunk)
-
+    add_executable(test-vector-chunk libs/self_healing/test/vector-chunk.cpp)
+    add_test(vector-chunk ${EXECUTABLE_OUTPUT_PATH}/test-vector-chunk)
     #add_executable(test-vector libs/self_healing/test/vector.cpp)
     #add_test(vector ${EXECUTABLE_OUTPUT_PATH}/test-vector)
     #add_executable(test-vector-iterators libs/self_healing/test/vector-iterators.cpp)

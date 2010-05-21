@@ -1,7 +1,7 @@
 /*! \file
-* \brief Chunk.
+* \brief Child.
 *
-* This file contains the class chunk.
+* This file contains the class child.
 *
 * (C) Copyright Sascha Peilicke 2010.
 *
@@ -12,47 +12,39 @@
 * 23 April 2010 - Initial Revision (Sascha Peilicke)
 */
 
-#ifndef BOOST_SELF_HEALING_CHUNK_HPP
-#define BOOST_SELF_HEALING_CHUNK_HPP
+#ifndef BOOST_SELF_HEALING_CHILD_HPP
+#define BOOST_SELF_HEALING_CHILD_HPP
 
 #include <boost/detail/workaround.hpp>
 
+#include <stdexcept>
+#include <boost/throw_exception.hpp>
+
 // FIXES for broken compilers
 #include <boost/config.hpp>
-
-#include "../checksummed_array.hpp"
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    /*! \brief Element storage chunk.
-    *
-    * A chunk is a checksummed_array with a pointer to it's parent and to be
-    * used as part of other data structures.
-    *
-    * \param T The data type of the stored values.
+    /*! A class to express parent-child relationship.
     * \param P The type of the parent data structure.
-    * \param CS The size of the chunk.
-    * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see checksummed_array
     */
-    template <class T, class P, std::size_t CS = 64>
-    class chunk : public checksummed_array<T, CS>
+    template <class P>
+    class child
     {
     public:
         // type definitions
-        typedef T         value_type;       //!< The type of elements stored in the <code>checksummed_array</code>.
-        typedef const T & const_reference;  //!< A const reference to an element.
-        typedef P         parent_type;      //!<
-        typedef P *       parent_pointer;   //!<
+        typedef P         parent_type;      //!< The type of the parent class.
+        typedef P *       parent_pointer;   //!< Pointer to parent class.
 
         /*! Constructor.
         * \param parent The parent.
-        * \param value An initial value that is set for all elements.
+        * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
-        explicit chunk(parent_pointer const parent, const_reference value = 0)
-            : checksummed_array<value_type, CS>(value), m_parent(parent) {
+        explicit child(parent_pointer const parent)
+            : m_parent(parent) {
             if (!parent) {
                 std::invalid_argument e("parent is NULL");
                 boost::throw_exception(e);
@@ -64,17 +56,18 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        bool is_valid(parent_pointer const parent = NULL) const {
+        virtual bool is_valid(parent_pointer const parent = NULL) const {
             try {
                 check_parent(parent);
-                return static_cast<const checksummed_array<value_type, CS> *>(this)->is_valid();
-            } catch (const std::runtime_error &e) {
+                return true;
+            } catch (const std::runtime_error &) {
                 return false;
             };
         }
 
         /*! Set a new parent.
         * \param parent Pointer to the new parent.
+        * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
         void setParent(parent_pointer const parent) { check_parent(parent); }
 
@@ -84,6 +77,9 @@ namespace boost { namespace self_healing {
         parent_pointer parent() const { return m_parent; }
 
     private:
+        /*! TODO.
+        * \throws std::invalid_argument Thrown if parent pointer is invalid.
+        */
         void check_parent(parent_pointer const parent) const {
             if (parent) {
                 // If a valid parent pointer was given we simply check against
@@ -106,4 +102,5 @@ namespace boost { namespace self_healing {
 } } // namespace boost::self_healing
 
 
-#endif // BOOST_SELF_HEALING_CHUNK_HPP
+#endif // BOOST_SELF_HEALING_CHILD_HPP
+
