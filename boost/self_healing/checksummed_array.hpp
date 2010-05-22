@@ -24,6 +24,9 @@
 
 #include <boost/detail/workaround.hpp>
 
+#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#include <iostream>
+#endif
 #include <stdexcept>
 #include <boost/swap.hpp>
 #include <boost/crc.hpp>
@@ -239,6 +242,9 @@ namespace boost { namespace self_healing {
         * \throws std::out_of_range Thrown if index is out of range.
         */
         static void rangecheck(size_type index) {
+#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+            std::cout << "boost::self_healing::checksummed_array<T, N>::rangecheck(" << index << ")" << std::endl;
+#endif
             if (index >= size()) {
                 std::out_of_range e("index out of range");
                 boost::throw_exception(e);
@@ -250,6 +256,9 @@ namespace boost { namespace self_healing {
         * \see check_checksums()
         */
         bool is_valid() const {
+#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+            std::cout << "boost::self_healing::checksummed_array<T, N>::is_valid()" << std::endl;
+#endif
             try {
                 check_checksums();
                 return true;
@@ -271,7 +280,9 @@ namespace boost { namespace self_healing {
         * \throws std::runtime_error Thrown if the data was damaged and checksums mismatch.
         */
         void check_checksums() const {
-            //std::cout << "boost::self_healing::checksummed_array<value_type, N>::check_checksums()" << std::endl;
+#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+            std::cout << "boost::self_healing::checksummed_array<T, N>::check_checksums()" << std::endl;
+#endif
             boost::crc_32_type crc3;
             crc3.process_bytes(&elements, N * sizeof(value_type));
             const bool equal_13 = crc1 == crc3.checksum();
@@ -327,7 +338,9 @@ namespace boost { namespace self_healing {
         /*! Compute and store CRC checksums.
         */
         void update_checksums() {
-            //std::cout << "boost::self_healing::checksummed_array<value_type, N>::update_checksums()" << std::endl;
+#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+            std::cout << "boost::self_healing::checksummed_array<T, N>::update_checksums()" << std::endl;
+#endif
             boost::crc_32_type crc;
             crc.process_bytes(&elements, N * sizeof(value_type));
             crc1 = crc.checksum();

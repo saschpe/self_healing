@@ -17,6 +17,10 @@
 
 #include <boost/detail/workaround.hpp>
 
+#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#include <iostream>
+#endif
+
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
@@ -60,7 +64,10 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        virtual bool is_valid(vector<T, CS> *const parent = NULL) const {
+        bool is_valid(vector<T, CS> *const parent = NULL) const {
+#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+            std::cout << "boost::self_healing::vector_chunk<T, CS>::is_valid()" << std::endl;
+#endif
             // call the is_valid methods of all base classes.
             return child<vector< T, CS> >::is_valid(parent) &&
                    checksummed_array<value_type, CS>::is_valid();
