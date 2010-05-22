@@ -27,42 +27,42 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
+    template <class T, std::size_t CS>
+    class vector;
+
     /*! \brief Vector element storage chunk.
     *
     * A chunk is a checksummed_array and a child and part of the self-healing
     * vector storage mechanism
     *
     * \param T The data type of the stored values.
-    * \param P The type of the parent data structure.
     * \param CS The size of the chunk.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see checksummed_array
     */
-    template <class T, class P, std::size_t CS = 64>
-    class vector_chunk : public child<P>, public checksummed_array<T, CS>
+    template <class T, std::size_t CS = 64>
+    class vector_chunk : public child<vector<T, CS> >, public checksummed_array<T, CS>
     {
     public:
         // type definitions
         typedef T         value_type;       //!< The type of elements stored in the <code>checksummed_array</code>.
         typedef const T & const_reference;  //!< A const reference to an element.
-        typedef P         parent_type;      //!< The type of the parent class.
-        typedef P *       parent_pointer;   //!< Pointer to parent class.
 
         /*! Constructor.
         * \param parent The parent.
         * \param value An initial value that is set for all elements.
         */
-        explicit vector_chunk(parent_pointer const parent, const_reference value = 0)
-            : child<P>(parent), checksummed_array<value_type, CS>(value) {}
+        explicit vector_chunk(vector<T, CS> *const parent, const_reference value = 0)
+            : child<vector<T, CS> >(parent), checksummed_array<value_type, CS>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent An optional pointer to the parent to check against.
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        virtual bool is_valid(parent_pointer const parent = NULL) const {
+        virtual bool is_valid(vector<T, CS> *const parent = NULL) const {
             // call the is_valid methods of all base classes.
-            return child<P>::is_valid(parent) &&
+            return child<vector< T, CS> >::is_valid(parent) &&
                    checksummed_array<value_type, CS>::is_valid();
         }
     };

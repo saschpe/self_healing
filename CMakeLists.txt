@@ -57,8 +57,8 @@ if(BUILD_TESTS)
     #add_test(vector ${EXECUTABLE_OUTPUT_PATH}/test-vector)
     #add_executable(test-vector-iterators libs/self_healing/test/vector-iterators.cpp)
     #add_test(vector-iterators ${EXECUTABLE_OUTPUT_PATH}/test-vector-iterators)
-    #add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
-    #add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
+    add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
+    add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 endif()
 
 # installation

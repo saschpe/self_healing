@@ -29,14 +29,14 @@
 // FIXES for broken compilers
 #include <boost/config.hpp>
 
-#include "./detail/chunk.hpp"
 #include "./detail/reference_wrapper.hpp"
+#include "./detail/vector_chunk.hpp"
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    /*! \brief Vector.
+    /*! \brief Self-healing vector.
     *
     * TODO.
     *
@@ -50,12 +50,13 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T                    value_type;        //!< The type of elements stored in the <code>vector</code>.
-        typedef A                    allocator_type;    //!< The type of an allocator used in the <code>vector</code>.
-        class                        iterator;          //!< Forward declaration of class iterator.
-        class                        const_iterator;    //!< Forward declaration of class const_iterator.
-        typedef reference_wrapper<T> reference;         //!< A reference to an element.
-        typedef const T &            const_reference;   //!< A const reference to an element.
+        typedef T                    value_type;      //!< The type of elements stored in the <code>vector</code>.
+        class                        iterator;        //!< Forward declaration of class iterator.
+        class                        const_iterator;  //!< Forward declaration of class const_iterator.
+        typedef T *                  pointer;
+        typedef const T *            const_pointer;
+        typedef reference_wrapper<T> reference;       //!< A reference to an element.
+        typedef const T &            const_reference; //!< A const reference to an element.
 
         /*! An unsigned integral type that can represent any non-negative value of the container's distance type.
         */
@@ -65,20 +66,21 @@ namespace boost { namespace self_healing {
         */
         typedef std::ptrdiff_t       difference_type;
 
+#if 0
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
         *
         * A safe iterator that calls a functor if the value at the current
         * position is changed. Checksumms are also updated correctly if the
         * iterator is dereferenced.
         */
-        class iterator : public std::iterator<std::random_access_iterator_tag, T>
+        class iterator : public std::iterator<std::random_access_iterator_tag, value_type>
         {
-            friend class vector<T, CS, A>;
+            friend class vector<value_type, CS>;
 
             /*! Private constructor.
             * \param rhs TODO.
             */
-            explicit iterator(T *rhs)
+            explicit iterator(pointer rhs)
                 : m_p(rhs) {}
 
         public:
@@ -114,9 +116,9 @@ namespace boost { namespace self_healing {
 
         /*! A const (random access) iterator used to iterate through the <code>vector</code>.
         */
-        class const_iterator : public std::iterator<std::random_access_iterator_tag, T>
+        class const_iterator : public std::iterator<std::random_access_iterator_tag, value_type>
         {
-            friend class vector<T, CS, A>;
+            friend class vector<T, CS>;
 
             /*! Private constructor.
             * \param rhs The chunk to initialize the iterator with.
@@ -189,61 +191,63 @@ namespace boost { namespace self_healing {
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
-        typedef typename A::reverse_iterator<iterator> reverse_iterator;
-        typedef typename A::reverse_iterator<const_iterator> const_reverse_iterator;
+        typedef typename reverse_iterator<iterator> reverse_iterator;
+        typedef typename reverse_iterator<const_iterator> const_reverse_iterator;
 #elif defined(_MSC_VER) && (_MSC_VER == 1300) && defined(BOOST_DINKUMWARE_STDLIB) && (BOOST_DINKUMWARE_STDLIB == 310)
         // workaround for broken reverse_iterator in VC7
-        typedef typename A::reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
-                                                         reference, iterator, reference> > reverse_iterator;
-        typedef typename A::reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
-                                                         const_reference, iterator, reference> > const_reverse_iterator;
+        typedef typename reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
+                                                                      reference, iterator, reference> > reverse_iterator;
+        typedef typename reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
+                                                                      const_reference, iterator, reference> > const_reverse_iterator;
 #elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
-        typedef typename A::reverse_iterator<iterator, std::random_access_iterator_tag,
+        typedef typename reverse_iterator<iterator, std::random_access_iterator_tag,
                                              value_type, reference, iterator, difference_type> reverse_iterator;
-        typedef typename A::reverse_iterator<const_iterator, std::random_access_iterator_tag,
+        typedef typename reverse_iterator<const_iterator, std::random_access_iterator_tag,
                                              value_type, const_reference, const_iterator, difference_type> const_reverse_iterator;
 #else
         // workaround for broken reverse_iterator implementations
-        typedef typename A::reverse_iterator<iterator, T> reverse_iterator;
-        typedef typename A::reverse_iterator<const_iterator, T> const_reverse_iterator;
+        typedef typename reverse_iterator<iterator, value_type> reverse_iterator;
+        typedef typename reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
 
+#endif
 
-        // constructors
-        explicit vector(const allocator_type &alloc = A())
-            : m_alloc(alloc) {}
+        /*! Default constructor.
+        */
+        explicit vector()
+            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {}
 
-        vector(size_type n, const_reference x = value_type(), const allocator_type &alloc = A())
-            : m_alloc(alloc) {
+        vector(size_type n, const_reference x = value_type())
+            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {
             assign(n, x);
         }
 
         template <class InputIterator>
-        vector(InputIterator first, InputIterator last, const allocator_type &alloc = A())
-            : m_alloc(alloc) {
+        vector(InputIterator first, InputIterator last)
+            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {
             assign(first, last);
         }
 
         /*! Copy constructor.
-        * \param other The other <code>boost::self_healing::vector</code> to copy from.
+        * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
-        vector(const vector<value_type, CS, allocator_type> &rhs)
-            : m_alloc(rhs.get_allocator()) {
+        vector(const vector<value_type, CS> &rhs)
+            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {
             assign(rhs.begin(), rhs.end());
         }
         /*! Copy constructor.
-        * \param other The other <code>std::vector</code> to copy from.
+        * \param rhs The other <code>std::vector</code> to copy from.
         */
-        vector(const std::vector<value_type> &rhs);
-            : m_alloc(rhs.get_allocator()) {
+        vector(const std::vector<value_type> &rhs)
+            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {
             assign(rhs.begin(), rhs.end());
         }
 
         ~vector() {
-            //m_alloc.deallocate(m_alloc.head, TODO);
+            delete[] m_head;
         }
 
-        vector<value_type, CS, allocator_type>& operator=(const vector<value_type, CS, allocator_type> &);
+        vector<value_type, CS>& operator=(const vector<value_type, CS> &);
 
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last);
@@ -251,8 +255,6 @@ namespace boost { namespace self_healing {
         void assign(Size n);
         template <class Size, class TT>
         void assign(Size n, const TT&);
-
-        allocator_type get_allocator() const { return m_alloc; }
 
         // iterator support
         //iterator begin() { return iterator(m_chunks); }
@@ -267,24 +269,11 @@ namespace boost { namespace self_healing {
         //const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // capacity
-        size_type size() const { check_size(); return m_alloc.size; }
+        size_type size() const { check_size(); return m_size; }
         bool empty() const { return size() == 0; }
 
-        /*! \brief Get the largest possible size or capacity of the <code>vector</code>. (It depends on
-        *          allocator's %max_size()).
-        * \return The maximum size/capacity the <code>vector</code> can be set to.
-        * \throws Nothing.
-        * \par Exception Safety
-        *      No-throw.
-        * \par Iterator Invalidation
-        *      Does not invalidate any iterators.
-        * \par Complexity
-        *      Constant (in the size of the <code>vector</code>).
-        * \sa <code>size()</code>, <code>capacity()</code>, <code>reserve()</code>
-        */
         size_type max_size() const {
-            //TODO: return something reasonable
-            return (std::min<size_type>)(/*m_alloc.max_size()*/999999999, (std::numeric_limits<difference_type>::max)());
+            return std::numeric_limits<difference_type>::max();
         }
 
         size_type capacity() const { check_chunks(); return m_chunks * CS; }
@@ -377,7 +366,7 @@ namespace boost { namespace self_healing {
 
     private:
         void check_chunks() const {
-            //TODO: Check and repair chunk count
+           //TODO: Check and repair chunk count
             std::runtime_error e("chunk count error");
             boost::throw_exception(e);
         }
@@ -388,210 +377,43 @@ namespace boost { namespace self_healing {
             boost::throw_exception(e);
         }
 
-        void check_allocator() const {
-            //TODO: check and repair allocator pointer
-            std::runtime_error e("allocator error");
-            boost::throw_exception(e);
-        }
-
-        /*chunk<T, CS> *next_chunk(const chunk<T, CS> *chunk) const {
-            if (this >= parent->m_tail) {
-                std::out_of_range e("vector<>: index out of range");
-                boost::throw_exception(e);
-            }
-            //return const_cast<chunk *>(this + sizeof(chunk));
-        }
-        chunk<T, CS> *previous_chunk(const chunk<T, CS> *chunk) const {
-            if (this <= parent->m_head) {
-                std::out_of_range e("vector<>: index out of range");
-                boost::throw_exception(e);
-            }
-            //return const_cast<chunk *>(this - sizeof(chunk));
-        }
-        bool is_head(const chunk<T, CS> *chunk) const { return this == parent->m_head; }
-        bool is_tail(const chunk<T, CS> *chunk) const { return this == parent->m_tail; }*/
-
-        //TODO: make this one fault-tolerant
-        struct vector_allocator : public allocator_type
-        {
-            vector(const allocator_type &alloc)
-                : allocator_type(alloc), head(NULL), tail(NULL), m_chunks(0);
-
-            chunk<value_type, vector<value_type, CS, allocator_type>, CS> *head;  //!< Pointer to the first chunk.
-            chunk<value_type, vector<value_type, CS, allocator_type>, CS> *tail;  //!< Pointer to the last chunk.
-            size_type chunks;                   //!< Chunk counter.
-            size_type size;                     //!< Counts how much elements are stored currently in all chunks.
-            size_type capacity;
-        };
-
-        vector_allocator m_alloc;
+        vector_chunk<value_type, CS> *m_head;   //!< Pointer to the first chunk.
+        vector_chunk<value_type, CS> *m_tail;   //!< Pointer to the last chunk.
+        size_type m_chunks;                     //!< Chunk counter.
+        size_type m_size;                       //!< Counts how much elements are stored currently in all chunks.
+        size_type m_capacity;
     };
-
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-    /*! Partial template specialization for the corner case of a vector with zero sized chunks.
-     */
-    template <class T>
-    class vector<T, 0>
-    {
-        // type definitions
-        typedef T              value_type;      //!< The type of elements stored in the <code>checksummed_array</code>.
-        typedef T *            iterator;        //!< A (random access) iterator used to iterate through the <code>checksummed_array</code>.
-        typedef const T *      const_iterator;  //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
-        typedef T *            pointer;         //!< A pointer to the element.
-        typedef const T *      const_pointer;   //!< A const pointer to the element.
-        typedef T &            reference;       //!< A reference to an element.
-        typedef const T &      const_reference; //!< A const reference to an element.
-
-        /// An unsigned integral type that can represent any non-negative value of the container's distance type.
-        typedef std::size_t    size_type;
-
-        /// A signed integral type used to represent the distance between two iterators.
-        typedef std::ptrdiff_t difference_type;
-
-        // reverse iterator support
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
-        typedef std::reverse_iterator<iterator> reverse_iterator;
-        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
-#elif defined(_MSC_VER) && (_MSC_VER == 1300) && defined(BOOST_DINKUMWARE_STDLIB) && (BOOST_DINKUMWARE_STDLIB == 310)
-        // workaround for broken reverse_iterator in VC7
-        typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
-                                                  reference, iterator, reference> > reverse_iterator;
-        typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
-                                                  const_reference, iterator, reference> > const_reverse_iterator;
-#elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
-        typedef std::reverse_iterator<iterator, std::random_access_iterator_tag,
-                                      value_type, reference, iterator, difference_type> reverse_iterator;
-        typedef std::reverse_iterator<const_iterator, std::random_access_iterator_tag,
-                                      value_type, const_reference, const_iterator, difference_type> const_reverse_iterator;
-#else
-        // workaround for broken reverse_iterator implementations
-        typedef std::reverse_iterator<iterator, value_type> reverse_iterator;
-        typedef std::reverse_iterator<const_iterator, value_type> const_reverse_iterator;
-#endif
-
-
-        // constructors
-        vector(size_type, const_reference) {}
-        vector(const vector<value_type, 0> &) {}
-        vector(const std::vector<value_type>) {}
-        explicit vector(size_type) {}
-        template <class InputIterator>
-        vector(InputIterator, InputIterator) {}
-
-        // assignment
-        vector<value_type, 0>& operator=(const vector<value_type, 0> &) { return *this; }
-
-        // assign one value to all elements
-        template <class InputIterator>
-        void assign(InputIterator, InputIterator) {}
-        template <class Size, class TT>
-        void assign(Size) {}
-        template <class Size, class TT>
-        void assign(Size, const TT &) {}
-
-        // iterator support
-        iterator begin() { return iterator(reinterpret_cast<pointer>(this)); }
-        const_iterator begin() const { return const_iterator(reinterpret_cast<const_pointer>(this)); }
-        iterator end() { return begin(); }
-        const_iterator end() const { return begin(); }
-
-        // reverse iterator support
-        reverse_iterator rbegin() { return reverse_iterator(end()); }
-        const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
-        reverse_iterator rend() { return reverse_iterator(begin()); }
-        const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
-
-        // size is constant
-        static size_type size() { return 0; }
-        static bool empty() { return true; }
-        static size_type max_size() { return 0; }
-        static size_type capacity() { return 0; }
-        enum { static_size = 0 };
-
-        void resize(size_type, value_type = T()) {
-            std::length_error e("attempt to resize a zero sized vector");
-            boost::throw_exception(e);
-        }
-        void reserve(size_type) {
-            std::length_error e("attempt to resize a zero sized vector");
-            boost::throw_exception(e);
-        }
-
-        // operator[]
-        reference operator[](size_type) { return failed_rangecheck(); }
-        const_reference operator[](size_type) const { return failed_rangecheck(); }
-
-        // at() with range check
-        reference at(size_type) { return failed_rangecheck(); }
-        const_reference at(size_type) const { return failed_rangecheck(); }
-
-        // front() and back()
-        reference front() { return failed_rangecheck(); }
-        const_reference front() const { return failed_rangecheck(); }
-        reference back() { return failed_rangecheck(); }
-        const_reference back() const { return failed_rangecheck(); }
-
-        // modifiers
-        void push_back(const_reference value) {}
-        void pop_back() {}
-        iterator insert(iterator) { return iterator(reinterpret_cast<pointer>(this)); }
-        iterator insert(iterator, const_reference) { return iterator(reinterpret_cast<pointer>(this)); }
-        void insert(iterator, size_type, const_reference) {}
-        template <class InputIterator>
-        void insert(iterator, InputIterator, InputIterator) {}
-        iterator erase(iterator) { return iterator(reinterpret_cast<pointer>(this)); }
-        iterator erase(iterator, iterator) { return iterator(reinterpret_cast<pointer>(this)); }
-
-        void swap(vector<value_type, 0> &) {}
-
-        // check range (may be private because it is static)
-        static reference failed_rangecheck() {
-            std::out_of_range e("attempt to access element of an empty vector");
-            boost::throw_exception(e);
-#if defined(BOOST_NO_EXCEPTIONS) || !defined(BOOST_MSVC)
-            //
-            // We need to return something here to keep
-            // some compilers happy: however we will never
-            // actually get here....
-            //
-            static value_type placeholder;
-            return placeholder;
-#endif
-        }
-
-    };
-#endif
 
     // comparisons
-    template<class T, std::size_t CS, class A>
-    inline bool operator==(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator==(const vector<T, CS> &x, const vector<T, CS> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
-    template<class T, std::size_t CS, class A>
-    inline bool operator<(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator<(const vector<T, CS> &x, const vector<T, CS> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
-    template<class T, std::size_t CS, class A>
-    inline bool operator!=(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator!=(const vector<T, CS> &x, const vector<T, CS> &y) {
         return !(x == y);
     }
-    template<class T, std::size_t CS, class A>
-    inline bool operator>(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator>(const vector<T, CS> &x, const vector<T, CS> &y) {
         return y < x;
     }
-    template<class T, std::size_t CS, class A>
-    inline bool operator<=(const vector<T, CS, A> &x, const vector<T, CS, A> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator<=(const vector<T, CS> &x, const vector<T, CS> &y) {
         return !(y < x);
     }
-    template<class T, std::size_t CS, class A>
-    inline bool operator>=(const vector<T, CS, A>& x, const vector<T, CS, A> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator>=(const vector<T, CS>& x, const vector<T, CS> &y) {
         return !(x < y);
     }
 
     /*! Global swap().
     */
-    template<class T, std::size_t CS, class A>
-    inline void swap (vector<T, CS, A> &x, vector<T, CS, A> &y) {
+    template<class T>
+    inline void swap (vector<T> &x, vector<T> &y) {
         x.swap(y);
     }
 
@@ -600,8 +422,8 @@ namespace boost { namespace self_healing {
 
 /*! Overload for operator<<() of std::ostream to print a vector.
 */
-template <class T, std::size_t CS, class A>
-std::ostream &operator<<(std::ostream &os, const boost::self_healing::vector<T, CS, A> &vector)
+template <class T, std::size_t CS>
+std::ostream &operator<<(std::ostream &os, const boost::self_healing::vector<T, CS> &vector)
 {
     os << "[";
     for (std::size_t i = 0; i < vector.size(); i++) {

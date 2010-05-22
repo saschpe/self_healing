@@ -12,6 +12,7 @@
  */
 
 #include <boost/self_healing/detail/vector_chunk.hpp>
+#include <boost/self_healing/vector.hpp>
 
 #include <iostream>
 
@@ -20,8 +21,8 @@ int main()
     std::cout << "testing class boost::self_healing::chunk" << std::endl;
 
     // create a chunk instance with whatever we want as parent
-    bool parent;
-    boost::self_healing::vector_chunk<int, bool, 4> c(&parent, 43);
+    boost::self_healing::vector<int, 4> parent;
+    boost::self_healing::vector_chunk<int, 4> c(&parent, 43);
 
     std::cout << "parent: " << &parent << std::endl;
     std::cout << "chunk is valid: " << c.is_valid() << std::endl;
@@ -29,13 +30,13 @@ int main()
     std::cout << "chunk is valid (with parent " << &parent << "): " << c.is_valid(&parent) << std::endl;
 
     std::cout << "setting a different parent" << std::endl;
-    bool anotherParent;
-    c.setParent(&anotherParent);
+    boost::self_healing::vector<int, 4> another_parent;
+    c.setParent(&another_parent);
 
-    std::cout << "parent: " << &anotherParent << std::endl;
+    std::cout << "parent: " << &another_parent << std::endl;
     std::cout << "chunk is valid: " << c.is_valid() << std::endl;
     std::cout << "chunk parent: " << c.parent() << std::endl;
-    std::cout << "chunk is valid (with parent " << &anotherParent << "): " << c.is_valid(&anotherParent) << std::endl;
+    std::cout << "chunk is valid (with parent " << &another_parent << "): " << c.is_valid(&another_parent) << std::endl;
 
     std::cout << "chunk: " << c << std::endl;
     return 0;
