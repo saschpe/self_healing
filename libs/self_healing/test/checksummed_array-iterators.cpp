@@ -28,10 +28,6 @@ int main()
         *it += 1;
     }
 
-    int i = 3;
-    boost::self_healing::checksummed_array<int, 16>::reference ar(i);
-    boost::self_healing::checksummed_array<int, 16>::const_reference car(i);
-
     std::cout << "testing iterator value assignment" << std::endl;
     boost::self_healing::checksummed_array<int, 16>::iterator tmp_it = a.begin();
     *tmp_it = 99;
@@ -40,9 +36,13 @@ int main()
     //TODO: fix this, the functor is not called here !!!
     *tmp_rit = 99;
 
-    std::cout << "testing const iterators" << std::endl;
     const int* cit = a.begin();
+    std::cout << cit << std::endl;
+
     boost::self_healing::checksummed_array<int, 16>::const_iterator tmp_cit = a.begin();
+    std::cout << "testing checksummed_array<>::const_iterator " << tmp_cit << std::endl;
+
+    std::cout << "testing checksummed_array<>::const_reverse_iterator" << std::endl;
     boost::self_healing::checksummed_array<int, 16>::const_reverse_iterator tmp_crit = a.rbegin();
 
     std::cout << "checksummed_array 1:  ";

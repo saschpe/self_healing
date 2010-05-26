@@ -24,6 +24,12 @@ int main()
     boost::self_healing::checksummed_array<int, 16> a;
     std::cout << "checksummed_array 1: " << a << std::endl;
 
+    int i = 3;
+    boost::self_healing::checksummed_array<int, 16>::reference ar(i);
+    std::cout << "testing checksummed_array<>::reference constructor for " << ar << std::endl;
+    boost::self_healing::checksummed_array<int, 16>::const_reference car(i);
+    std::cout << "testing checksummed_array<>::const_reference constructor for " << car << std::endl;
+
     assert(a.at(0) == 0);
     assert(a.at(a.size() - 1) == 0);
 
