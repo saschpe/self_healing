@@ -42,6 +42,7 @@ endif()
 
 # add other documentation as target
 if(DOCUTILS_FOUND)
+    #TODO: This is not platform independent!
     add_custom_target(docutils COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc/html
                                COMMAND ${RST2HTML_EXECUTABLE} README.txt doc/html/README.html
                                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
