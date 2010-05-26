@@ -17,7 +17,7 @@
 
 #include <boost/detail/workaround.hpp>
 
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
 #include <iostream>
 #endif
 #include <stdexcept>
@@ -71,7 +71,7 @@ namespace boost { namespace self_healing {
         * \see check_parent()
         */
         bool is_valid(parent_pointer const parent = NULL) const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::child<P>::is_valid()" << std::endl;
 #endif
             try {
@@ -87,7 +87,7 @@ namespace boost { namespace self_healing {
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
         void check_parent(parent_pointer const parent) const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::child<P>::check_parent(" << parent << ")" << std::endl;
 #endif
             if (parent) {

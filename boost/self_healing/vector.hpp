@@ -18,7 +18,7 @@
 
 #include <boost/detail/workaround.hpp>
 
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
 #include <iostream>
 #endif
 #include <stdexcept>
@@ -253,18 +253,18 @@ namespace boost { namespace self_healing {
             delete[] m_head;
         }
 
-        vector<value_type, CS>& operator=(const vector<value_type, CS> &);
+        vector<value_type, CS>& operator=(const vector<value_type, CS> &rhs) {
+            assign(rhs.begin(), rhs.end());
+        };
 
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last) {
+            check_head_and_tail_pointers();
             //TODO: Implement when iterators are available
         }
-        template <class Size>
-        void assign(Size n) {
-            //TODO: Is this one needed?
-        }
         template <class Size, class TT>
-        void assign(Size n, const TT &) {
+        void assign(Size n, const TT &x = TT()) {
+            check_head_and_tail_pointers();
             //TODO: Implement first!
         }
 
@@ -352,7 +352,7 @@ namespace boost { namespace self_healing {
         * \throws std::out_of_range Thrown if index is out of range.
         */
         void rangecheck(size_type index) const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::rangecheck(" << index << ")" << std::endl;
 #endif
             if (index >= size()) {
@@ -366,7 +366,7 @@ namespace boost { namespace self_healing {
         * \see check_size
         */
         bool is_valid() const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::is_valid()" << std::endl;
 #endif
             try {
@@ -382,16 +382,35 @@ namespace boost { namespace self_healing {
 
     private:
         void check_head_and_tail_pointers() const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+            //TODO: Check and repair head and tail pointers
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::check_head_and_tail_pointers()" << std::endl;
 #endif
-            //TODO: Check and repair head and tail pointers
+            if (m_head == NULL && m_tail == NULL) {
+                // Both are NULL, this means nothing seems to be alloced yet
+                // We're fine if the other values reflect that
+                if (m_capacity == 0 && m_size == 0 && m_chunks == 0) {
+                    return;
+                }
+                check_chunks();
+                check_size();
+                //TODO: Maybe do a simpler check here instead
+            } else if (m_head == NULL) {
+                // Only head is null, could be error with tail or head
+
+            } else if (m_tail == NULL) {
+                // Only tail is null, could be error with tail or head
+
+            } else {
+                // Both are non-NULL, further checks
+
+            }
             /*std::runtime_error e("head or tail error");
             boost::throw_exception(e);*/
         }
 
         void check_chunks() const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::check_chunks()" << std::endl;
 #endif
             //TODO: Check and repair chunk count
@@ -400,7 +419,7 @@ namespace boost { namespace self_healing {
         }
 
         void check_size() const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::check_size()" << std::endl;
 #endif
             //TODO: check and repair size
@@ -409,10 +428,10 @@ namespace boost { namespace self_healing {
         }
 
         vector_chunk<value_type, CS> *m_head;   //!< Pointer to the first chunk.
-        vector_chunk<value_type, CS> *m_tail;   //!< Pointer to the last chunk.
-        size_type m_chunks;                     //!< Chunk counter.
         size_type m_size;                       //!< Counts how much elements are stored currently in all chunks.
-        size_type m_capacity;
+        size_type m_chunks;                     //!< Chunk counter.
+        size_type m_capacity;                   //!< Current element storage capacity.
+        vector_chunk<value_type, CS> *m_tail;   //!< Pointer to the last chunk.
     };
 
     // comparisons
@@ -441,17 +460,17 @@ namespace boost { namespace self_healing {
         return !(x < y);
     }
 
-    /*! Global swap().
+    /*! Global swap function.
     */
     template<class T>
-    inline void swap (vector<T> &x, vector<T> &y) {
+    inline void swap(vector<T> &x, vector<T> &y) {
         x.swap(y);
     }
 
 } } // namespace boost::self_healing
 
 
-/*! Overload for operator<<() of std::ostream to print a vector.
+/*! Overload for operator << of std::ostream to print a vector.
 */
 template <class T, std::size_t CS>
 std::ostream &operator<<(std::ostream &os, const boost::self_healing::vector<T, CS> &vector)

@@ -17,7 +17,7 @@
 
 #include <boost/detail/workaround.hpp>
 
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
 #include <iostream>
 #endif
 
@@ -65,7 +65,7 @@ namespace boost { namespace self_healing {
         * \see check_parent()
         */
         bool is_valid(vector<T, CS> *const parent = NULL) const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector_chunk<T, CS>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.

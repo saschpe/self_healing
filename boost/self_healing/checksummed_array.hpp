@@ -24,7 +24,7 @@
 
 #include <boost/detail/workaround.hpp>
 
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
 #include <iostream>
 #endif
 #include <stdexcept>
@@ -242,7 +242,7 @@ namespace boost { namespace self_healing {
         * \throws std::out_of_range Thrown if index is out of range.
         */
         static void rangecheck(size_type index) {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::checksummed_array<T, N>::rangecheck(" << index << ")" << std::endl;
 #endif
             if (index >= size()) {
@@ -256,7 +256,7 @@ namespace boost { namespace self_healing {
         * \see check_checksums()
         */
         bool is_valid() const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::checksummed_array<T, N>::is_valid()" << std::endl;
 #endif
             try {
@@ -280,7 +280,7 @@ namespace boost { namespace self_healing {
         * \throws std::runtime_error Thrown if the data was damaged and checksums mismatch.
         */
         void check_checksums() const {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::checksummed_array<T, N>::check_checksums()" << std::endl;
 #endif
             boost::crc_32_type crc3;
@@ -338,7 +338,7 @@ namespace boost { namespace self_healing {
         /*! Compute and store CRC checksums.
         */
         void update_checksums() {
-#ifdef BOOST_SELF_HEALING_DEBUG_BUILD
+#ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::checksummed_array<T, N>::update_checksums()" << std::endl;
 #endif
             boost::crc_32_type crc;
