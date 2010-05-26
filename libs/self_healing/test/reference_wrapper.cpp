@@ -21,9 +21,14 @@ int main()
 
     int i = 3;
     boost::self_healing::reference_wrapper<int> rr(i);
-    int j = 1 + *rr + 3;
-    int k = 1 + rr + 3;
 
     std::cout << "sizeof(self_healing::reference_wrapper<int>): " << sizeof(rr) << std::endl;
+
+    int j = 1 + *rr + 3;
+    std::cout << "1 + *rr + 3: " << j << std::endl;
+
+    int k = 1 + rr + 3;
+    std::cout << "1 + rr + 3: " << k << std::endl;
+
     return 0;
 }
