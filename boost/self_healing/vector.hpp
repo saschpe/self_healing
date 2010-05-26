@@ -218,31 +218,40 @@ namespace boost { namespace self_healing {
         /*! Default constructor.
         */
         explicit vector()
-            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {}
+            : m_head(NULL), m_size(0), m_chunks(0), m_capacity(0), m_tail(NULL) {}
 
+        /*! Constructor to initialize vector with a custom size and an optional fill value.
+        * \param n Custom initial vector size.
+        * \param x Optional value to fill the vector with.
+        */
         vector(size_type n, const_reference x = value_type())
-            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {
+            : m_head(NULL), m_size(0), m_chunks(0), m_capacity(0), m_tail(NULL) {
             assign(n, x);
         }
 
+        /*! Constructor to initialize vector with a custom value range supplied by an iterator.
+        * \param first Begin of value range.
+        * \param last End of value range.
+        */
         template <class InputIterator>
         vector(InputIterator first, InputIterator last)
-            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {
+            : m_head(NULL), m_size(0), m_chunks(0), m_capacity(0), m_tail(NULL) {
             assign(first, last);
         }
 
-        /*! Copy constructor.
+        /*! Copy constructor to copy from a <code>boost::self_healing::vector</code>.
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
         vector(const vector<value_type, CS> &rhs)
-            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {
+            : m_head(NULL), m_size(0), m_chunks(0), m_capacity(0), m_tail(NULL) {
             assign(rhs.begin(), rhs.end());
         }
-        /*! Copy constructor.
+
+        /*! Copy constructor to copy from a <code>std::vector</code>.
         * \param rhs The other <code>std::vector</code> to copy from.
         */
         vector(const std::vector<value_type> &rhs)
-            : m_head(NULL), m_tail(NULL), m_chunks(0), m_size(0), m_capacity(0) {
+            : m_head(NULL), m_size(0), m_chunks(0), m_capacity(0), m_tail(NULL) {
             assign(rhs.begin(), rhs.end());
         }
 
@@ -260,11 +269,13 @@ namespace boost { namespace self_healing {
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last) {
             check_head_and_tail_pointers();
+            reserve(last - first);
             //TODO: Implement when iterators are available
         }
         template <class Size, class TT>
         void assign(Size n, const TT &x = TT()) {
             check_head_and_tail_pointers();
+            reserve(n);
             //TODO: Implement first!
         }
 
