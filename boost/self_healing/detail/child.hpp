@@ -77,7 +77,10 @@ namespace boost { namespace self_healing {
             try {
                 check_parent(parent);
                 return true;
-            } catch (const std::runtime_error &) {
+            } catch (const std::runtime_error &e) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+                std::cout << "boost::self_healing::child<P>::is_valid() caught runtime error: " << e.what() << std::endl;
+#endif
                 return false;
             };
         }
