@@ -34,6 +34,7 @@
 
 #include "./detail/reference_wrapper.hpp"
 #include "./detail/vector_chunk.hpp"
+#include "./detail/utility.hpp"
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
@@ -46,7 +47,7 @@ namespace boost { namespace self_healing {
     * \param T The data type of the stored values.
     * \param CS The size of the internal chunks.
     * \remarks The chunk size should be chosen based on CPU cache size.
-    * \see chunk
+    * \see vector_chunk
     */
     template <class T, std::size_t CS = 64>
     class vector
@@ -242,7 +243,7 @@ namespace boost { namespace self_healing {
         /*! Copy constructor to copy from a <code>boost::self_healing::vector</code>.
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
-        vector(const vector<value_type, CS> &rhs)
+        vector(const boost::self_healing::vector<value_type, CS> &rhs)
             : m_head(NULL), m_size(0), m_chunks(0), m_capacity(0), m_tail(NULL) {
             assign(rhs.begin(), rhs.end());
         }
@@ -280,10 +281,10 @@ namespace boost { namespace self_healing {
         }
 
         // iterator support
-        //iterator begin() { check_head_and_tail_pointers(); check_chunks(); return iterator(m_chunks); }
-        //const_iterator begin() const { check_head_and_tail_pointers(); check_chunks(); return const_iterator(m_head, m_head->elements.begin()); }
-        //iterator end() { check_head_and_tail_pointers(); check_chunks(); return iterator(m_chunks + N); }
-        //const_iterator end() const { check_head_and_tail_pointers(); check_chunks(); return const_iterator(m_tail, m_tail->elements.end()); }
+        iterator begin() { check_head_and_tail_pointers(); check_chunks(); return iterator(m_head); }
+        const_iterator begin() const { check_head_and_tail_pointers(); check_chunks(); return const_iterator(m_head, m_head->elements.begin()); }
+        iterator end() { check_head_and_tail_pointers(); check_chunks(); return iterator(m_tail + CS); }
+        const_iterator end() const { check_head_and_tail_pointers(); check_chunks(); return const_iterator(m_tail, m_tail->elements.end()); }
 
         // reverse iterator support
         //reverse_iterator rbegin() { return reverse_iterator(end()); }
@@ -297,16 +298,21 @@ namespace boost { namespace self_healing {
         size_type max_size() const { return std::numeric_limits<difference_type>::max(); }
         size_type capacity() const { check_chunks(); return m_chunks * CS; }
 
-        void resize(size_type new_size, value_type fill = T()) {
+        void resize(size_type new_size, value_type item = T()) {
             check_size();
             if (new_size > size()) {
+                check_capacity();
+                if (new_size > capacity()) {
+                    reserve(new_size);
+                }
+                insert(end(), new_size - size(), item);
                 //const int old_size = m_size;
-                reserve(new_size);
                 // TODO: fill new elelemts with provide value
                 /*for (int i = old_size; i < size; i++) {
                 }*/
             } else if (new_size < size()) {
-
+                // Invalidate values after 'new_size', capacity remains the same.
+                m_size = new_size;
             }
             // vector throws a length_error if resized above max_size
             /*void resize(size_type new_size, param_value_type item = value_type()) {
@@ -322,7 +328,10 @@ namespace boost { namespace self_healing {
         }
         void reserve(size_type new_size) {
             check_size();
-            if (new_size > size()) {
+            if (new_size > max_size()) {
+                std::length_error e("unable to reserve " + to_string(new_size) + " elements");
+                boost::throw_exception(e);
+            } else if (new_size > size()) {
                 //TODO: Do something actually
             }
             // vector throws a length_error if resized above max_size
@@ -347,16 +356,41 @@ namespace boost { namespace self_healing {
         const_reference back() const { check_size(); return operator[](m_size - 1); }
 
         // modifiers
-        /*void push_back(const_reference value);
-        void pop_back();*/
-        /*iterator insert(iterator it);
+        iterator insert(iterator it);
         iterator insert(iterator it, const_reference value);
-        void insert(iterator it, size_type, const_reference value);
+        void insert(iterator it, size_type, const_reference value) {
+            //TODO:
+        }
         template <class InputIterator>
-        void insert(iterator, InputIterator, InputIterator);
+        void insert(iterator, InputIterator, InputIterator) {
+            //TODO:
+        }
+        void push_back(const_reference value) {
+            //TODO:
+        }
         iterator erase(iterator);
-        iterator erase(iterator, iterator);*/
-        //void swap(vector<value_type> &);
+        iterator erase(iterator, iterator);
+        void pop_back() {
+            //TODO:
+        }
+        void clear() {
+            //TODO:
+        }
+
+        void swap(vector<value_type> &rhs) {
+            /*resize(rhs.capacity);
+            if (rhs.capacity
+
+            for (const_iterator it = begin(); it != end(); it++) {
+                boost::swap(
+
+            }
+            for (size_type i = 0; i < N; ++i) {
+                boost::swap(elements[i], other.elements[i]);
+            }
+            boost::swap(crc1, other.crc1);
+            boost::swap(crc2, other.crc2);*/
+        }
 
         /*! Check index validity against size.
         * \param index The index to check.
@@ -381,12 +415,23 @@ namespace boost { namespace self_healing {
             std::cout << "boost::self_healing::vector<T, CS>::is_valid()" << std::endl;
 #endif
             try {
+                // check all parts of the data structure
                 check_head_and_tail_pointers();
                 check_chunks();
+                check_capacity();
                 check_size();
-                //TODO: Call is_valid for all chunks with 'this' as parent
+                for (int i = 0; i < m_chunks; i++) {
+                    // make sure that the head pointer is valid during the loop
+                    check_head_and_tail_pointers();
+                    // compute address of next chunk
+                    vector_chunk<value_type, CS> *chunk = m_head + i * CS;
+                    chunk->is_valid(this);
+                }
                 return true;
             } catch (const std::runtime_error &e) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+                std::cout << "boost::self_healing::vector<T, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
+#endif
                 return false;
             };
         }
@@ -416,8 +461,8 @@ namespace boost { namespace self_healing {
                 // Both are non-NULL, further checks
 
             }
-            /*std::runtime_error e("head or tail error");
-            boost::throw_exception(e);*/
+            std::runtime_error e("head or tail error");
+            boost::throw_exception(e);
         }
 
         void check_chunks() const {
@@ -425,8 +470,8 @@ namespace boost { namespace self_healing {
             std::cout << "boost::self_healing::vector<T, CS>::check_chunks()" << std::endl;
 #endif
             //TODO: Check and repair chunk count
-            /*std::runtime_error e("chunk count error");
-            boost::throw_exception(e);*/
+            std::runtime_error e("chunk count error");
+            boost::throw_exception(e);
         }
 
         void check_size() const {
@@ -434,8 +479,17 @@ namespace boost { namespace self_healing {
             std::cout << "boost::self_healing::vector<T, CS>::check_size()" << std::endl;
 #endif
             //TODO: check and repair size
-            /*std::runtime_error e("size error");
-            boost::throw_exception(e);*/
+            std::runtime_error e("size error");
+            boost::throw_exception(e);
+        }
+
+        void check_capacity() const {
+#ifdef BOOST_SELF_HEALING_DEBUG
+            std::cout << "boost::self_healing::vector<T, CS>::check_capacity()" << std::endl;
+#endif
+            //TODO: check and repair size
+            std::runtime_error e("capacity error");
+            boost::throw_exception(e);
         }
 
         vector_chunk<value_type, CS> *m_head;   //!< Pointer to the first chunk.
