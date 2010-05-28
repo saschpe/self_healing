@@ -52,11 +52,11 @@ namespace boost { namespace self_healing {
         typedef T         value_type;       //!< The type of elements stored in the <code>checksummed_array</code>.
         typedef const T & const_reference;  //!< A const reference to an element.
 
-        /*! Constructor.
+        /*! Default constructor.
         * \param parent The parent.
         * \param value An initial value that is set for all elements.
         */
-        explicit vector_chunk(vector<value_type, N> *const parent, const_reference value = 0)
+        explicit vector_chunk(vector<value_type, N> *const parent = NULL, const_reference value = 0)
             : child<vector<value_type, N> >(parent), checksummed_array<value_type, N>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.

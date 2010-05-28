@@ -42,17 +42,12 @@ namespace boost { namespace self_healing {
         typedef P         parent_type;      //!< The type of the parent class.
         typedef P *       parent_pointer;   //!< Pointer to parent class.
 
-        /*! Constructor.
+        /*! Default constructor.
         * \param parent The parent.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
-        explicit child(parent_pointer const parent)
-            : m_parent(parent) {
-            if (!parent) {
-                std::invalid_argument e("parent is NULL");
-                boost::throw_exception(e);
-            }
-        }
+        explicit child(parent_pointer const parent = NULL)
+            : m_parent(parent) {}
 
         /*! Set a new parent.
         * \param parent Pointer to the new parent.
