@@ -54,21 +54,21 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T                               value_type;        //!< The type of elements stored in the <code>vector</code>.
-        class                                   iterator;          //!< Forward declaration of class iterator.
-        class                                   const_iterator;    //!< Forward declaration of class const_iterator.
-        typedef T *                             pointer;           //!< A pointer to an element.
-        typedef const T *                       const_pointer;     //!< A const pointer to an element.
-        typedef reference_wrapper<T>            reference;         //!< A reference to an element.
-        typedef const T &                       const_reference;   //!< A const reference to an element.
-        typedef std::size_t                     size_type;         //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
-        typedef std::ptrdiff_t                  difference_type;   //!< A signed integral type used to represent the distance between two iterators.
+        typedef T                       value_type;        //!< The type of elements stored in the <code>vector</code>.
+        class                           iterator;          //!< Forward declaration of class iterator.
+        class                           const_iterator;    //!< Forward declaration of class const_iterator.
+        typedef T *                     pointer;           //!< A pointer to an element.
+        typedef const T *               const_pointer;     //!< A const pointer to an element.
+        typedef reference_wrapper<T>    reference;         //!< A reference to an element.
+        typedef const T &               const_reference;   //!< A const reference to an element.
+        typedef std::size_t             size_type;         //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
+        typedef std::ptrdiff_t          difference_type;   //!< A signed integral type used to represent the distance between two iterators.
 
     private:
         // private type definitions
-        typedef vector_chunk<value_type, N>     vector_chunk_type;                              //!< A vector chunk.
-        typedef vector_chunk<value_type, N> *   vector_chunk_pointer;                           //!< A pointer to vector chunk.
-        static const size_type                  vector_chunk_size = sizeof(vector_chunk_type);  //!< The size of a vector chunk.
+        typedef vector_chunk<T, N>      vector_chunk_type;                              //!< A vector chunk.
+        typedef vector_chunk<T, N> *    vector_chunk_pointer;                           //!< A pointer to vector chunk.
+        static const size_type          vector_chunk_size = sizeof(vector_chunk_type);  //!< The size of a vector chunk.
     public:
 
 #if 0
@@ -195,26 +195,30 @@ namespace boost { namespace self_healing {
             typename checksummed_array<T, N>::const_iterator m_end;
         };
 
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
-        typedef typename reverse_iterator<iterator> reverse_iterator;
-        typedef typename reverse_iterator<const_iterator> const_reverse_iterator;
-#elif defined(_MSC_VER) && (_MSC_VER == 1300) && defined(BOOST_DINKUMWARE_STDLIB) && (BOOST_DINKUMWARE_STDLIB == 310)
-        // workaround for broken reverse_iterator in VC7
-        typedef typename reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
-                                                                      reference, iterator, reference> > reverse_iterator;
-        typedef typename reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
-                                                                      const_reference, iterator, reference> > const_reverse_iterator;
-#elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
-        typedef typename reverse_iterator<iterator, std::random_access_iterator_tag,
-                                             value_type, reference, iterator, difference_type> reverse_iterator;
-        typedef typename reverse_iterator<const_iterator, std::random_access_iterator_tag,
-                                             value_type, const_reference, const_iterator, difference_type> const_reverse_iterator;
-#else
-        // workaround for broken reverse_iterator implementations
-        typedef typename reverse_iterator<iterator, value_type> reverse_iterator;
-        typedef typename reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
 
+        //TODO: Implement iterators!
+        class iterator : public std::iterator<std::random_access_iterator_tag, value_type> {};
+        class const_iterator : public std::iterator<std::random_access_iterator_tag, value_type> {};
+
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+#elif defined(_MSC_VER) && (_MSC_VER == 1300) && defined(BOOST_DINKUMWARE_STDLIB) && (BOOST_DINKUMWARE_STDLIB == 310)
+        // workaround for broken reverse_iterator in VC7
+        typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, iterator,
+                                                  reference, iterator, reference> > reverse_iterator;
+        typedef std::reverse_iterator<std::_Ptrit<value_type, difference_type, const_iterator,
+                                                  const_reference, iterator, reference> > const_reverse_iterator;
+#elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
+        typedef std::reverse_iterator<iterator, std::random_access_iterator_tag,
+                                      value_type, reference, iterator, difference_type> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator, std::random_access_iterator_tag,
+                                      value_type, const_reference, const_iterator, difference_type> const_reverse_iterator;
+#else
+        // workaround for broken reverse_iterator implementations
+        typedef std::reverse_iterator<iterator, value_type> reverse_iterator;
+        typedef std:: reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
 
         /*! Default constructor.
@@ -289,10 +293,10 @@ namespace boost { namespace self_healing {
         const_iterator end() const { check_head_and_tail_pointers(); check_chunks(); return const_iterator(m_tail, m_tail->elements.end()); }
 
         // reverse iterator support
-        /*reverse_iterator rbegin() { return reverse_iterator(end()); }
+        reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
         reverse_iterator rend() { return reverse_iterator(begin()); }
-        const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }*/
+        const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // capacity
         size_type size() const { check_size(); return m_size; }
@@ -460,7 +464,7 @@ namespace boost { namespace self_healing {
 #endif
             //TODO: Check head and tail pointer
             //check_head_and_tail_pointers();
-            difference_type chunk_count = ((m_tail + vector_chunk_size) - m_head) / vector_chunk_size;
+            size_type chunk_count = ((m_tail + vector_chunk_size) - m_head) / vector_chunk_size;
 
             if (m_chunks != chunk_count) {
                 //TODO: Repair chunk count
