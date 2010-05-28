@@ -302,7 +302,11 @@ namespace boost { namespace self_healing {
         // capacity
         size_type size() const { check_size(); return m_size; }
         bool empty() const { return size() == 0; }
-        size_type max_size() const { return std::numeric_limits<difference_type>::max(); }
+        size_type max_size() const {
+            // determin how much chunks fit into memory and thus how much elements we can have
+            const size_type max_elems = std::numeric_limits<pointer>::max() / vector_chunk_size * N;
+            return std::min(max_elems, std::numeric_limits<difference_type>::max());
+        }
         size_type capacity() const { check_storage(); return m_chunks * vector_chunk_type::size(); }
 
         void resize(size_type new_size, value_type item = T()) {
