@@ -302,16 +302,13 @@ namespace boost { namespace self_healing {
             boost::throw_exception(e);
         }
 
-        /*! \brief Check and repair checksums functor.
-        *
-        * A private functor implementation that calls check_checksums() for a
-        * given checksummed_array instance if called itself.
+        /*! A private functor that calls check_checksums() for a given checksummed_array instance if called itself.
         */
         class check_checksums_functor
         {
         public:
             /*! Constructor.
-            * \param parent The checksummed_array instance that owns the functor instance.
+            * \param parent The checksummed_array instance for which to call check_checksums().
             */
             explicit check_checksums_functor(checksummed_array<value_type, N> *parent)
                 : m_parent(parent) {}
@@ -334,16 +331,13 @@ namespace boost { namespace self_healing {
             crc2 = crc1;
         }
 
-        /*! \brief Update checksums functor.
-        *
-        * A private functor implementation that calls update_checksums() for a
-        * given checksummed_array instance if called itself.
+        /*! A private functor that calls update_checksums() for a given checksummed_array instance if called itself.
         */
         class update_checksums_functor
         {
         public:
             /*! Constructor.
-            * \param parent The checksummed_array instance that owns the functor instance.
+            * \param parent The checksummed_array instance for wich to call update_checksums().
             */
             explicit update_checksums_functor(checksummed_array<value_type, N> *parent)
                 : m_parent(parent) {}
