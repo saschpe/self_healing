@@ -33,9 +33,11 @@ endif()
 
 # add doxygen source code documentation as target
 if(DOXYGEN_FOUND)
+    # configure the Doxygen file
     set(DOXYFILE_IN "${CMAKE_CURRENT_SOURCE_DIR}/libs/self_healing/doc/reference.dox")
     set(DOXYFILE_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/doc/reference")
     configure_file(${DOXYFILE_IN} Doxyfile ESCAPE_QUOTES IMMEDIATE @ONLY)
+    # add the target
     add_custom_target(doxygen ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
                               COMMENT "Generating Doxygen code documentation")
     add_dependencies(doc doxygen) # add doxygen as dependency to doc-target
