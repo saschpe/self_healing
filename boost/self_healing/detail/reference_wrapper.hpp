@@ -18,10 +18,10 @@
 
 #include <ostream>
 
+#include <boost/function.hpp>
+
 // FIXES for broken compilers
 #include <boost/config.hpp>
-
-#include "./nullary_function.hpp"
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
@@ -33,11 +33,12 @@ namespace boost { namespace self_healing {
     * object that is called every time the value changes.
     *
     * \param T The data type of the stored value.
-    * \see nullary_function, empty_nullary_function
     */
     template <class T>
     class reference_wrapper
     {
+        static void empty_function() {}
+
     public:
         // type definitions
         typedef T                    value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
@@ -48,7 +49,7 @@ namespace boost { namespace self_healing {
         * \param value The value to initialize the reference with.
         * \param update The function to apply if the value is changed.
         */
-        explicit reference_wrapper(reference value, nullary_function &update = empty_nullary_function)
+        explicit reference_wrapper(reference value, boost::function<void (void)> update = empty_function)
             : value(value), update(update) {}
 
         /*! Copy constructor.
@@ -93,7 +94,7 @@ namespace boost { namespace self_healing {
 
     private:
         reference value;
-        nullary_function &update;
+        boost::function<void (void)> update;
     };
 
 } } // namespace boost::self_healing
