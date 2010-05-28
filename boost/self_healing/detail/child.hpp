@@ -49,6 +49,12 @@ namespace boost { namespace self_healing {
         explicit child(parent_pointer const parent = NULL)
             : m_parent(parent) {}
 
+        /*! Copy constructor.
+        * \param other The other iterator instance to copy from.
+        */
+        child(const child &other)
+            : m_parent(other) {}
+
         /*! Set a new parent.
         * \param parent Pointer to the new parent.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
