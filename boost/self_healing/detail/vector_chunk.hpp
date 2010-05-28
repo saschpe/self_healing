@@ -53,7 +53,7 @@ namespace boost { namespace self_healing {
         typedef const T & const_reference;  //!< A const reference to an element.
 
         /*! Default constructor.
-        * \param parent The parent.
+        * \param parent The parent vector.
         * \param value An initial value that is set for all elements.
         */
         explicit vector_chunk(vector<value_type, N> *const parent = NULL, const_reference value = 0)
