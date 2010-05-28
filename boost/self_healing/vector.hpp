@@ -265,7 +265,7 @@ namespace boost { namespace self_healing {
         /*! Destructor.
         */
         ~vector() {
-            check_head_and_tail_pointers();
+            check_storage();
             delete[] m_head;
         }
 
@@ -275,23 +275,23 @@ namespace boost { namespace self_healing {
 
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last) {
-            check_head_and_tail_pointers();
+            check_storage();
             reserve(last - first);
             //TODO: Implement when iterators are available
         }
         template <class Size, class TT>
         void assign(Size n, const TT &x = TT()) {
-            check_head_and_tail_pointers();
+            check_storage();
             reserve(n);
             //TODO: Implement first!
         }
 
         // iterator support
         //TODO: Fix iterator construction.
-        iterator begin() { check_head_and_tail_pointers(); check_chunks(); return iterator(m_head); }
-        const_iterator begin() const { check_head_and_tail_pointers(); check_chunks(); return const_iterator(m_head, m_head->elements.begin()); }
-        iterator end() { check_head_and_tail_pointers(); check_chunks(); return iterator(m_tail + vector_chunk_size); }
-        const_iterator end() const { check_head_and_tail_pointers(); check_chunks(); return const_iterator(m_tail, m_tail->elements.end()); }
+        iterator begin() { check_storage(); return iterator(0); }
+        const_iterator begin() const { check_storage(); return const_iterator(0); }
+        iterator end() { check_storage(); check_size(); return iterator(size()); }
+        const_iterator end() const { check_storage(); check_size(); return const_iterator(size()); }
 
         // reverse iterator support
         reverse_iterator rbegin() { return reverse_iterator(end()); }
@@ -303,7 +303,7 @@ namespace boost { namespace self_healing {
         size_type size() const { check_size(); return m_size; }
         bool empty() const { return size() == 0; }
         size_type max_size() const { return std::numeric_limits<difference_type>::max(); }
-        size_type capacity() const { check_chunks(); return m_chunks * vector_chunk_type::size(); }
+        size_type capacity() const { check_storage(); return m_chunks * vector_chunk_type::size(); }
 
         void resize(size_type new_size, value_type item = T()) {
             check_size();
@@ -329,7 +329,7 @@ namespace boost { namespace self_healing {
                     std::length_error e("unable to reserve capacity: " + to_string(new_capacity));
                     boost::throw_exception(e);
                 }
-                check_head_and_tail_pointers();
+                // check_storage(); // Already done in capacity() method call
 
                 const vector_chunk_pointer old_head = m_head;
                 const size_type new_chunk_count = std::ceil(new_capacity / N);
@@ -344,18 +344,18 @@ namespace boost { namespace self_healing {
         }
 
         // operator[]
-        reference operator[](size_type i) { check_head_and_tail_pointers(); return m_head[i / N][i % N]; }
-        const_reference operator[](size_type i) const { check_head_and_tail_pointers(); return m_head[i / N][(i % N)]; }
+        reference operator[](size_type i) { check_storage(); return m_head[i / N][i % N]; }
+        const_reference operator[](size_type i) const { check_storage(); return m_head[i / N][(i % N)]; }
 
         // at() with range check
         reference at(size_type i) { rangecheck(i); return operator[](i); }
         const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
 
         // front() and back()
-        reference front() { check_head_and_tail_pointers(); return m_head.front(); }
-        const_reference front() const { check_head_and_tail_pointers; return m_head.front(); }
-        reference back() { check_head_and_tail_pointers(); return m_tail.back(); }
-        const_reference back() const { check_head_and_tail_pointers(); return m_tail.back(); }
+        reference front() { check_storage(); return m_head.front(); }
+        const_reference front() const { check_storage; return m_head.front(); }
+        reference back() { check_storage(); return m_tail.back(); }
+        const_reference back() const { check_storage(); return m_tail.back(); }
 
         // modifiers
         iterator insert(iterator it);
@@ -367,18 +367,20 @@ namespace boost { namespace self_healing {
         void insert(iterator, InputIterator, InputIterator) {
             //TODO:
         }
+
+        iterator erase(iterator);
+        iterator erase(iterator, iterator);
+
         void push_back(const_reference value) {
             //TODO:
         }
-        iterator erase(iterator);
-        iterator erase(iterator, iterator);
         void pop_back() {
             //TODO:
         }
-        void clear() {
-            //TODO:
-            if (!empty()) {
 
+        void clear() {
+            if (!empty()) {
+                erase(begin(), end());
             }
         }
 
@@ -387,8 +389,7 @@ namespace boost { namespace self_healing {
             boost::swap(m_tail, rhs.m_tail);
             boost::swap(m_chunks, rhs.m_chunks);
             boost::swap(m_size, rhs.m_size);
-            check_head_and_tail_pointers();
-            check_chunks();
+            check_storage();
             check_size();
         }
 
@@ -416,12 +417,11 @@ namespace boost { namespace self_healing {
 #endif
             try {
                 // check all parts of the data structure
-                check_head_and_tail_pointers();
-                check_chunks();
+                check_storage();
                 check_size();
                 for (int i = 0; i < m_chunks; i++) {
                     // make sure that the head pointer is valid during the loop
-                    check_head_and_tail_pointers();
+                    check_storage();
                     // compute address of next chunk
                     vector_chunk_pointer chunk = m_head + i * vector_chunk_size;
                     chunk->is_valid(this);
@@ -436,10 +436,10 @@ namespace boost { namespace self_healing {
         }
 
     private:
-        void check_head_and_tail_pointers() const {
+        void check_storage() const {
             //TODO: Check and repair head and tail pointers
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, N>::check_head_and_tail_pointers()" << std::endl;
+            std::cout << "boost::self_healing::vector<T, N>::check_storage()" << std::endl;
 #endif
             if (m_head == NULL && m_tail == NULL) {
                 // Both are NULL, this means nothing seems to be alloced yet
@@ -447,8 +447,7 @@ namespace boost { namespace self_healing {
                 if (m_size == 0 && m_chunks == 0) {
                     return;
                 }
-                /*check_chunks();
-                check_size();*/
+                /*check_size();*/
                 //TODO: Maybe do a simpler check here instead
             } else if (m_head == NULL) {
                 // Only head is null, could be error with tail or head
@@ -460,24 +459,16 @@ namespace boost { namespace self_healing {
                 // Both are non-NULL, further checks
 
             }
-            std::runtime_error e("head or tail error");
-            boost::throw_exception(e);
-        }
-
-        void check_chunks() const {
-#ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, N>::check_chunks()" << std::endl;
-#endif
-            //TODO: Check head and tail pointer
-            //check_head_and_tail_pointers();
-            size_type chunk_count = ((m_tail + vector_chunk_size) - m_head) / vector_chunk_size;
+            /*size_type chunk_count = ((m_tail + vector_chunk_size) - m_head) / vector_chunk_size;
 
             if (m_chunks != chunk_count) {
                 //TODO: Repair chunk count
 
                 std::runtime_error e("chunk count error");
                 boost::throw_exception(e);
-            }
+            }*/
+            std::runtime_error e("head or tail error");
+            boost::throw_exception(e);
         }
 
         void check_size() const {
