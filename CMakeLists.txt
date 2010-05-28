@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBOOST_SELF_HEALING_DEBUG")
 
 find_package(Boost 1.42.0 REQUIRED)
 find_package(Doxygen)
-#find_package(Docutils)
+find_package(Docutils)
 
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -22,7 +22,8 @@ option(BUILD_TESTS "Build tests" on)
 
 if(DOXYGEN_FOUND OR DOCUTILS_FOUND)
     # cleanup $build/doc on "make clean"
-    set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BUILD_DIR}/doc)
+    make_directory(${CMAKE_CURRENT_BINARY_DIR}/doc)
+    set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/doc)
     # make sure there is actually a 'doc' target
     get_target_property(DOC_TARGET doc TYPE)
     if(NOT DOC_TARGET)
@@ -33,7 +34,7 @@ endif()
 # add doxygen source code documentation as target
 if(DOXYGEN_FOUND)
     set(DOXYFILE_IN "${CMAKE_CURRENT_SOURCE_DIR}/libs/self_healing/doc/reference.dox")
-    set(DOXYFILE_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/doc")
+    set(DOXYFILE_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/doc/reference")
     configure_file(${DOXYFILE_IN} Doxyfile ESCAPE_QUOTES IMMEDIATE @ONLY)
     add_custom_target(doxygen ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
                               COMMENT "Generating Doxygen code documentation")
@@ -42,7 +43,6 @@ endif()
 
 # add other documentation as target
 if(DOCUTILS_FOUND)
-    #TODO: This is not platform independent!
     add_custom_target(docutils ${RST2HTML_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/README.txt ${CMAKE_CURRENT_BINARY_DIR}/doc/README.html
                                COMMENT "Generating README.html")
     add_dependencies(doc docutils) # add docutils as dependency to doc-target
