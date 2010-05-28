@@ -18,12 +18,13 @@
 
 #include <boost/detail/workaround.hpp>
 
+#include <boost/swap.hpp>
+#include <cmath>
 #ifdef BOOST_SELF_HEALING_DEBUG
 #include <iostream>
 #endif
 #include <stdexcept>
 #include <vector>
-#include <boost/swap.hpp>
 
 // Handles broken standard libraries better than <iterator>
 #include <boost/detail/iterator.hpp>
@@ -328,28 +329,33 @@ namespace boost { namespace self_healing {
                     std::length_error e("unable to reserve capacity: " + to_string(new_capacity));
                     boost::throw_exception(e);
                 }
-                //TODO: Do something actually
                 check_head_and_tail_pointers();
+
+                const vector_chunk_pointer old_head = m_head;
+                const size_type new_chunk_count = std::ceil(new_capacity / N);
+
+                m_head = new vector_chunk_type[new_chunk_count];
+                m_chunks = new_chunk_count;
+
+                //TODO: copy values
+
+                delete[] old_head;
             }
         }
 
         // operator[]
-        reference operator[](size_type i) {
-
-        }
-        const_reference operator[](size_type i) const {
-
-        }
+        reference operator[](size_type i) { check_head_and_tail_pointers(); return m_head[i / N][i % N]; }
+        const_reference operator[](size_type i) const { check_head_and_tail_pointers(); return m_head[i / N][(i % N)]; }
 
         // at() with range check
         reference at(size_type i) { rangecheck(i); return operator[](i); }
         const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
 
         // front() and back()
-        reference front() { return operator[](0); }
-        const_reference front() const { return operator[](0); }
-        reference back() { check_size(); return operator[](m_size - 1); }
-        const_reference back() const { check_size(); return operator[](m_size - 1); }
+        reference front() { check_head_and_tail_pointers(); return m_head.front(); }
+        const_reference front() const { check_head_and_tail_pointers; return m_head.front(); }
+        reference back() { check_head_and_tail_pointers(); return m_tail.back(); }
+        const_reference back() const { check_head_and_tail_pointers(); return m_tail.back(); }
 
         // modifiers
         iterator insert(iterator it);
@@ -487,10 +493,10 @@ namespace boost { namespace self_healing {
             }
         }
 
-        vector_chunk_pointer m_head;    //!< Pointer to the first chunk.
+        vector_chunk_pointer m_head;    //!< Pointer to the first chunk of an array of vector_chunk instances.
         size_type m_size;               //!< Counts how much elements are stored currently in all chunks.
         size_type m_chunks;             //!< Chunk counter.
-        vector_chunk_pointer m_tail;    //!< Pointer to the last chunk.
+        vector_chunk_pointer m_tail;    //!< Pointer to the last chunk in the array of vector_chunk instances.
     };
 
     // comparisons
