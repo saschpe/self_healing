@@ -83,10 +83,17 @@ namespace boost { namespace self_healing {
             * \param parent The vector parent.
             * \param index The index to start with.
             */
-            explicit iterator(vector<value_type, N> *const parent = NULL, size_type index = 0)
+            explicit iterator(vector<value_type, N> *const parent, size_type index)
                 : child<vector<value_type, N> >(parent), m_i(index) {}
 
         public:
+            /*! Default constructor.
+            * \remarks This constructor does not build a valid iterator instance, it is just
+            *          there to satisfy some bad STL algorithms.
+            */
+            iterator()
+                : child<vector<value_type, N> >(NULL), m_i(-1) {}
+
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             */
@@ -115,7 +122,7 @@ namespace boost { namespace self_healing {
             bool operator<(const iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const iterator &other) const { return m_i <= other.m_i; }
 
-            reference operator*() { return child<vector<value_type, N> >::parent()->at(m_i); }
+            reference operator*() const { return child<vector<value_type, N> >::parent()->at(m_i); }
             operator const_iterator() const { return const_iterator(child<vector<value_type, N> >::parent(), m_i); }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
@@ -136,7 +143,7 @@ namespace boost { namespace self_healing {
             * \param parent The vector parent.
             * \param index The index to start with.
             */
-            explicit const_iterator(vector<value_type, N> *const parent = NULL, size_type index = 0)
+            explicit const_iterator(vector<value_type, N> *const parent, size_type index)
                 : child<vector<value_type, N> >(parent), m_i(index) {}
 
         public:
