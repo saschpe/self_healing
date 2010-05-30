@@ -37,7 +37,7 @@ int main()
     std::cout << "It is located at index " << largest - numbers.begin() << "\n";
 
     std::cout << "sort the elements" << std::endl;
-    std::sort( numbers.begin(), numbers.end() );
+    std::sort(numbers.begin(), numbers.end());
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "find the position of the number 5 in the vector, O(log n)" << std::endl;
