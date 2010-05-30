@@ -69,79 +69,87 @@ namespace boost { namespace self_healing {
         static const size_type          vector_chunk_size = sizeof(vector_chunk_type);  //!< The size of a vector chunk.
     public:
 
-        //TODO: Implement iterators!
-        class iterator : public std::iterator<std::random_access_iterator_tag, value_type> {};
-#if 0
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
         *
         * A safe iterator that calls a functor if the value at the current
         * position is changed. Checksumms are also updated correctly if the
         * iterator is dereferenced.
         */
-        class iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+        class iterator : public child<vector<value_type, N> >, public std::iterator<std::random_access_iterator_tag, value_type>
         {
-            friend class vector<value_type, N>;
+            friend class vector;
 
             /*! Private constructor.
-            * \param rhs TODO.
+            * \param parent The vector parent.
+            * \param index The index to start with.
             */
-            explicit iterator(pointer rhs)
-                : m_p(rhs) {}
+            explicit iterator(vector<value_type, N> *const parent = NULL, size_type index = 0)
+                : child<vector<value_type, N> >(parent), m_i(index) {}
 
         public:
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             */
             iterator(const iterator &other)
-                : m_p(other.m_p) {}
+                : child<vector<value_type, N> >(other.parent()), m_i(other.m_i) {}
 
-            iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; return *this; }
+            iterator& operator=(const iterator &rhs) { m_i = rhs.m_i; setParent(rhs.parent()); return *this; }
 
-            iterator& operator+(difference_type n) const { return m_p + n; }
-            iterator& operator-(difference_type n) const { return m_p - n; }
-            difference_type operator+(const iterator &rhs) const { return m_p + rhs.m_p; }
-            difference_type operator-(const iterator &rhs) const { return m_p - rhs.m_p; }
+            iterator operator+(difference_type n) const { return iterator(child<vector<value_type, N> >::parent(), m_i + n); }
+            iterator operator-(difference_type n) const { return iterator(child<vector<value_type, N> >::parent(), m_i - n); }
+            difference_type operator+(const iterator &rhs) const { return m_i + rhs.m_i; }
+            difference_type operator-(const iterator &rhs) const { return m_i - rhs.m_i; }
 
-            iterator& operator+=(difference_type n) { m_p += n; return *this; }
-            iterator& operator-=(difference_type n) { m_p -= n; return *this; }
-            iterator& operator++() { ++m_p; return *this; }
-            iterator& operator++(int) { m_p++; return *this; }
-            iterator& operator--() { --m_p; return *this; }
-            iterator& operator--(int) { m_p--; return *this; }
+            iterator& operator+=(difference_type n) { m_i += n; return *this; }
+            iterator& operator-=(difference_type n) { m_i -= n; return *this; }
+            iterator& operator++() { ++m_i; return *this; }
+            iterator& operator++(int) { m_i++; return *this; }
+            iterator& operator--() { --m_i; return *this; }
+            iterator& operator--(int) { m_i--; return *this; }
 
-            bool operator==(const iterator& rhs) const { return m_p == rhs.m_p; }
-            bool operator!=(const iterator& rhs) const { return m_p != rhs.m_p; }
+            // comparison
+            bool operator==(const iterator& other) const { return m_i == other.m_i; }
+            bool operator!=(const iterator& other) const { return m_i != other.m_i; }
+            bool operator>(const iterator &other) const { return m_i > other.m_i; }
+            bool operator>=(const iterator &other) const { return m_i >= other.m_i; }
+            bool operator<(const iterator &other) const { return m_i < other.m_i; }
+            bool operator<=(const iterator &other) const { return m_i <= other.m_i; }
 
-            reference operator*() const { return reference(*m_p); }
-            operator const_iterator() const { return m_p; }
+            reference operator*() { return child<vector<value_type, N> >::parent()->at(m_i); }
+            operator const_iterator() const { return const_iterator(child<vector<value_type, N> >::parent(), m_i); }
+
+            /*! Overload for operator<<() of std::ostream to print an iterator.
+            */
+            friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.m_i; }
 
         private:
-            T *m_p; //!< Internal pointer to the current position in the vector.
+            size_type m_i;                          //!< Internal index to the current element.
         };
-
-#endif
 
         /*! A const (random access) iterator used to iterate through the <code>vector</code>.
         */
-        class const_iterator : public std::iterator<std::random_access_iterator_tag, value_type>
+        class const_iterator : public child<vector<value_type, N> >, public std::iterator<std::random_access_iterator_tag, value_type>
         {
+            friend class vector;
+
             /*! Private constructor.
-            * \param rhs The chunk to initialize the iterator with.
+            * \param parent The vector parent.
+            * \param index The index to start with.
             */
-            explicit const_iterator(size_type i, vector<value_type, N> *const parent)
-                : m_i(i), m_parent(parent) {}
+            explicit const_iterator(vector<value_type, N> *const parent = NULL, size_type index = 0)
+                : child<vector<value_type, N> >(parent), m_i(index) {}
 
         public:
             /*! Copy constructor.
-            * \param other The other iterator instance to copy from.anged.
+            * \param other The other const_iterator instance to copy from.
             */
             const_iterator(const const_iterator &other)
-                : m_i(other.m_i) {}
+                : child<vector<value_type, N> >(other.parent()), m_i(other.m_i) {}
 
-            const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; return *this; }
+            const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; setParent(rhs.parent()); return *this; }
 
-            const_iterator operator+(difference_type n) const { return m_i + n; }
-            const_iterator operator-(difference_type n) const { return m_i - n; }
+            const_iterator operator+(difference_type n) const { return const_iterator(child<vector<value_type, N> >::parent(), m_i + n); }
+            const_iterator operator-(difference_type n) const { return const_iterator(child<vector<value_type, N> >::parent(), m_i - n); }
             difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const const_iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -152,7 +160,7 @@ namespace boost { namespace self_healing {
             const_iterator& operator--() { --m_i; return *this; }
             const_iterator& operator--(int) { m_i--; return *this; }
 
-            // Comparison
+            // comparison
             bool operator==(const const_iterator& other) const { return m_i == other.m_i; }
             bool operator!=(const const_iterator& other) const { return m_i != other.m_i; }
             bool operator>(const const_iterator &other) const { return m_i > other.m_i; }
@@ -160,8 +168,7 @@ namespace boost { namespace self_healing {
             bool operator<(const const_iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const const_iterator &other) const { return m_i <= other.m_i; }
 
-            const_reference operator*() const { return m_i; }
-            //reference operator*() const { check(); return reference(*p, update); }
+            const_reference operator*() const { return child<vector<value_type, N> >::parent()->at(m_i); }
 
             /*! Overload for operator<<() of std::ostream to print a const_iterator.
             */
@@ -188,7 +195,7 @@ namespace boost { namespace self_healing {
 #else
         // workaround for broken reverse_iterator implementations
         typedef std::reverse_iterator<iterator, value_type> reverse_iterator;
-        typedef std:: reverse_iterator<const_iterator, value_type> const_reverse_iterator;
+        typedef std::reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
 
 
@@ -257,11 +264,10 @@ namespace boost { namespace self_healing {
         }
 
         // iterator support
-        //TODO: Fix iterator construction.
-        iterator begin() { check_storage(); return iterator(0); }
-        const_iterator begin() const { check_storage(); return const_iterator(0); }
-        iterator end() { check_storage(); check_size(); return iterator(size()); }
-        const_iterator end() const { check_storage(); check_size(); return const_iterator(size()); }
+        iterator begin() { check_storage(); return iterator(this, 0); }
+        const_iterator begin() const { check_storage(); return const_iterator(this, 0); }
+        iterator end() { check_storage(); check_size(); return iterator(this, size()); }
+        const_iterator end() const { check_storage(); check_size(); return const_iterator(this, size()); }
 
         // reverse iterator support
         reverse_iterator rbegin() { return reverse_iterator(end()); }
