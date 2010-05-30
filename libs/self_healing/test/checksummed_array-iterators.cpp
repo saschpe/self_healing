@@ -30,12 +30,15 @@ int main()
     boost::self_healing::checksummed_array<int, 16>::iterator tmp_it = a.begin();
     *tmp_it = 99;
 
+    std::cout << "it + value: " << tmp_it + 1 << std::endl;
+
     boost::self_healing::checksummed_array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
     //TODO: fix this, the functor is not called here !!!
     *tmp_rit = 99;
 
     const int* cit = a.begin();
     std::cout << cit << std::endl;
+
 
     boost::self_healing::checksummed_array<int, 16>::const_iterator tmp_cit = a.begin();
     std::cout << "testing checksummed_array<>::const_iterator " << tmp_cit << std::endl;

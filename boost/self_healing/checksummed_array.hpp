@@ -92,8 +92,8 @@ namespace boost { namespace self_healing {
 
             iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; check = rhs.check; update = rhs.update; return *this; }
 
-            iterator& operator+(difference_type n) const { return m_p + n; }
-            iterator& operator-(difference_type n) const { return m_p - n; }
+            iterator operator+(difference_type n) const { return iterator(m_p + n, check, update); }
+            iterator operator-(difference_type n) const { return iterator(m_p - n, check, update); }
             difference_type operator+(const iterator &rhs) const { return m_p + rhs.m_p; }
             difference_type operator-(const iterator &rhs) const { return m_p - rhs.m_p; }
 
