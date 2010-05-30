@@ -84,7 +84,7 @@ namespace boost { namespace self_healing {
         reference operator*() const { return value; }
         operator reference() const { return value; }
 
-        /*! Overload for operator<<() of std::ostream to print an iterator
+        /*! Overload for operator<<() of std::ostream to print a reference_wrapper.
         */
         friend std::ostream &operator<<(std::ostream &os, const reference_wrapper<value_type> &ref) { return os << ref.value; }
 
