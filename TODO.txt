@@ -4,16 +4,24 @@ To-Do Items
 Documentation
 -------------
 
- - Source code documentation
- - Design rationale
- - Tutorial
+ - source code documentation
+ - design rationale
+ - tutorial
 
 
 Functionality
 -------------
 
- - Implement class vector
- - Implement class b_tree
- - Implement more unit-tests
-   - Tests for partial template specializations
- - Bugfixing
+ - class checksummed_array
+   * iterator interface should comply with all requirements__
+ - class vector
+   * iterator interfaces should comply with all requirements__
+   * const_iterator interfaces should comply with all requirements__
+ - class b_tree
+   * concept and implementation
+ - unit-tests
+   - tests for partial template specializations
+ - bugfixing
+
+
+http://stdcxx.apache.org/doc/stdlibref/iterators.html#sec9
