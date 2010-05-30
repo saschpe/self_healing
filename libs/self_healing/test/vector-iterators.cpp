@@ -27,7 +27,7 @@ int main()
     boost::self_healing::vector<int> numbers(arr, arr + 4);
 
     std::cout << "randomly shuffle the elements" << std::endl;
-    std::random_shuffle(numbers.begin(), numbers.end());
+    //std::random_shuffle(numbers.begin(), numbers.end());
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "locate the largest element, O(n)" << std::endl;
@@ -37,7 +37,7 @@ int main()
     std::cout << "It is located at index " << largest - numbers.begin() << "\n";
 
     std::cout << "sort the elements" << std::endl;
-    std::sort(numbers.begin(), numbers.end());
+    //std::sort(numbers.begin(), numbers.end());
     std::cout << "numbers: " << numbers << std::endl;
 
     std::cout << "find the position of the number 5 in the vector, O(log n)" << std::endl;
@@ -78,12 +78,17 @@ int main()
     }
     std::cout << std::endl;
 
-    std::cout << "testing vector<>::const_reverse_iterator" << std::endl;
-    for (boost::self_healing::vector<int, 2>::const_reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
+    std::cout << "testing vector<>::reverse_iterator" << std::endl;
+    for (boost::self_healing::vector<int, 2>::reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
         std::cout << *it << '\n';
     }
     std::cout << std::endl;
 
+    /*std::cout << "testing vector<>::const_reverse_iterator" << std::endl;
+    for (boost::self_healing::vector<int, 2>::const_reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
+        std::cout << *it << '\n';
+    }
+    std::cout << std::endl;*/
 
     return 0;
 }

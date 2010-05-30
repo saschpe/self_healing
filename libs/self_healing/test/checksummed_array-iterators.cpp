@@ -43,7 +43,7 @@ int main()
     std::cout << cit << std::endl;
 
     std::cout << "randomly shuffle the elements" << std::endl;
-    std::random_shuffle(a.begin(), a.end());
+    //std::random_shuffle(a.begin(), a.end());
     std::cout << "numbers: " << a << std::endl;
 
     std::cout << "locate the largest element, O(n)" << std::endl;
