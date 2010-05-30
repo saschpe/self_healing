@@ -1,7 +1,7 @@
 /*! \file
 * \brief Reference.
 *
-* This files contains the class reference_wrapper, which defines a wrapper of a
+* This file contains the class reference_wrapper, which defines a wrapper of a
 * reference to a value that calls a function object on value updates.
 *
 * (C) Copyright Sascha Peilicke 2010.
