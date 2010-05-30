@@ -13,12 +13,14 @@
 
 #include <iostream>
 
+static void empty_function() {}
+
 int main()
 {
     std::cout << "testing class boost::self_healing::reference_wrapper<>" << std::endl;
 
     int i = 3;
-    boost::self_healing::reference_wrapper<int> rr(i);
+    boost::self_healing::reference_wrapper<int> rr(i, empty_function);
 
     std::cout << "sizeof(self_healing::reference_wrapper<int>): " << sizeof(rr) << std::endl;
 

@@ -35,8 +35,6 @@ namespace boost { namespace self_healing {
     template <class T>
     class reference_wrapper
     {
-        static void empty_function() {}
-
     public:
         // type definitions
         typedef T                    value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
@@ -47,7 +45,7 @@ namespace boost { namespace self_healing {
         * \param value The value to initialize the reference with.
         * \param update The function to apply if the value is changed.
         */
-        explicit reference_wrapper(reference value, boost::function<void (void)> update = empty_function)
+        explicit reference_wrapper(reference value, boost::function<void (void)> update)
             : value(value), update(update) {}
 
         /*! Copy constructor.
