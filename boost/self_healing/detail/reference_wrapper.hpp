@@ -16,12 +16,10 @@
 #ifndef BOOST_SELF_HEALING_REFERENCE_WRAPPER_HPP
 #define BOOST_SELF_HEALING_REFERENCE_WRAPPER_HPP
 
-#include <ostream>
-
+#include <boost/config.hpp>
 #include <boost/function.hpp>
 
-// FIXES for broken compilers
-#include <boost/config.hpp>
+#include <ostream>
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.

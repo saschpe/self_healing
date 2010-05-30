@@ -15,7 +15,6 @@
 #ifndef BOOST_SELF_HEALING_UTILITY_HPP
 #define BOOST_SELF_HEALING_UTILITY_HPP
 
-// FIXES for broken compilers
 #include <boost/config.hpp>
 
 #include <sstream>

@@ -22,23 +22,19 @@
 #ifndef BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
 #define BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
 
-#include <boost/detail/workaround.hpp>
+#include "./detail/reference_wrapper.hpp"
 
-#ifdef BOOST_SELF_HEALING_DEBUG
-#include <iostream>
-#endif
-#include <stdexcept>
-#include <boost/swap.hpp>
+#include <boost/config.hpp>
 #include <boost/crc.hpp>
-
-// Handles broken standard libraries better than <iterator>
 #include <boost/detail/iterator.hpp>
+#include <boost/detail/workaround.hpp>
+#include <boost/swap.hpp>
 #include <boost/throw_exception.hpp>
 
-// FIXES for broken compilers
-#include <boost/config.hpp>
-
-#include "./detail/reference_wrapper.hpp"
+#ifdef BOOST_SELF_HEALING_DEBUG
+#   include <iostream>
+#endif
+#include <stdexcept>
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.

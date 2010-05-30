@@ -15,17 +15,15 @@
 #ifndef BOOST_SELF_HEALING_VECTOR_CHUNK_HPP
 #define BOOST_SELF_HEALING_VECTOR_CHUNK_HPP
 
+#include "child.hpp"
+#include "../checksummed_array.hpp"
+
+#include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
 
 #ifdef BOOST_SELF_HEALING_DEBUG
-#include <iostream>
+#   include <iostream>
 #endif
-
-// FIXES for broken compilers
-#include <boost/config.hpp>
-
-#include "child.hpp"
-#include "../checksummed_array.hpp"
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
