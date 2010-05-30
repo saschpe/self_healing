@@ -277,25 +277,23 @@ namespace boost { namespace self_healing {
 
             if (equal_12 && equal_13 && equal_23) {
                 return;             // all fine
-            }
-            if (equal_13) {
+            } else if (equal_13) {
                 const_cast<checksum_type &>(crc2) = crc1;   // fix crc2 as the others are equal
                 return;             // all fine
-            }
-            if (equal_23) {
+            } else if (equal_23) {
                 const_cast<checksum_type &>(crc1) = crc2;   // fix crc1 as the others are equal
                 return;             // all fine
-            }
-            if (equal_12) {
+            } else if (equal_12) {
                 // The computed checksum over the content is not the same as
                 // the stored onces, thus the content was maliciously changed
                 // and the checksummed_array is invalid.
                 std::runtime_error e("data error");
                 boost::throw_exception(e);
+            } else {
+                // All three checksums differ
+                std::runtime_error e("checksum error");
+                boost::throw_exception(e);
             }
-            // All three checksums differ
-            std::runtime_error e("checksum error");
-            boost::throw_exception(e);
         }
 
         /*! A private functor that calls check_checksums() for a given checksummed_array instance if called itself.
