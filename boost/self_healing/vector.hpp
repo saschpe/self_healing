@@ -399,10 +399,10 @@ namespace boost { namespace self_healing {
 
         void swap(vector<value_type> &rhs) {
             boost::swap(m_head, rhs.m_head);
-            boost::swap(m_tail, rhs.m_tail);
-            boost::swap(m_chunks, rhs.m_chunks);
             boost::swap(m_size1, rhs.m_size1);
+            boost::swap(m_tail, rhs.m_tail);
             boost::swap(m_size2, rhs.m_size2);
+            boost::swap(m_chunks, rhs.m_chunks);
             boost::swap(m_size3, rhs.m_size3);
             check_storage();
             check_size();
