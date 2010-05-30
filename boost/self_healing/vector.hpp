@@ -16,26 +16,23 @@
 #ifndef BOOST_SELF_HEALING_VECTOR_HPP
 #define BOOST_SELF_HEALING_VECTOR_HPP
 
-#include <boost/detail/workaround.hpp>
-
-#include <boost/swap.hpp>
-#include <cmath>
-#ifdef BOOST_SELF_HEALING_DEBUG
-#include <iostream>
-#endif
-#include <stdexcept>
-#include <vector>
-
-// Handles broken standard libraries better than <iterator>
-#include <boost/detail/iterator.hpp>
-#include <boost/throw_exception.hpp>
-
-// FIXES for broken compilers
-#include <boost/config.hpp>
-
 #include "./detail/reference_wrapper.hpp"
 #include "./detail/vector_chunk.hpp"
 #include "./detail/utility.hpp"
+
+#include <boost/config.hpp>
+#include <boost/detail/iterator.hpp>
+#include <boost/detail/workaround.hpp>
+#include <boost/swap.hpp>
+#include <boost/throw_exception.hpp>
+
+#include <algorithm>
+#include <cmath>
+#ifdef BOOST_SELF_HEALING_DEBUG
+#   include <iostream>
+#endif
+#include <stdexcept>
+#include <vector>
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
@@ -48,7 +45,7 @@ namespace boost { namespace self_healing {
     * \param T The data type of the stored values.
     * \param N The capacity of the internal chunks.
     * \remarks The chunk size should be chosen based on CPU cache size.
-    * \see std:vector, vector_chunk
+    * \see std:vector, vector_chunk<T, N>
     */
     template <class T, std::size_t N = 64>
     class vector
@@ -72,6 +69,8 @@ namespace boost { namespace self_healing {
         static const size_type          vector_chunk_size = sizeof(vector_chunk_type);  //!< The size of a vector chunk.
     public:
 
+        //TODO: Implement iterators!
+        class iterator : public std::iterator<std::random_access_iterator_tag, value_type> {};
 #if 0
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
         *
@@ -120,87 +119,57 @@ namespace boost { namespace self_healing {
             T *m_p; //!< Internal pointer to the current position in the vector.
         };
 
+#endif
+
         /*! A const (random access) iterator used to iterate through the <code>vector</code>.
         */
         class const_iterator : public std::iterator<std::random_access_iterator_tag, value_type>
         {
-            friend class vector<T, N>;
-
             /*! Private constructor.
             * \param rhs The chunk to initialize the iterator with.
             */
-            explicit const_iterator(chunk *rhs, const typename checksummed_array<T, N>::iterator &it)
-                : m_chunk(rhs), m_it(it), m_begin(rhs->elements.begin()), m_end(rhs->elements.end()) {}
+            explicit const_iterator(size_type i, vector<value_type, N> *const parent)
+                : m_i(i), m_parent(parent) {}
 
         public:
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.anged.
             */
             const_iterator(const const_iterator &other)
-                : m_chunk(other.m_chunk), m_it(other.m_it), m_begin(other.m_begin), m_end(other.m_end) {}
+                : m_i(other.m_i) {}
 
-            const_iterator& operator=(const const_iterator &rhs) { m_chunk = rhs.m_chunk; m_it = rhs.m_it; return *this; }
+            const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; return *this; }
 
-            const_iterator operator+(difference_type n) const {
-                typename checksummed_array<T, N>::const_iterator tmp_new = m_it + n;
+            const_iterator operator+(difference_type n) const { return m_i + n; }
+            const_iterator operator-(difference_type n) const { return m_i - n; }
+            difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }
+            difference_type operator-(const const_iterator &rhs) const { return m_i - rhs.m_i; }
 
-                if (tmp_new >= m_begin && tmp_new < m_end) {
-                    return const_iterator(m_chunk, tmp_new);
-                } else if (tmp_new < m_begin) {
-                    chunk *previous_chunk;
-                    /*do {
-                        previous_chunk = m_chunk->previous();
-                        m_begin = previous_chunk->elements.begin();
-                        m_end = previous_chunk->elements.end();
-                        //tmp_new += N;
-                    } while (tmp_new < m_begin);*/
-                    //return const_iterator(previous_chunk, tmp_new);
-                } else {
-                    chunk *next_chunk;
-                    /*do {
-                        next_chunk = m_chunk->next();
-                        m_begin = next_chunk->elements.begin();
-                        m_end = next_chunk->elements.end();
-                        tmp_new -= N;
-                    } while (tmp_new >= m_end);*/
-                    //return const_iterator(next_chunk, tmp_new);
-                }
-            }
+            const_iterator& operator+=(difference_type n) { m_i += n; return *this; }
+            const_iterator& operator-=(difference_type n) { m_i -= n; return *this; }
+            const_iterator& operator++() { ++m_i; return *this; }
+            const_iterator& operator++(int) { m_i++; return *this; }
+            const_iterator& operator--() { --m_i; return *this; }
+            const_iterator& operator--(int) { m_i--; return *this; }
 
-            //const_iterator operator-(difference_type n) const { return from_current(m_index - n); }
-            /*difference_type operator+(const const_iterator &rhs) const { return 0; }
-            difference_type operator-(const const_iterator &rhs) const { return 0; }*/
+            // Comparison
+            bool operator==(const const_iterator& other) const { return m_i == other.m_i; }
+            bool operator!=(const const_iterator& other) const { return m_i != other.m_i; }
+            bool operator>(const const_iterator &other) const { return m_i > other.m_i; }
+            bool operator>=(const const_iterator &other) const { return m_i >= other.m_i; }
+            bool operator<(const const_iterator &other) const { return m_i < other.m_i; }
+            bool operator<=(const const_iterator &other) const { return m_i <= other.m_i; }
 
-            /*const_iterator& operator+=(difference_type n) { *this = from_current(m_index + n); return *this; }
-            const_iterator& operator-=(difference_type n) { *this = from_current(m_index - n); return *this; }
-            const_iterator& operator++() { *this = from_current(m_index + 1); return *this; }
-            const_iterator& operator++(int) { *this = from_current(m_index + 1); return *this; }
-            const_iterator& operator--() { *this = from_current(m_index - 1); return *this; }
-            const_iterator& operator--(int) { *this = from_current(m_index - 1); return *this; }*/
+            const_reference operator*() const { return m_i; }
+            //reference operator*() const { check(); return reference(*p, update); }
 
-            bool operator==(const const_iterator& rhs) const { return m_chunk == rhs.m_chunk && m_it == rhs.m_it; }
-            bool operator!=(const const_iterator& rhs) const { return m_chunk != rhs.m_chunk || m_it != rhs.m_it; }
-
-            const_reference operator*() const { return *m_it; }
-
-            /*! Overload for operator<<() of std::ostream to print a reference.
+            /*! Overload for operator<<() of std::ostream to print a const_iterator.
             */
-            friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) {
-                return os << it.m_it;
-            }
+            friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) { return os << it.m_i; }
 
         private:
-            struct chunk *m_chunk;                                      //!< Internal pointer to the current chunk.
-            typename checksummed_array<T, N>::const_iterator m_it;     //!< Iterator of the current chunk
-            typename checksummed_array<T, N>::const_iterator m_begin;  //!<
-            typename checksummed_array<T, N>::const_iterator m_end;
+            size_type m_i;  //!< Internal index to the current element.
         };
-
-#endif
-
-        //TODO: Implement iterators!
-        class iterator : public std::iterator<std::random_access_iterator_tag, value_type> {};
-        class const_iterator : public std::iterator<std::random_access_iterator_tag, value_type> {};
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
         typedef std::reverse_iterator<iterator> reverse_iterator;
@@ -221,6 +190,7 @@ namespace boost { namespace self_healing {
         typedef std::reverse_iterator<iterator, value_type> reverse_iterator;
         typedef std:: reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
+
 
         /*! Default constructor.
         */
@@ -304,7 +274,7 @@ namespace boost { namespace self_healing {
         bool empty() const { return size() == 0; }
         size_type max_size() const {
             // determin how much chunks fit into memory and thus how much elements we can have
-            const size_type max_elems = std::numeric_limits<pointer>::max() / vector_chunk_size * N;
+            const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * N;
             return std::min(max_elems, std::numeric_limits<difference_type>::max());
         }
         size_type capacity() const { check_storage(); return m_chunks * vector_chunk_type::size(); }
