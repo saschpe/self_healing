@@ -11,6 +11,9 @@
 
 #include <boost/self_healing/checksummed_array.hpp>
 
+#include <algorithm>
+#include <cassert>
+#include <functional>
 #include <iostream>
 
 int main()
@@ -39,6 +42,12 @@ int main()
     const int* cit = a.begin();
     std::cout << cit << std::endl;
 
+    std::cout << "randomly shuffle the elements" << std::endl;
+    std::random_shuffle(a.begin(), a.end());
+    std::cout << "numbers: " << a << std::endl;
+
+    std::cout << "locate the largest element, O(n)" << std::endl;
+    boost::self_healing::checksummed_array<int, 16>::iterator largest = std::max_element(a.begin(), a.end());
 
     boost::self_healing::checksummed_array<int, 16>::const_iterator tmp_cit = a.begin();
     std::cout << "testing checksummed_array<>::const_iterator " << tmp_cit << std::endl;
