@@ -15,6 +15,8 @@
 #include <cassert>
 #include <memory>
 
+static void empty_function() {}
+
 int main()
 {
     std::cout << "testing class boost::self_healing::checksummed_array<>" << std::endl;
@@ -23,7 +25,7 @@ int main()
     std::cout << "checksummed_array 1: " << a << std::endl;
 
     int i = 3;
-    boost::self_healing::checksummed_array<int, 16>::reference ar(i);
+    boost::self_healing::checksummed_array<int, 16>::reference ar(i, empty_function);
     std::cout << "testing checksummed_array<>::reference constructor for " << ar << std::endl;
     boost::self_healing::checksummed_array<int, 16>::const_reference car(i);
     std::cout << "testing checksummed_array<>::const_reference constructor for " << car << std::endl;
