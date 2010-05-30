@@ -112,7 +112,7 @@ namespace boost { namespace self_healing {
             bool operator<(const iterator &other) const { return m_p < other.m_p; }
             bool operator<=(const iterator &other) const { return m_p <= other.m_p; }
 
-            reference operator*() { check(); return reference(*m_p, update); }
+            reference operator*() const { check(); return reference(*m_p, update); }
             operator const_iterator() const { return m_p; }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
