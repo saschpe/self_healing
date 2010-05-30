@@ -260,14 +260,20 @@ namespace boost { namespace self_healing {
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last) {
             check_storage();
-            reserve(last - first);
-            //TODO: Implement when iterators are available
+            resize(last - first);
+            size_type i = 0;
+            for (InputIterator it = first; it != last; it++) {
+                m_head[i / N][i % N] = *it;
+                i++;
+            }
         }
         template <class Size, class TT>
         void assign(Size n, const TT &x = TT()) {
             check_storage();
-            reserve(n);
-            //TODO: Implement first!
+            resize(n);
+            for (size_type i = 0; i < n; i++) {
+                m_head[i / N][i % N] = x;
+            }
         }
 
         // iterator support
@@ -293,7 +299,6 @@ namespace boost { namespace self_healing {
         size_type capacity() const { check_storage(); return m_chunks * vector_chunk_type::size(); }
 
         void resize(size_type new_size, value_type item = T()) {
-            check_size();
             if (new_size > size()) {
                 if (new_size > capacity()) {
                     reserve(new_size);
@@ -324,7 +329,10 @@ namespace boost { namespace self_healing {
                 m_head = new vector_chunk_type[new_chunk_count];
                 m_chunks = new_chunk_count;
 
-                //TODO: copy values
+                // copy values from old location to new
+                for (size_type i = 0; i < size(); i++) {
+                    m_head[i / N][i % N] = old_head[i / N][i % N];
+                };
 
                 delete[] old_head;
             }
@@ -359,7 +367,9 @@ namespace boost { namespace self_healing {
         iterator erase(iterator, iterator);
 
         void push_back(const_reference value) {
-            //TODO:
+            if (size() == capacity()) {
+
+            }
         }
         void pop_back() {
             //TODO:
