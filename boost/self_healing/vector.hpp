@@ -209,14 +209,14 @@ namespace boost { namespace self_healing {
         /*! Default constructor.
         */
         explicit vector()
-            : m_head(NULL), m_size(0), m_chunks(0), m_tail(NULL) {}
+            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {}
 
         /*! Constructor to initialize vector with a custom size and an optional fill value.
         * \param n Custom initial vector size.
         * \param x Optional value to fill the vector with.
         */
         vector(size_type n, const_reference x = value_type())
-            : m_head(NULL), m_size(0), m_chunks(0), m_tail(NULL) {
+            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {
             assign(n, x);
         }
 
@@ -226,7 +226,7 @@ namespace boost { namespace self_healing {
         */
         template <class InputIterator>
         vector(InputIterator first, InputIterator last)
-            : m_head(NULL), m_size(0), m_chunks(0), m_tail(NULL) {
+            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {
             assign(first, last);
         }
 
@@ -234,7 +234,7 @@ namespace boost { namespace self_healing {
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
         vector(const boost::self_healing::vector<value_type, N> &rhs)
-            : m_head(NULL), m_size(0), m_chunks(0), m_tail(NULL) {
+            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {
             assign(rhs.begin(), rhs.end());
         }
 
@@ -242,7 +242,7 @@ namespace boost { namespace self_healing {
         * \param rhs The other <code>std::vector</code> to copy from.
         */
         vector(const std::vector<value_type> &rhs)
-            : m_head(NULL), m_size(0), m_chunks(0), m_tail(NULL) {
+            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {
             assign(rhs.begin(), rhs.end());
         }
 
@@ -266,14 +266,21 @@ namespace boost { namespace self_healing {
                 m_head[i / N][i % N] = *it;
                 i++;
             }
+            m_size1 = i;
+            m_size2 = i;
+            m_size3 = i;
         }
         template <class Size, class TT>
         void assign(Size n, const TT &x = TT()) {
             check_storage();
             resize(n);
-            for (size_type i = 0; i < n; i++) {
+            size_type i = 0;
+            for (; i < n; i++) {
                 m_head[i / N][i % N] = x;
             }
+            m_size1 = i;
+            m_size2 = i;
+            m_size3 = i;
         }
 
         // iterator support
@@ -289,7 +296,7 @@ namespace boost { namespace self_healing {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // capacity
-        size_type size() const { check_size(); return m_size; }
+        size_type size() const { check_size(); return m_size1; }
         bool empty() const { return size() == 0; }
         size_type max_size() const {
             // determin how much chunks fit into memory and thus how much elements we can have
@@ -353,7 +360,9 @@ namespace boost { namespace self_healing {
         const_reference back() const { check_storage(); return m_tail.back(); }
 
         // modifiers
-        iterator insert(iterator it);
+        iterator insert(iterator it) {
+            //TODO:
+        }
         iterator insert(iterator it, const_reference value);
         void insert(iterator it, size_type, const_reference value) {
             //TODO:
@@ -363,16 +372,23 @@ namespace boost { namespace self_healing {
             //TODO:
         }
 
-        iterator erase(iterator);
-        iterator erase(iterator, iterator);
+        iterator erase(iterator)  {
+            //TODO:
+        }
+        iterator erase(iterator, iterator) {
+            //TODO:
+        }
 
         void push_back(const_reference value) {
             if (size() == capacity()) {
+                //TODO:
 
             }
         }
         void pop_back() {
-            //TODO:
+            m_size1--;
+            m_size2--;
+            m_size3--;
         }
 
         void clear() {
@@ -385,7 +401,9 @@ namespace boost { namespace self_healing {
             boost::swap(m_head, rhs.m_head);
             boost::swap(m_tail, rhs.m_tail);
             boost::swap(m_chunks, rhs.m_chunks);
-            boost::swap(m_size, rhs.m_size);
+            boost::swap(m_size1, rhs.m_size1);
+            boost::swap(m_size2, rhs.m_size2);
+            boost::swap(m_size3, rhs.m_size3);
             check_storage();
             check_size();
         }
@@ -441,7 +459,7 @@ namespace boost { namespace self_healing {
             if (m_head == NULL && m_tail == NULL) {
                 // Both are NULL, this means nothing seems to be alloced yet
                 // We're fine if the other values reflect that
-                if (m_size == 0 && m_chunks == 0) {
+                if (size() == 0 && m_chunks == 0) {
                     return;
                 }
                 /*check_size();*/
@@ -472,19 +490,39 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, N>::check_size()" << std::endl;
 #endif
-            //TODO: check and repair size
-            if (m_size > capacity()) {
+            // check and repair size via TMR voting
+            const bool equal_13 = m_size1 == m_size3;
+            const bool equal_23 = m_size2 == m_size3;
+            const bool equal_12 = m_size1 == m_size2;
+
+            if (equal_12 && equal_13 && equal_23) {
+                // all fine
+            } else if (equal_13) {
+                const_cast<size_type &>(m_size2) = m_size1; // fix m_size1 as the others are equal
+                // all fine
+            } else if (equal_23) {
+                const_cast<size_type &>(m_size1) = m_size2; // fix m_size1 as the others are equal
+                // all fine
+            } else if (equal_12) {
+                const_cast<size_type &>(m_size3) = m_size1; // fix m_size3 as the others are equal
+                // all fine
+            } else {
+                std::runtime_error e("size error");         // all three sizes differ
+                boost::throw_exception(e);
+            }
+
+            if (m_size1 > capacity()) {
                 std::runtime_error e("size is bigger than capacity");
                 boost::throw_exception(e);
-            } else {
-                //TODO: See if we can do other checks/fixes
             }
         }
 
         vector_chunk_pointer m_head;    //!< Pointer to the first chunk of an array of vector_chunk instances.
-        size_type m_size;               //!< Counts how much elements are stored currently in all chunks.
+        size_type m_size1;              //!< Counts how much elements are stored currently in all chunks.
         size_type m_chunks;             //!< Chunk counter.
+        size_type m_size2;
         vector_chunk_pointer m_tail;    //!< Pointer to the last chunk in the array of vector_chunk instances.
+        size_type m_size3;
     };
 
     // comparisons
