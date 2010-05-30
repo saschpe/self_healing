@@ -22,7 +22,7 @@
 #ifndef BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
 #define BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
 
-#include "./detail/reference_wrapper.hpp"
+#include "./detail/safe_ref.hpp"
 
 #include <boost/config.hpp>
 #include <boost/crc.hpp>
@@ -52,16 +52,16 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T                    value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
-        class                        iterator;          //!< Forward declaration of class iterator.
-        typedef const T *            const_iterator;    //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
-        //typedef self_healing::pointer<T>   pointer;   //!< A pointer to the element.
-        typedef const T *            const_pointer;     //!< A const pointer to the element.
-        typedef reference_wrapper<T> reference;         //!< A reference to an element.
-        typedef const T &            const_reference;   //!< A const reference to an element.
-        typedef std::size_t          size_type;         //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
-        typedef std::ptrdiff_t       difference_type;   //!< A signed integral type used to represent the distance between two iterators.
-        typedef unsigned int         checksum_type;     //!< The type of the internal checksums
+        typedef T               value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
+        class                   iterator;           //!< Forward declaration of class iterator.
+        typedef const T *       const_iterator;     //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
+        //typedef safe_ptr<T>     pointer;            //!< A pointer to the element.
+        typedef const T *       const_pointer;      //!< A const pointer to the element.
+        typedef safe_ref<T>     reference;          //!< A reference to an element.
+        typedef const T &       const_reference;    //!< A const reference to an element.
+        typedef std::size_t     size_type;          //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
+        typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
+        typedef unsigned int    checksum_type;      //!< The type of the internal checksums
 
         /*! \brief A (random access) iterator used to iterate through the <code>checksummed_array</code>.
         *

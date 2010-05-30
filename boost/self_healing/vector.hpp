@@ -16,7 +16,7 @@
 #ifndef BOOST_SELF_HEALING_VECTOR_HPP
 #define BOOST_SELF_HEALING_VECTOR_HPP
 
-#include "./detail/reference_wrapper.hpp"
+#include "./detail/safe_ref.hpp"
 #include "./detail/vector_chunk.hpp"
 #include "./detail/utility.hpp"
 
@@ -52,21 +52,21 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T                       value_type;        //!< The type of elements stored in the <code>vector</code>.
-        class                           iterator;          //!< Forward declaration of class iterator.
-        class                           const_iterator;    //!< Forward declaration of class const_iterator.
-        typedef T *                     pointer;           //!< A pointer to an element.
-        typedef const T *               const_pointer;     //!< A const pointer to an element.
-        typedef reference_wrapper<T>    reference;         //!< A reference to an element.
-        typedef const T &               const_reference;   //!< A const reference to an element.
-        typedef std::size_t             size_type;         //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
-        typedef std::ptrdiff_t          difference_type;   //!< A signed integral type used to represent the distance between two iterators.
+        typedef T               value_type;         //!< The type of elements stored in the <code>vector</code>.
+        class                   iterator;           //!< Forward declaration of class iterator.
+        class                   const_iterator;     //!< Forward declaration of class const_iterator.
+        typedef T *             pointer;            //!< A pointer to an element.
+        typedef const T *       const_pointer;      //!< A const pointer to an element.
+        typedef safe_ref<T>     reference;          //!< A reference to an element.
+        typedef const T &       const_reference;    //!< A const reference to an element.
+        typedef std::size_t     size_type;          //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
+        typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
 
     private:
         // private type definitions
-        typedef vector_chunk<T, N>      vector_chunk_type;                              //!< A vector chunk.
-        typedef vector_chunk<T, N> *    vector_chunk_pointer;                           //!< A pointer to vector chunk.
-        static const size_type          vector_chunk_size = sizeof(vector_chunk_type);  //!< The size of a vector chunk.
+        typedef vector_chunk<T, N>   vector_chunk_type;                             //!< A vector chunk.
+        typedef vector_chunk<T, N> * vector_chunk_pointer;                          //!< A pointer to vector chunk.
+        static const size_type       vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
     public:
 
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
