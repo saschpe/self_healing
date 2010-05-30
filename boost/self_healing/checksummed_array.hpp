@@ -120,9 +120,9 @@ namespace boost { namespace self_healing {
             friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.m_p; }
 
         private:
-            value_type *m_p;    //!< Internal pointer to the current position in the checksummed_array.
-            boost::function<void (void)> check;
-            boost::function<void (void)> update;
+            value_type *m_p;                        //!< Internal pointer to the current position in the checksummed_array.
+            boost::function<void (void)> check;     //!< Called to check the consistency of the corresponding checksummed_array instance.
+            boost::function<void (void)> update;    //!< Called to update the checksums of the corresponding checksummed_array instance.
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
