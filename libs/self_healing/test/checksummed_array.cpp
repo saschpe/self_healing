@@ -1,7 +1,5 @@
 /* Test case for class checksummed_array.
  *
- * The original author site is at: http://saschpe.wordpress.com/
- *
  * (C) Copyright Sascha Peilicke 2010.
  *
  * Distributed under the Boost Software License, Version 1.0. (See
