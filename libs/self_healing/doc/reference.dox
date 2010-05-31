@@ -92,9 +92,9 @@ INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/boost" \
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          =
 RECURSIVE              = YES
-EXCLUDE                = .svn .git .*.swp
+EXCLUDE                = .svn .git
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       =
+EXCLUDE_PATTERNS       = .*.swp
 EXCLUDE_SYMBOLS        =
 EXAMPLE_PATH           = "@CMAKE_CURRENT_SOURCE_DIR@/libs/self_healing/doc" \
                          "@CMAKE_CURRENT_SOURCE_DIR@"
