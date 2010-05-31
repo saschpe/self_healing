@@ -85,7 +85,7 @@ namespace boost { namespace self_healing {
         }
 
     private:
-        /*! TODO.
+        /*! Checks the internal parent pointer against a provided one.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
         void check_parent(parent_pointer const parent) const {
