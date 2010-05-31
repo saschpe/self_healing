@@ -32,7 +32,7 @@ int main()
     //NOTE: dereferencing dangling pointers is generally unsafe.
     std::cout << "setting a valid parent" << std::endl;
     boost::self_healing::vector<int, 4> *another_parent;
-    c.setParent(another_parent);
+    c.set_parent(another_parent);
 
     std::cout << "valid parent: " << &another_parent << std::endl;
     std::cout << "chunk is valid: " << c.is_valid() << std::endl;

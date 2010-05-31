@@ -57,7 +57,7 @@ namespace boost { namespace self_healing {
         * \param parent Pointer to the new parent.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
-        void setParent(parent_pointer const parent) { check_parent(parent); }
+        void set_parent(parent_pointer const parent) { check_parent(parent); }
 
         /*! Accessor to get the chunk's parent.
         * \return Pointer to the parent.

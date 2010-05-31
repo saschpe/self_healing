@@ -100,7 +100,7 @@ namespace boost { namespace self_healing {
             iterator(const iterator &other)
                 : child<vector<value_type, N> >(other.parent()), m_i(other.m_i) {}
 
-            iterator& operator=(const iterator &rhs) { m_i = rhs.m_i; setParent(rhs.parent()); return *this; }
+            iterator& operator=(const iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
             iterator operator+(difference_type n) const { return iterator(child<vector<value_type, N> >::parent(), m_i + n); }
             iterator operator-(difference_type n) const { return iterator(child<vector<value_type, N> >::parent(), m_i - n); }
@@ -153,7 +153,7 @@ namespace boost { namespace self_healing {
             const_iterator(const const_iterator &other)
                 : child<vector<value_type, N> >(other.parent()), m_i(other.m_i) {}
 
-            const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; setParent(rhs.parent()); return *this; }
+            const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
             const_iterator operator+(difference_type n) const { return const_iterator(child<vector<value_type, N> >::parent(), m_i + n); }
             const_iterator operator-(difference_type n) const { return const_iterator(child<vector<value_type, N> >::parent(), m_i - n); }
@@ -386,6 +386,7 @@ namespace boost { namespace self_healing {
             }
         }
         void pop_back() {
+            check_size();
             m_size1--;
             m_size2--;
             m_size3--;
@@ -435,8 +436,6 @@ namespace boost { namespace self_healing {
                 check_storage();
                 check_size();
                 for (int i = 0; i < m_chunks; i++) {
-                    // make sure that the head pointer is valid during the loop
-                    check_storage();
                     // compute address of next chunk
                     vector_chunk_pointer chunk = m_head + i * vector_chunk_size;
                     chunk->is_valid(this);
