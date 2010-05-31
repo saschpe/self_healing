@@ -17,6 +17,7 @@
 #define BOOST_SELF_HEALING_HPP
 
 
+#include "./self_healing/btree.hpp"
 #include "./self_healing/checksummed_array.hpp"
 #include "./self_healing/vector.hpp"
 
