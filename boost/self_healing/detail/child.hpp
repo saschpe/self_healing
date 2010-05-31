@@ -48,7 +48,7 @@ namespace boost { namespace self_healing {
             : m_parent(parent) {}
 
         /*! Copy constructor.
-        * \param other The other iterator instance to copy from.
+        * \param other The other child instance to copy from.
         */
         child(const child &other)
             : m_parent(other) {}
