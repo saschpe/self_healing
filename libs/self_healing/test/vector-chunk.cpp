@@ -15,7 +15,7 @@
 
 int main()
 {
-    std::cout << "testing class boost::self_healing::chunk" << std::endl;
+    std::cout << "testing class boost::self_healing::chunk<>" << std::endl;
 
     // this parent is invalid, thus checks should fail
     boost::self_healing::vector<int, 4> *parent = NULL;
