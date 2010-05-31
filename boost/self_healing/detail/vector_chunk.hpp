@@ -40,7 +40,7 @@ namespace boost { namespace self_healing {
     * \param T The data type of the stored values.
     * \param N The capacity of the chunk.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
-    * \see checksummed_array
+    * \see child, checksummed_array
     */
     template <class T, std::size_t N = 64>
     class vector_chunk : public child<vector<T, N> >, public checksummed_array<T, N>
