@@ -74,13 +74,39 @@ namespace boost { namespace self_healing {
         }
 
     private:
-        /*! TODO.
+        /*! Checks the internal sibling pointers against the provided ones.
+        * \throws std::invalid_argument Thrown if a sibling pointer is invalid.
         */
-        void check_siblings(sibling_pointer const next = NULL, sibling_pointer const previous = NULL) const {
+        void check_siblings(sibling_pointer const next, sibling_pointer const previous) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::sibling<P>::check_siblings" << std::endl;
 #endif
-            //TODO:
+            if (next) {
+                // If a valid next sibling_pointer pointer was given we simply
+                // check against it and fix the internal pointer if needed.
+                if (m_next != next) {
+                    const_cast<sibling_pointer &>(m_next) = next;
+                }
+            } else {
+                // No pointer was given to check against, so we can do only limited checks
+                if (!m_next) {
+                    std::runtime_error e("next sibling is NULL");
+                    boost::throw_exception(e);
+                }
+            }
+            if (previous) {
+                // If a valid next sibling_pointer pointer was given we simply
+                // check against it and fix the internal pointer if needed.
+                if (m_previous != previous) {
+                    const_cast<sibling_pointer &>(m_previous) = previous;
+                }
+            } else {
+                // No pointer was given to check against, so we can do only limited checks
+                if (!m_previous) {
+                    std::runtime_error e("previous sibling is NULL");
+                    boost::throw_exception(e);
+                }
+            }
         }
 
         sibling_pointer m_next;
