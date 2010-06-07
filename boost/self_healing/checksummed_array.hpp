@@ -208,7 +208,9 @@ namespace boost { namespace self_healing {
         */
         template <typename T2>
         checksummed_array<value_type, N>& operator=(const checksummed_array<T2, N> &other) {
-            std::copy(other.begin(), other.end(), begin());
+            for (size_type i = 0; i < size(); i++) {
+                elements[i] = other.elements[i];
+            }
             update_checksums();
             return *this;
         }
@@ -216,7 +218,9 @@ namespace boost { namespace self_healing {
         // assign one value to all elements
         void assign(const_reference value) { fill(value); }    // A synonym for fill
         void fill(const_reference value) {
-            std::fill_n(begin(), size(), value);
+            for (size_type i = 0; i < size(); i++) {
+                elements[i] = value;
+            }
             update_checksums();
         }
 
