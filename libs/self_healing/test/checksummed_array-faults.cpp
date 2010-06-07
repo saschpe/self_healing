@@ -32,6 +32,7 @@ int main()
     utility::flip_bits(&ca, sizeof(ca), 1);
     utility::print_raw(&ca, sizeof(ca));
     std::cout << "1 flipped bit, is valid: " << ca.is_valid() << std::endl;
+
     utility::flip_bits(&(ca = a), sizeof(ca), 2);
     std::cout << "2 flipped bit, is valid: " << ca.is_valid() << std::endl;
     utility::flip_bits(&(ca = a), sizeof(ca), 3);
