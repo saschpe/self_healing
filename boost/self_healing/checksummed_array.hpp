@@ -168,8 +168,8 @@ namespace boost { namespace self_healing {
         const_reference operator[](size_type i) const { check_checksums(); return elements[i]; }
 
         // at() with range check
-        reference at(size_type i) { return operator[](i); }
-        const_reference at(size_type i) const { return operator[](i); }
+        reference at(size_type i) { rangecheck(i); return operator[](i); }
+        const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
 
         // front() and back()
         reference front() { check_checksums(); return reference(elements[0], update_checksums_functor(this)); }
