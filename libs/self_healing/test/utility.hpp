@@ -25,7 +25,7 @@
 /// The namespace utility contains utility functions to provoke errors.
 namespace utility {
 
-    static const boost::rand48 s_rng;
+    static const boost::rand48 s_rng;   //!< Fast number generator used by several functions.
 
     /*! Function to randomly flip bits in a given memory region.
     * \param obj Pointer to an object of type T.
@@ -34,7 +34,7 @@ namespace utility {
     template <class T>
     void flip_bits(T * const obj, std::size_t bit_count = 1)
     {
-        // build a random number generator
+        // a random number generator to select bits within 'obj'
         static const boost::uniform_int<> dist(0, sizeof(T) * 8 - 1);
         static boost::variate_generator<boost::rand48 &, boost::uniform_int<> > dice(s_rng, dist);
 
@@ -58,11 +58,11 @@ namespace utility {
             return;
         }
         if (burst_length >= sizeof(T) * 8) {
-            // if burst range is bigger than the bit-size of T set it to a sensible maximum
+            // if burst range is bigger than the bit-size of T set it to allowed maximum
             burst_length = sizeof(T) * 8;
         }
 
-        // build a random number generator
+        // a random number generator to generate the starting bit position within 'obj'
         static const boost::uniform_int<> dist(0, sizeof(T) * 8 - 1 - burst_length);
         static boost::variate_generator<boost::rand48 &, boost::uniform_int<> > dice(s_rng, dist);
         const std::size_t start_pos = dice();
@@ -81,12 +81,10 @@ namespace utility {
     template <class T>
     void change_value(T * const var)
     {
-        // build a number generator
         static const boost::uniform_int<> dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
         static boost::variate_generator<boost::rand48 &, boost::uniform_int<> > dice(s_rng, dist);
 
-        // apply random number to target
-        *var = dice();
+        *var = dice(); // apply random number to target
     }
 
 } // namespace utility
