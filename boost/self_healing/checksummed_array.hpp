@@ -257,6 +257,19 @@ namespace boost { namespace self_healing {
             };
         }
 
+        /*! Overload for operator<<() of std::ostream to print a vector.
+        * \param os TODO.
+        * \param array The array instance to print.
+        */
+        friend std::ostream &operator<<(std::ostream &os, const boost::self_healing::checksummed_array<T, N> &array)
+        {
+            os << "[";
+            for (std::size_t i = 0; i < array.size(); i++) {
+                os << (i == 0 ? "" : ",") << array.elements[i];
+            }
+            return os << "]";
+        }
+
     private:
         /*! \brief Validity check that tries to correct minor checksum faults silently.
         *
@@ -497,21 +510,6 @@ namespace boost { namespace self_healing {
     }
 
 } } // namespace boost::self_healing
-
-
-/*! Overload for operator<<() of std::ostream to print a vector.
-* \param os TODO.
-* \param array The array instance to print.
-*/
-template <class T, std::size_t N>
-std::ostream &operator<<(std::ostream &os, const boost::self_healing::checksummed_array<T, N> &array)
-{
-    os << "[";
-    for (std::size_t i = 0; i < array.size(); i++) {
-        os << (i == 0 ? "" : ",") << array[i];
-    }
-    return os << "]";
-}
 
 
 #endif // BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
