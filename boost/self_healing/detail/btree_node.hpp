@@ -30,7 +30,7 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    template <class T, std::size_t N = 64>
+    template <class T, std::size_t CS = 64>
     class btree_leaf;   // forward declaration
 
     /*! \brief TODO.
@@ -38,19 +38,19 @@ namespace boost { namespace self_healing {
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param N The size 
+    * \param CS The size 
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child
     */
-    template <class T, std::size_t N = 64>
-    class btree_node : public child<btree_node<T, N> >
+    template <class T, std::size_t CS = 64>
+    class btree_node : public child<btree_node<T, CS> >
     {
     public:
         // type definitions
         typedef T                   value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
         typedef const T &           const_reference;    //!< A const reference to an element.
-        typedef btree_node<T, N>    parent_type;        //!< The type of the parent.
-        typedef btree_node<T, N> *  parent_pointer;     //!< Pointer to parent objects.
+        typedef btree_node<T, CS>    parent_type;        //!< The type of the parent.
+        typedef btree_node<T, CS> *  parent_pointer;     //!< Pointer to parent objects.
 
         /*! Default constructor.
         * \param parent The parent B-tree.
@@ -66,7 +66,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid(parent_pointer const parent = NULL) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::btree_node<T, N>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::btree_node<T, CS>::is_valid()" << std::endl;
 #endif
             try {
                 // check all parts of the data structure
@@ -74,7 +74,7 @@ namespace boost { namespace self_healing {
                 return child<parent_type>::is_valid(parent);
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::btree_node<T, N>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::btree_node<T, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -83,7 +83,7 @@ namespace boost { namespace self_healing {
 
         void check_children() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::btree_node<T, N>::check_children" << std::endl;
+            std::cout << "boost::self_healing::btree_node<T, CS>::check_children" << std::endl;
 #endif
 
         }
@@ -91,8 +91,8 @@ namespace boost { namespace self_healing {
         /*! Children may be either nodes or leaves
         */
         union {
-            btree_node<T, N> nodes;
-            btree_leaf<T, N> leaves;
+            btree_node<T, CS> nodes;
+            btree_leaf<T, CS> leaves;
         } m_children;
     };
 
