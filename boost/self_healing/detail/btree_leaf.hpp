@@ -33,7 +33,7 @@
 namespace boost { namespace self_healing {
 
     template <class T, std::size_t N = 64>
-    class btree_node;
+    class btree_node;   // forward declaration
 
     /*! \brief TODO.
     *
