@@ -60,16 +60,19 @@ namespace boost { namespace self_healing {
             : child<parent_type>(parent), sibling<sibling_type>(next, previous), checksummed_array<value_type, N>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.
-        * \param parent An optional pointer to the parent to check against.
+        * \param parent Optional pointer to the parent to check against.
+        * \param next Optional pointer to the next sibling to check against.
+        * \param previous Optional pointer to the previous sibling to check against.
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        bool is_valid(parent_pointer const parent = NULL) const {
+        bool is_valid(parent_pointer const parent = NULL, sibling_pointer next = NULL, sibling_pointer const previous = NULL) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::btree_leaf<T, N>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.
-            return child<parent_type>::is_valid(parent) && sibling<sibling_type>::is_valid() &&
+            return child<parent_type>::is_valid(parent) &&
+                   sibling<sibling_type>::is_valid(next, previous) &&
                    checksummed_array<value_type, N>::is_valid();
         }
     };
