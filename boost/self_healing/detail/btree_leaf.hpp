@@ -21,6 +21,12 @@
 
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
+#include <boost/throw_exception.hpp>
+
+#ifdef BOOST_SELF_HEALING_DEBUG
+#   include <iostream>
+#endif
+#include <stdexcept>
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
