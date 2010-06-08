@@ -43,11 +43,11 @@ namespace boost { namespace self_healing {
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param N The capacity of the internal chunks.
+    * \param CS Optional (chunk) storage capacity of node leaves.
     * \remarks The chunk size should be chosen based on CPU cache size.
     * \see btree_leaf, btree_node
     */
-    template <class T, std::size_t N = 64>
+    template <class T, std::size_t CS = 64>
     class btree
     {
     public:
@@ -72,7 +72,7 @@ namespace boost { namespace self_healing {
         * position is changed. Checksumms are also updated correctly if the
         * iterator is dereferenced.
         */
-        class iterator : public child<btree<value_type, N> >, public std::iterator<std::random_access_iterator_tag, value_type>
+        class iterator : public child<btree<value_type, CS> >, public std::iterator<std::random_access_iterator_tag, value_type>
         {};
 #if 0
         {
@@ -82,8 +82,8 @@ namespace boost { namespace self_healing {
             * \param parent The btree parent.
             * \param index The index to start with.
             */
-            explicit iterator(btree<value_type, N> *const parent, size_type index)
-                : child<btree<value_type, N> >(parent), m_i(index) {}
+            explicit iterator(btree<value_type, CS> *const parent, size_type index)
+                : child<btree<value_type, CS> >(parent), m_i(index) {}
 
         public:
             /*! Default constructor.
@@ -91,18 +91,18 @@ namespace boost { namespace self_healing {
             *          there to satisfy some bad STL algorithms.
             */
             iterator()
-                : child<btree<value_type, N> >(0), m_i(-1) {}
+                : child<btree<value_type, CS> >(0), m_i(-1) {}
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             */
             iterator(const iterator &other)
-                : child<btree<value_type, N> >(other.parent()), m_i(other.m_i) {}
+                : child<btree<value_type, CS> >(other.parent()), m_i(other.m_i) {}
 
             iterator& operator=(const iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
-            iterator operator+(difference_type n) const { return iterator(child<btree<value_type, N> >::parent(), m_i + n); }
-            iterator operator-(difference_type n) const { return iterator(child<btree<value_type, N> >::parent(), m_i - n); }
+            iterator operator+(difference_type n) const { return iterator(child<btree<value_type, CS> >::parent(), m_i + n); }
+            iterator operator-(difference_type n) const { return iterator(child<btree<value_type, CS> >::parent(), m_i - n); }
             difference_type operator+(const iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -121,8 +121,8 @@ namespace boost { namespace self_healing {
             bool operator<(const iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const iterator &other) const { return m_i <= other.m_i; }
 
-            reference operator*() const { return child<btree<value_type, N> >::parent()->at(m_i); }
-            operator const_iterator() const { return const_iterator(child<btree<value_type, N> >::parent(), m_i); }
+            reference operator*() const { return child<btree<value_type, CS> >::parent()->at(m_i); }
+            operator const_iterator() const { return const_iterator(child<btree<value_type, CS> >::parent(), m_i); }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
             */
@@ -135,7 +135,7 @@ namespace boost { namespace self_healing {
 
         /*! A const (random access) iterator used to iterate through the <code>btree</code>.
         */
-        class const_iterator : public child<btree<value_type, N> >, public std::iterator<std::random_access_iterator_tag, value_type>
+        class const_iterator : public child<btree<value_type, CS> >, public std::iterator<std::random_access_iterator_tag, value_type>
         {};
 #if 0
             friend class btree;
@@ -144,20 +144,20 @@ namespace boost { namespace self_healing {
             * \param parent The btree parent.
             * \param index The index to start with.
             */
-            explicit const_iterator(btree<value_type, N> *const parent, size_type index)
-                : child<btree<value_type, N> >(parent), m_i(index) {}
+            explicit const_iterator(btree<value_type, CS> *const parent, size_type index)
+                : child<btree<value_type, CS> >(parent), m_i(index) {}
 
         public:
             /*! Copy constructor.
             * \param other The other const_iterator instance to copy from.
             */
             const_iterator(const const_iterator &other)
-                : child<btree<value_type, N> >(other.parent()), m_i(other.m_i) {}
+                : child<btree<value_type, CS> >(other.parent()), m_i(other.m_i) {}
 
             const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
-            const_iterator operator+(difference_type n) const { return const_iterator(child<btree<value_type, N> >::parent(), m_i + n); }
-            const_iterator operator-(difference_type n) const { return const_iterator(child<btree<value_type, N> >::parent(), m_i - n); }
+            const_iterator operator+(difference_type n) const { return const_iterator(child<btree<value_type, CS> >::parent(), m_i + n); }
+            const_iterator operator-(difference_type n) const { return const_iterator(child<btree<value_type, CS> >::parent(), m_i - n); }
             difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const const_iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -176,7 +176,7 @@ namespace boost { namespace self_healing {
             bool operator<(const const_iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const const_iterator &other) const { return m_i <= other.m_i; }
 
-            const_reference operator*() const { return child<btree<value_type, N> >::parent()->at(m_i); }
+            const_reference operator*() const { return child<btree<value_type, CS> >::parent()->at(m_i); }
 
             /*! Overload for operator<<() of std::ostream to print a const_iterator.
             */
@@ -232,7 +232,7 @@ namespace boost { namespace self_healing {
         /*! Copy constructor to copy from a <code>btree</code>.
         * \param rhs The other <code>btree</code> to copy from.
         */
-        btree(const btree<value_type, N> &rhs) {
+        btree(const btree<value_type, CS> &rhs) {
             assign(rhs.begin(), rhs.end());
         }
 
@@ -242,7 +242,7 @@ namespace boost { namespace self_healing {
             //TODO:
         }
 
-        btree<value_type, N>& operator=(const btree<value_type, N> &rhs) {
+        btree<value_type, CS>& operator=(const btree<value_type, CS> &rhs) {
             assign(rhs.begin(), rhs.end());
         };
 
@@ -272,7 +272,7 @@ namespace boost { namespace self_healing {
         bool empty() const { return size() == 0; }
         size_type max_size() const {
             // determin how much chunks fit into memory and thus how much elements we can have
-            //const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * N;
+            //const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * CS;
             //return std::min(max_elems, std::numeric_limits<difference_type>::max());
         }
         size_type capacity() const {}
@@ -327,7 +327,7 @@ namespace boost { namespace self_healing {
         */
         void rangecheck(size_type index) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::btree<T, N>::rangecheck(" << index << ")" << std::endl;
+            std::cout << "boost::self_healing::btree<T, CS>::rangecheck(" << index << ")" << std::endl;
 #endif
             if (index >= size()) {
                 std::out_of_range e("index out of range");
@@ -341,7 +341,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::btree<T, N>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::btree<T, CS>::is_valid()" << std::endl;
 #endif
             try {
                 // check all parts of the data structure
@@ -349,7 +349,7 @@ namespace boost { namespace self_healing {
                 return true;
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::btree<T, N>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::btree<T, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -360,28 +360,28 @@ namespace boost { namespace self_healing {
     };
 
     // comparisons
-    template <class T, std::size_t N>
-    inline bool operator==(const btree<T, N> &x, const btree<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator==(const btree<T, CS> &x, const btree<T, CS> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
-    template <class T, std::size_t N>
-    inline bool operator<(const btree<T, N> &x, const btree<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator<(const btree<T, CS> &x, const btree<T, CS> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
-    template <class T, std::size_t N>
-    inline bool operator!=(const btree<T, N> &x, const btree<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator!=(const btree<T, CS> &x, const btree<T, CS> &y) {
         return !(x == y);
     }
-    template <class T, std::size_t N>
-    inline bool operator>(const btree<T, N> &x, const btree<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator>(const btree<T, CS> &x, const btree<T, CS> &y) {
         return y < x;
     }
-    template <class T, std::size_t N>
-    inline bool operator<=(const btree<T, N> &x, const btree<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator<=(const btree<T, CS> &x, const btree<T, CS> &y) {
         return !(y < x);
     }
-    template <class T, std::size_t N>
-    inline bool operator>=(const btree<T, N>& x, const btree<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator>=(const btree<T, CS>& x, const btree<T, CS> &y) {
         return !(x < y);
     }
 
