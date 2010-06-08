@@ -43,11 +43,11 @@ namespace boost { namespace self_healing {
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param N The capacity of the internal chunks.
+    * \param CS Optional storage capacity of the internal chunks.
     * \remarks The chunk size should be chosen based on CPU cache size.
-    * \see std:vector, vector_chunk<T, N>
+    * \see std:vector, vector_chunk<T, CS>
     */
-    template <class T, std::size_t N = 64>
+    template <class T, std::size_t CS = 64>
     class vector
     {
     public:
@@ -64,8 +64,8 @@ namespace boost { namespace self_healing {
 
     private:
         // private type definitions
-        typedef vector_chunk<T, N>   vector_chunk_type;                             //!< A vector chunk.
-        typedef vector_chunk<T, N> * vector_chunk_pointer;                          //!< A pointer to vector chunk.
+        typedef vector_chunk<T, CS>   vector_chunk_type;                             //!< A vector chunk.
+        typedef vector_chunk<T, CS> * vector_chunk_pointer;                          //!< A pointer to vector chunk.
         static const size_type       vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
     public:
 
@@ -75,7 +75,7 @@ namespace boost { namespace self_healing {
         * position is changed. Checksumms are also updated correctly if the
         * iterator is dereferenced.
         */
-        class iterator : public child<vector<value_type, N> >, public std::iterator<std::random_access_iterator_tag, value_type>
+        class iterator : public child<vector<value_type, CS> >, public std::iterator<std::random_access_iterator_tag, value_type>
         {
             friend class vector;
 
@@ -83,8 +83,8 @@ namespace boost { namespace self_healing {
             * \param parent The vector parent.
             * \param index The index to start with.
             */
-            explicit iterator(vector<value_type, N> *const parent, size_type index)
-                : child<vector<value_type, N> >(parent), m_i(index) {}
+            explicit iterator(vector<value_type, CS> *const parent, size_type index)
+                : child<vector<value_type, CS> >(parent), m_i(index) {}
 
         public:
             /*! Default constructor.
@@ -92,18 +92,18 @@ namespace boost { namespace self_healing {
             *          there to satisfy some bad STL algorithms.
             */
             iterator()
-                : child<vector<value_type, N> >(0), m_i(-1) {}
+                : child<vector<value_type, CS> >(0), m_i(-1) {}
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             */
             iterator(const iterator &other)
-                : child<vector<value_type, N> >(other.parent()), m_i(other.m_i) {}
+                : child<vector<value_type, CS> >(other.parent()), m_i(other.m_i) {}
 
             iterator& operator=(const iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
-            iterator operator+(difference_type n) const { return iterator(child<vector<value_type, N> >::parent(), m_i + n); }
-            iterator operator-(difference_type n) const { return iterator(child<vector<value_type, N> >::parent(), m_i - n); }
+            iterator operator+(difference_type n) const { return iterator(child<vector<value_type, CS> >::parent(), m_i + n); }
+            iterator operator-(difference_type n) const { return iterator(child<vector<value_type, CS> >::parent(), m_i - n); }
             difference_type operator+(const iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -122,8 +122,8 @@ namespace boost { namespace self_healing {
             bool operator<(const iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const iterator &other) const { return m_i <= other.m_i; }
 
-            reference operator*() const { return child<vector<value_type, N> >::parent()->at(m_i); }
-            operator const_iterator() const { return const_iterator(child<vector<value_type, N> >::parent(), m_i); }
+            reference operator*() const { return child<vector<value_type, CS> >::parent()->at(m_i); }
+            operator const_iterator() const { return const_iterator(child<vector<value_type, CS> >::parent(), m_i); }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
             */
@@ -135,7 +135,7 @@ namespace boost { namespace self_healing {
 
         /*! A const (random access) iterator used to iterate through the <code>vector</code>.
         */
-        class const_iterator : public child<vector<value_type, N> >, public std::iterator<std::random_access_iterator_tag, value_type>
+        class const_iterator : public child<vector<value_type, CS> >, public std::iterator<std::random_access_iterator_tag, value_type>
         {
             friend class vector;
 
@@ -143,20 +143,20 @@ namespace boost { namespace self_healing {
             * \param parent The vector parent.
             * \param index The index to start with.
             */
-            explicit const_iterator(vector<value_type, N> *const parent, size_type index)
-                : child<vector<value_type, N> >(parent), m_i(index) {}
+            explicit const_iterator(vector<value_type, CS> *const parent, size_type index)
+                : child<vector<value_type, CS> >(parent), m_i(index) {}
 
         public:
             /*! Copy constructor.
             * \param other The other const_iterator instance to copy from.
             */
             const_iterator(const const_iterator &other)
-                : child<vector<value_type, N> >(other.parent()), m_i(other.m_i) {}
+                : child<vector<value_type, CS> >(other.parent()), m_i(other.m_i) {}
 
             const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
-            const_iterator operator+(difference_type n) const { return const_iterator(child<vector<value_type, N> >::parent(), m_i + n); }
-            const_iterator operator-(difference_type n) const { return const_iterator(child<vector<value_type, N> >::parent(), m_i - n); }
+            const_iterator operator+(difference_type n) const { return const_iterator(child<vector<value_type, CS> >::parent(), m_i + n); }
+            const_iterator operator-(difference_type n) const { return const_iterator(child<vector<value_type, CS> >::parent(), m_i - n); }
             difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const const_iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -175,7 +175,7 @@ namespace boost { namespace self_healing {
             bool operator<(const const_iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const const_iterator &other) const { return m_i <= other.m_i; }
 
-            const_reference operator*() const { return child<vector<value_type, N> >::parent()->at(m_i); }
+            const_reference operator*() const { return child<vector<value_type, CS> >::parent()->at(m_i); }
 
             /*! Overload for operator<<() of std::ostream to print a const_iterator.
             */
@@ -233,7 +233,7 @@ namespace boost { namespace self_healing {
         /*! Copy constructor to copy from a <code>boost::self_healing::vector</code>.
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
-        vector(const boost::self_healing::vector<value_type, N> &rhs)
+        vector(const boost::self_healing::vector<value_type, CS> &rhs)
             : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
             assign(rhs.begin(), rhs.end());
         }
@@ -253,7 +253,7 @@ namespace boost { namespace self_healing {
             delete[] m_head;
         }
 
-        vector<value_type, N>& operator=(const vector<value_type, N> &rhs) {
+        vector<value_type, CS>& operator=(const vector<value_type, CS> &rhs) {
             assign(rhs.begin(), rhs.end());
         };
 
@@ -263,7 +263,7 @@ namespace boost { namespace self_healing {
             resize(last - first);
             size_type i = 0;
             for (InputIterator it = first; it != last; it++) {
-                m_head[i / N][i % N] = *it;
+                m_head[i / CS][i % CS] = *it;
                 i++;
             }
             m_size1 = i;
@@ -276,7 +276,7 @@ namespace boost { namespace self_healing {
             resize(n);
             size_type i = 0;
             for (; i < n; i++) {
-                m_head[i / N][i % N] = x;
+                m_head[i / CS][i % CS] = x;
             }
             m_size1 = i;
             m_size2 = i;
@@ -300,7 +300,7 @@ namespace boost { namespace self_healing {
         bool empty() const { return size() == 0; }
         size_type max_size() const {
             // determin how much chunks fit into memory and thus how much elements we can have
-            const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * N;
+            const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * CS;
             return std::min(max_elems, std::numeric_limits<difference_type>::max());
         }
         size_type capacity() const { check_storage(); return m_chunks * vector_chunk_type::size(); }
@@ -331,14 +331,14 @@ namespace boost { namespace self_healing {
                 // check_storage(); // Already done in capacity() method call
 
                 const vector_chunk_pointer old_head = m_head;
-                const size_type new_chunk_count = std::ceil(new_capacity / N);
+                const size_type new_chunk_count = std::ceil(new_capacity / CS);
 
                 m_head = new vector_chunk_type[new_chunk_count];
                 m_chunks = new_chunk_count;
 
                 // copy values from old location to new
                 for (size_type i = 0; i < size(); i++) {
-                    m_head[i / N][i % N] = old_head[i / N][i % N];
+                    m_head[i / CS][i % CS] = old_head[i / CS][i % CS];
                 };
 
                 delete[] old_head;
@@ -346,8 +346,8 @@ namespace boost { namespace self_healing {
         }
 
         // operator[]
-        reference operator[](size_type i) { check_storage(); return m_head[i / N][i % N]; }
-        const_reference operator[](size_type i) const { check_storage(); return m_head[i / N][(i % N)]; }
+        reference operator[](size_type i) { check_storage(); return m_head[i / CS][i % CS]; }
+        const_reference operator[](size_type i) const { check_storage(); return m_head[i / CS][(i % CS)]; }
 
         // at() with range check
         reference at(size_type i) { rangecheck(i); return operator[](i); }
@@ -415,7 +415,7 @@ namespace boost { namespace self_healing {
         */
         void rangecheck(size_type index) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, N>::rangecheck(" << index << ")" << std::endl;
+            std::cout << "boost::self_healing::vector<T, CS>::rangecheck(" << index << ")" << std::endl;
 #endif
             if (index >= size()) {
                 std::out_of_range e("index out of range");
@@ -429,7 +429,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, N>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::vector<T, CS>::is_valid()" << std::endl;
 #endif
             try {
                 // check all parts of the data structure
@@ -443,7 +443,7 @@ namespace boost { namespace self_healing {
                 return true;
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::vector<T, N>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::vector<T, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -453,7 +453,7 @@ namespace boost { namespace self_healing {
         void check_storage() const {
             //TODO: Check and repair head and tail pointers
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, N>::check_storage()" << std::endl;
+            std::cout << "boost::self_healing::vector<T, CS>::check_storage()" << std::endl;
 #endif
             if (m_head == 0 && m_tail == 0) {
                 // Both are 0, this means nothing seems to be alloced yet
@@ -487,7 +487,7 @@ namespace boost { namespace self_healing {
 
         void check_size() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, N>::check_size()" << std::endl;
+            std::cout << "boost::self_healing::vector<T, CS>::check_size()" << std::endl;
 #endif
             // check and repair size via TMR voting
             const bool equal_13 = m_size1 == m_size3;
@@ -525,28 +525,28 @@ namespace boost { namespace self_healing {
     };
 
     // comparisons
-    template <class T, std::size_t N>
-    inline bool operator==(const vector<T, N> &x, const vector<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator==(const vector<T, CS> &x, const vector<T, CS> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
-    template <class T, std::size_t N>
-    inline bool operator<(const vector<T, N> &x, const vector<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator<(const vector<T, CS> &x, const vector<T, CS> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
-    template <class T, std::size_t N>
-    inline bool operator!=(const vector<T, N> &x, const vector<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator!=(const vector<T, CS> &x, const vector<T, CS> &y) {
         return !(x == y);
     }
-    template <class T, std::size_t N>
-    inline bool operator>(const vector<T, N> &x, const vector<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator>(const vector<T, CS> &x, const vector<T, CS> &y) {
         return y < x;
     }
-    template <class T, std::size_t N>
-    inline bool operator<=(const vector<T, N> &x, const vector<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator<=(const vector<T, CS> &x, const vector<T, CS> &y) {
         return !(y < x);
     }
-    template <class T, std::size_t N>
-    inline bool operator>=(const vector<T, N>& x, const vector<T, N> &y) {
+    template <class T, std::size_t CS>
+    inline bool operator>=(const vector<T, CS>& x, const vector<T, CS> &y) {
         return !(x < y);
     }
 
@@ -562,8 +562,8 @@ namespace boost { namespace self_healing {
 
 /*! Overload for operator << of std::ostream to print a vector.
 */
-template <class T, std::size_t N>
-std::ostream &operator<<(std::ostream &os, const boost::self_healing::vector<T, N> &vector)
+template <class T, std::size_t CS>
+std::ostream &operator<<(std::ostream &os, const boost::self_healing::vector<T, CS> &vector)
 {
     os << "[";
     for (std::size_t i = 0; i < vector.size(); i++) {
