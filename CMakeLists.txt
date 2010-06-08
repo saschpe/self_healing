@@ -80,8 +80,8 @@ if(BUILD_TESTS)
     add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 
     # tests related to class btree helper classes btree_node and btree_leaf
-    #add_executable(test-btree-node libs/self_healing/test/btree-node.cpp)
-    #add_test(btree-node ${EXECUTABLE_OUTPUT_PATH}/test-btree-node)
+    add_executable(test-btree-node libs/self_healing/test/btree-node.cpp)
+    add_test(btree-node ${EXECUTABLE_OUTPUT_PATH}/test-btree-node)
     add_executable(test-btree-leaf libs/self_healing/test/btree-leaf.cpp)
     add_test(btree-leaf ${EXECUTABLE_OUTPUT_PATH}/test-btree-leaf)
 
