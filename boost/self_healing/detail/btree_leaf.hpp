@@ -40,7 +40,7 @@ namespace boost { namespace self_healing {
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param CS The size of the chunk.
+    * \param CS Optional (chunk) storage capacity.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child, sibling, checksummed_array
     */
