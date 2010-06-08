@@ -32,7 +32,7 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    template <class T, std::size_t N = 64>
+    template <class T, std::size_t CS = 64>
     class btree_node;   // forward declaration
 
     /*! \brief TODO.
@@ -40,21 +40,21 @@ namespace boost { namespace self_healing {
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param N The size of the chunk.
+    * \param CS The size of the chunk.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child, sibling, checksummed_array
     */
-    template <class T, std::size_t N = 64>
-    class btree_leaf : public child<btree_node<T, N> >, public sibling<btree_leaf<T, N> >, public checksummed_array<T, N>
+    template <class T, std::size_t CS = 64>
+    class btree_leaf : public child<btree_node<T, CS> >, public sibling<btree_leaf<T, CS> >, public checksummed_array<T, CS>
     {
     public:
         // type definitions
         typedef T                   value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
         typedef const T &           const_reference;    //!< A const reference to an element.
-        typedef btree_node<T, N>    parent_type;        //!< The type of the parent.
-        typedef btree_node<T, N> *  parent_pointer;     //!< Pointer to parent objects.
-        typedef btree_leaf<T, N>    sibling_type;       //!< The type of the siblings.
-        typedef btree_leaf<T, N> *  sibling_pointer;    //!< Pointer to sibling objects.
+        typedef btree_node<T, CS>    parent_type;        //!< The type of the parent.
+        typedef btree_node<T, CS> *  parent_pointer;     //!< Pointer to parent objects.
+        typedef btree_leaf<T, CS>    sibling_type;       //!< The type of the siblings.
+        typedef btree_leaf<T, CS> *  sibling_pointer;    //!< Pointer to sibling objects.
 
         /*! Default constructor.
         * \param parent The parent B-tree.
@@ -63,7 +63,7 @@ namespace boost { namespace self_healing {
         * \param value An initial value that is set for all elements.
         */
         explicit btree_leaf(parent_pointer const parent = NULL, sibling_pointer next = NULL, sibling_pointer const previous = NULL, const_reference value = 0)
-            : child<parent_type>(parent), sibling<sibling_type>(next, previous), checksummed_array<value_type, N>(value) {}
+            : child<parent_type>(parent), sibling<sibling_type>(next, previous), checksummed_array<value_type, CS>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent Optional pointer to the parent to check against.
@@ -74,12 +74,12 @@ namespace boost { namespace self_healing {
         */
         bool is_valid(parent_pointer const parent = NULL, sibling_pointer next = NULL, sibling_pointer const previous = NULL) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::btree_leaf<T, N>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::btree_leaf<T, CS>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.
             return child<parent_type>::is_valid(parent) &&
                    sibling<sibling_type>::is_valid(next, previous) &&
-                   checksummed_array<value_type, N>::is_valid();
+                   checksummed_array<value_type, CS>::is_valid();
         }
     };
 

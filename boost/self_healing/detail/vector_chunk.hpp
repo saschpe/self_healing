@@ -29,7 +29,7 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    template <class T, std::size_t N>
+    template <class T, std::size_t CS>
     class vector;
 
     /*! \brief Vector element storage chunk.
@@ -38,12 +38,12 @@ namespace boost { namespace self_healing {
     * vector storage mechanism
     *
     * \param T The data type of the stored values.
-    * \param N The capacity of the chunk.
+    * \param CS The capacity of the chunk.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child, checksummed_array
     */
-    template <class T, std::size_t N = 64>
-    class vector_chunk : public child<vector<T, N> >, public checksummed_array<T, N>
+    template <class T, std::size_t CS = 64>
+    class vector_chunk : public child<vector<T, CS> >, public checksummed_array<T, CS>
     {
     public:
         // type definitions
@@ -54,21 +54,21 @@ namespace boost { namespace self_healing {
         * \param parent The parent vector.
         * \param value An initial value that is set for all elements.
         */
-        explicit vector_chunk(vector<value_type, N> *const parent = NULL, const_reference value = 0)
-            : child<vector<value_type, N> >(parent), checksummed_array<value_type, N>(value) {}
+        explicit vector_chunk(vector<value_type, CS> *const parent = NULL, const_reference value = 0)
+            : child<vector<value_type, CS> >(parent), checksummed_array<value_type, CS>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent An optional pointer to the parent to check against.
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        bool is_valid(vector<value_type, N> *const parent = NULL) const {
+        bool is_valid(vector<value_type, CS> *const parent = NULL) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector_chunk<T, N>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::vector_chunk<T, CS>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.
-            return child<vector<value_type, N> >::is_valid(parent) &&
-                   checksummed_array<value_type, N>::is_valid();
+            return child<vector<value_type, CS> >::is_valid(parent) &&
+                   checksummed_array<value_type, CS>::is_valid();
         }
     };
 
