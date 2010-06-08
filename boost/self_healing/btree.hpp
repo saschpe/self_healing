@@ -91,7 +91,7 @@ namespace boost { namespace self_healing {
             *          there to satisfy some bad STL algorithms.
             */
             iterator()
-                : child<btree<value_type, N> >(NULL), m_i(-1) {}
+                : child<btree<value_type, N> >(0), m_i(-1) {}
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.

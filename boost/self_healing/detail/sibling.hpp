@@ -43,7 +43,7 @@ namespace boost { namespace self_healing {
         * \param previous Pointer to the previous sibling.
         * \throws std::invalid_argument Thrown if a sibling pointer is invalid.
         */
-        explicit sibling(sibling_pointer const next = NULL, sibling_pointer const previous = NULL) {
+        explicit sibling(sibling_pointer const next = 0, sibling_pointer const previous = 0) {
             set_next(next);
             set_previous(previous);
         }
@@ -62,7 +62,7 @@ namespace boost { namespace self_healing {
         */
         void set_next(sibling_pointer const next) {
             if (!next) {
-                std::invalid_argument e("next sibling argument is NULL");
+                std::invalid_argument e("next sibling argument is null");
                 boost::throw_exception(e);
             };
             m_next1 = next;
@@ -80,7 +80,7 @@ namespace boost { namespace self_healing {
         */
         void set_previous(sibling_pointer const previous) {
             if (!previous) {
-                std::invalid_argument e("previous sibling argument is NULL");
+                std::invalid_argument e("previous sibling argument is null");
                 boost::throw_exception(e);
             };
             m_previous1 = previous;
@@ -99,7 +99,7 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_siblings()
         */
-        bool is_valid(sibling_pointer const next = NULL, sibling_pointer const previous = NULL) const {
+        bool is_valid(sibling_pointer const next = 0, sibling_pointer const previous = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::sibling<P>::is_valid()" << std::endl;
 #endif
@@ -118,7 +118,7 @@ namespace boost { namespace self_healing {
         /*! Checks the internal sibling pointers against the provided ones.
         * \throws std::invalid_argument Thrown if a sibling pointer is invalid.
         */
-        void check_siblings(sibling_pointer const next = NULL, sibling_pointer const previous = NULL) const {
+        void check_siblings(sibling_pointer const next = 0, sibling_pointer const previous = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::sibling<P>::check_siblings" << std::endl;
 #endif

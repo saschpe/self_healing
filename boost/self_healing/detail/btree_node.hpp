@@ -56,7 +56,7 @@ namespace boost { namespace self_healing {
         * \param parent The parent B-tree.
         * \param value An initial value that is set for all elements.
         */
-        explicit btree_node(parent_pointer const parent = NULL)
+        explicit btree_node(parent_pointer const parent = 0)
             : child<parent_type>(parent) {}
 
         /*! Validity check that tries to correct minor faults silently.
@@ -64,7 +64,7 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        bool is_valid(parent_pointer const parent = NULL) const {
+        bool is_valid(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::btree_node<T, CS>::is_valid()" << std::endl;
 #endif

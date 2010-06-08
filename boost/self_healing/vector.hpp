@@ -92,7 +92,7 @@ namespace boost { namespace self_healing {
             *          there to satisfy some bad STL algorithms.
             */
             iterator()
-                : child<vector<value_type, N> >(NULL), m_i(-1) {}
+                : child<vector<value_type, N> >(0), m_i(-1) {}
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
@@ -209,14 +209,14 @@ namespace boost { namespace self_healing {
         /*! Default constructor.
         */
         explicit vector()
-            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {}
+            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {}
 
         /*! Constructor to initialize vector with a custom size and an optional fill value.
         * \param n Custom initial vector size.
         * \param x Optional value to fill the vector with.
         */
         vector(size_type n, const_reference x = value_type())
-            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {
+            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
             assign(n, x);
         }
 
@@ -226,7 +226,7 @@ namespace boost { namespace self_healing {
         */
         template <class InputIterator>
         vector(InputIterator first, InputIterator last)
-            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {
+            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
             assign(first, last);
         }
 
@@ -234,7 +234,7 @@ namespace boost { namespace self_healing {
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
         vector(const boost::self_healing::vector<value_type, N> &rhs)
-            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {
+            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
             assign(rhs.begin(), rhs.end());
         }
 
@@ -242,7 +242,7 @@ namespace boost { namespace self_healing {
         * \param rhs The other <code>std::vector</code> to copy from.
         */
         vector(const std::vector<value_type> &rhs)
-            : m_head(NULL), m_size1(0), m_chunks(0), m_size2(0), m_tail(NULL), m_size3(0) {
+            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
             assign(rhs.begin(), rhs.end());
         }
 
@@ -455,22 +455,22 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, N>::check_storage()" << std::endl;
 #endif
-            if (m_head == NULL && m_tail == NULL) {
-                // Both are NULL, this means nothing seems to be alloced yet
+            if (m_head == 0 && m_tail == 0) {
+                // Both are 0, this means nothing seems to be alloced yet
                 // We're fine if the other values reflect that
                 if (size() == 0 && m_chunks == 0) {
                     return;
                 }
                 /*check_size();*/
                 //TODO: Maybe do a simpler check here instead
-            } else if (m_head == NULL) {
+            } else if (m_head == 0) {
                 // Only head is null, could be error with tail or head
 
-            } else if (m_tail == NULL) {
+            } else if (m_tail == 0) {
                 // Only tail is null, could be error with tail or head
 
             } else {
-                // Both are non-NULL, further checks
+                // Both are non-0, further checks
 
             }
             /*size_type chunk_count = ((m_tail + vector_chunk_size) - m_head) / vector_chunk_size;

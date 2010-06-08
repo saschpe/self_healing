@@ -54,7 +54,7 @@ namespace boost { namespace self_healing {
         * \param parent The parent vector.
         * \param value An initial value that is set for all elements.
         */
-        explicit vector_chunk(vector<value_type, CS> *const parent = NULL, const_reference value = 0)
+        explicit vector_chunk(vector<value_type, CS> *const parent = 0, const_reference value = 0)
             : child<vector<value_type, CS> >(parent), checksummed_array<value_type, CS>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.
@@ -62,7 +62,7 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        bool is_valid(vector<value_type, CS> *const parent = NULL) const {
+        bool is_valid(vector<value_type, CS> *const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector_chunk<T, CS>::is_valid()" << std::endl;
 #endif

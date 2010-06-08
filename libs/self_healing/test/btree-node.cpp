@@ -17,7 +17,7 @@ int main()
 {
     std::cout << "testing class boost::self_healing::btree_node<>" << std::endl;
 
-    boost::self_healing::btree_node<int> parent(NULL);
+    boost::self_healing::btree_node<int> parent(0);
     boost::self_healing::btree_node<int> child(parent);
 
     return 0;

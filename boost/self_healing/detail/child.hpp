@@ -44,7 +44,7 @@ namespace boost { namespace self_healing {
         * \param parent The parent.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
-        explicit child(parent_pointer const parent = NULL) {
+        explicit child(parent_pointer const parent = 0) {
             set_parent(parent);
         }
 
@@ -61,7 +61,7 @@ namespace boost { namespace self_healing {
         */
         void set_parent(parent_pointer const parent) {
             if (!parent) {
-                std::invalid_argument e("parent argument is NULL");
+                std::invalid_argument e("parent argument is null");
                 boost::throw_exception(e);
             };
             m_parent1 = parent;
@@ -79,7 +79,7 @@ namespace boost { namespace self_healing {
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        bool is_valid(parent_pointer const parent = NULL) const {
+        bool is_valid(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::child<P>::is_valid()" << std::endl;
 #endif
@@ -98,7 +98,7 @@ namespace boost { namespace self_healing {
         /*! Checks the internal parent pointer against a provided one.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
-        void check_parent(parent_pointer const parent = NULL) const {
+        void check_parent(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::child<P>::check_parent(" << parent << ")" << std::endl;
 #endif
