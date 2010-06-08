@@ -9,7 +9,7 @@
  * 31 May 2010 - Initial Revision (Sascha Peilicke)
  */
 
-#include <boost/self_healing/btree.hpp>
+#include <boost/self_healing/detail/btree_node.hpp>
 
 #include <iostream>
 
@@ -17,8 +17,8 @@ int main()
 {
     std::cout << "testing class boost::self_healing::btree_node<>" << std::endl;
 
-    boost::self_healing::btree<char> t;
-    boost::self_healing::btree_node<char> n;
+    boost::self_healing::btree_node<int> parent(NULL);
+    boost::self_healing::btree_node<int> child(parent);
 
     return 0;
 }
