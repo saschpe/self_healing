@@ -75,7 +75,7 @@ namespace boost { namespace self_healing {
         parent_pointer parent() const { check_parent(); return m_parent1; }
 
         /*! Validity check that tries to correct minor faults silently.
-        * \param parent An optional pointer to the parent to check against.
+        * \param parent Optional pointer to the parent to check against.
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */

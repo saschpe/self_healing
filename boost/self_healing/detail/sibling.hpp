@@ -94,8 +94,8 @@ namespace boost { namespace self_healing {
         sibling_pointer previous() const { check_siblings(); return m_previous1; }
 
         /*! Validity check that tries to correct minor faults silently.
-        * \param next Pointer to the next sibling.
-        * \param previous Pointer to the previous sibling.
+        * \param next Optional pointer to the next sibling to check against.
+        * \param previous Optional pointer to the previous sibling to check against.
         * \return true, if the internal structure and data is valid.
         * \see check_siblings()
         */
