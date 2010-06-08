@@ -38,7 +38,7 @@ namespace boost { namespace self_healing {
     * vector storage mechanism
     *
     * \param T The data type of the stored values.
-    * \param CS The capacity of the chunk.
+    * \param CS Optional storage capacity of the chunk.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child, checksummed_array
     */
