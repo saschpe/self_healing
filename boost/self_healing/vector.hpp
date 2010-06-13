@@ -51,10 +51,12 @@ namespace boost { namespace self_healing {
     class vector
     {
         // private type definitions
+        typedef vector<T, CS>         vector_type;
+        typedef vector<T, CS> *       vector_pointer;
         typedef vector_chunk<T, CS>   vector_chunk_type;    //!< A vector chunk.
         typedef vector_chunk<T, CS> * vector_chunk_pointer; //!< A pointer to vector chunk.
 
-        static const size_type  vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
+        static const size_type        vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
 
     public:
         // type definitions
@@ -75,7 +77,7 @@ namespace boost { namespace self_healing {
         * position is changed. Checksumms are also updated correctly if the
         * iterator is dereferenced.
         */
-        class iterator : public child<vector<value_type, CS> >, public std::iterator<std::random_access_iterator_tag, value_type>
+        class iterator : public child<vector_type>, public std::iterator<std::random_access_iterator_tag, value_type>
         {
             friend class vector;
 
@@ -83,8 +85,8 @@ namespace boost { namespace self_healing {
             * \param parent The vector parent.
             * \param index The index to start with.
             */
-            explicit iterator(vector<value_type, CS> *const parent, size_type index)
-                : child<vector<value_type, CS> >(parent), m_i(index) {}
+            explicit iterator(vector_pointer const parent, size_type index)
+                : child<vector_type>(parent), m_i(index) {}
 
         public:
             /*! Default constructor.
@@ -92,18 +94,18 @@ namespace boost { namespace self_healing {
             *          there to satisfy some bad STL algorithms.
             */
             iterator()
-                : child<vector<value_type, CS> >(0), m_i(-1) {}
+                : child<vector_type>(0), m_i(-1) {}
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             */
             iterator(const iterator &other)
-                : child<vector<value_type, CS> >(other.parent()), m_i(other.m_i) {}
+                : child<vector_type>(other.parent()), m_i(other.m_i) {}
 
             iterator& operator=(const iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
-            iterator operator+(difference_type n) const { return iterator(child<vector<value_type, CS> >::parent(), m_i + n); }
-            iterator operator-(difference_type n) const { return iterator(child<vector<value_type, CS> >::parent(), m_i - n); }
+            iterator operator+(difference_type n) const { return iterator(child<vector_type>::parent(), m_i + n); }
+            iterator operator-(difference_type n) const { return iterator(child<vector_type>::parent(), m_i - n); }
             difference_type operator+(const iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -122,8 +124,8 @@ namespace boost { namespace self_healing {
             bool operator<(const iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const iterator &other) const { return m_i <= other.m_i; }
 
-            reference operator*() const { return child<vector<value_type, CS> >::parent()->at(m_i); }
-            operator const_iterator() const { return const_iterator(child<vector<value_type, CS> >::parent(), m_i); }
+            reference operator*() const { return child<vector_type>::parent()->at(m_i); }
+            operator const_iterator() const { return const_iterator(child<vector_type>::parent(), m_i); }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
             */
@@ -135,7 +137,7 @@ namespace boost { namespace self_healing {
 
         /*! A const (random access) iterator used to iterate through the <code>vector</code>.
         */
-        class const_iterator : public child<vector<value_type, CS> >, public std::iterator<std::random_access_iterator_tag, value_type>
+        class const_iterator : public child<vector_type>, public std::iterator<std::random_access_iterator_tag, value_type>
         {
             friend class vector;
 
@@ -143,20 +145,20 @@ namespace boost { namespace self_healing {
             * \param parent The vector parent.
             * \param index The index to start with.
             */
-            explicit const_iterator(vector<value_type, CS> *const parent, size_type index)
-                : child<vector<value_type, CS> >(parent), m_i(index) {}
+            explicit const_iterator(vector_pointer const parent, size_type index)
+                : child<vector_type>(parent), m_i(index) {}
 
         public:
             /*! Copy constructor.
             * \param other The other const_iterator instance to copy from.
             */
             const_iterator(const const_iterator &other)
-                : child<vector<value_type, CS> >(other.parent()), m_i(other.m_i) {}
+                : child<vector_type>(other.parent()), m_i(other.m_i) {}
 
             const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
-            const_iterator operator+(difference_type n) const { return const_iterator(child<vector<value_type, CS> >::parent(), m_i + n); }
-            const_iterator operator-(difference_type n) const { return const_iterator(child<vector<value_type, CS> >::parent(), m_i - n); }
+            const_iterator operator+(difference_type n) const { return const_iterator(child<vector_type>::parent(), m_i + n); }
+            const_iterator operator-(difference_type n) const { return const_iterator(child<vector_type>::parent(), m_i - n); }
             difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const const_iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -175,7 +177,7 @@ namespace boost { namespace self_healing {
             bool operator<(const const_iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const const_iterator &other) const { return m_i <= other.m_i; }
 
-            const_reference operator*() const { return child<vector<value_type, CS> >::parent()->at(m_i); }
+            const_reference operator*() const { return child<vector_type>::parent()->at(m_i); }
 
             /*! Overload for operator<<() of std::ostream to print a const_iterator.
             */
@@ -233,7 +235,7 @@ namespace boost { namespace self_healing {
         /*! Copy constructor to copy from a <code>boost::self_healing::vector</code>.
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
-        vector(const boost::self_healing::vector<value_type, CS> &rhs)
+        vector(const vector_type &rhs)
             : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
             assign(rhs.begin(), rhs.end());
         }
@@ -253,7 +255,7 @@ namespace boost { namespace self_healing {
             delete[] m_head;
         }
 
-        vector<value_type, CS>& operator=(const vector<value_type, CS> &rhs) {
+        vector_type& operator=(const vector_type &rhs) {
             assign(rhs.begin(), rhs.end());
         };
 
@@ -546,14 +548,14 @@ namespace boost { namespace self_healing {
         return !(y < x);
     }
     template <class T, std::size_t CS>
-    inline bool operator>=(const vector<T, CS>& x, const vector<T, CS> &y) {
+    inline bool operator>=(const vector<T, CS> &x, const vector<T, CS> &y) {
         return !(x < y);
     }
 
     /*! Global swap function.
     */
-    template<class T>
-    inline void swap(vector<T> &x, vector<T> &y) {
+    template<class T, std::size_t CS>
+    inline void swap(vector<T, CS> &x, vector<T, CS> &y) {
         x.swap(y);
     }
 
