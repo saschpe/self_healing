@@ -38,15 +38,16 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T           value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
-        typedef T &         reference;
-        typedef const T &   const_reference;    //!< A const reference to an element.
+        typedef T                            value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef T &                          reference;
+        typedef const T &                    const_reference;   //!< A const reference to an element.
+        typedef boost::function<void (void)> function_type;
 
         /*! Constructor.
         * \param value The value to initialize the reference with.
         * \param update The function to apply if the value is changed.
         */
-        explicit safe_ref(reference value, boost::function<void (void)> update)
+        explicit safe_ref(reference value, function_type update)
             : value(value), update(update) {}
 
         /*! Copy constructor.
@@ -91,7 +92,7 @@ namespace boost { namespace self_healing {
 
     private:
         reference value;
-        boost::function<void (void)> update;
+        function_type update;
     };
 
 } } // namespace boost::self_healing
