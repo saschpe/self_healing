@@ -56,7 +56,7 @@ namespace boost { namespace self_healing {
         typedef vector_chunk<T, CS>   vector_chunk_type;    //!< A vector chunk.
         typedef vector_chunk<T, CS> * vector_chunk_pointer; //!< A pointer to vector chunk.
 
-        static const size_type        vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
+        static const std::size_t      vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
 
     public:
         // type definitions
