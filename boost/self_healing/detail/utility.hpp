@@ -16,6 +16,7 @@
 #define BOOST_SELF_HEALING_UTILITY_HPP
 
 #include <boost/config.hpp>
+#include <boost/detail/workaround.hpp>
 
 #include <sstream>
 
