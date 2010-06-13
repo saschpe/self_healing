@@ -50,6 +50,9 @@ namespace boost { namespace self_healing {
     template <class T, std::size_t N>
     class checksummed_array
     {
+        // private type definitions
+        typedef typename safe_ref<T>::function_type function_type;
+
     public:
         // type definitions
         typedef T               value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
@@ -80,7 +83,7 @@ namespace boost { namespace self_healing {
             * \param check TODO.
             * \param update TODO.
             */
-            explicit iterator(value_type *rhs, boost::function<void (void)> check, boost::function<void (void)> update)
+            explicit iterator(value_type *rhs, function_type check, function_type update)
                 : m_p(rhs), check(check), update(update) {}
 
         public:
@@ -120,9 +123,9 @@ namespace boost { namespace self_healing {
             friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.m_p; }
 
         private:
-            value_type *m_p;                        //!< Internal pointer to the current position in the checksummed_array.
-            boost::function<void (void)> check;     //!< Called to check the consistency of the corresponding checksummed_array instance.
-            boost::function<void (void)> update;    //!< Called to update the checksums of the corresponding checksummed_array instance.
+            value_type *m_p;        //!< Internal pointer to the current position in the checksummed_array.
+            function_type check;    //!< Called to check the consistency of the corresponding checksummed_array instance.
+            function_type update;   //!< Called to update the checksums of the corresponding checksummed_array instance.
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
