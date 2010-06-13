@@ -50,6 +50,12 @@ namespace boost { namespace self_healing {
     template <class T, std::size_t CS = 64>
     class vector
     {
+        // private type definitions
+        typedef vector_chunk<T, CS>   vector_chunk_type;    //!< A vector chunk.
+        typedef vector_chunk<T, CS> * vector_chunk_pointer; //!< A pointer to vector chunk.
+
+        static const size_type  vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
+
     public:
         // type definitions
         typedef T               value_type;         //!< The type of elements stored in the <code>vector</code>.
@@ -62,13 +68,7 @@ namespace boost { namespace self_healing {
         typedef std::size_t     size_type;          //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
         typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
 
-    private:
-        // private type definitions
-        typedef vector_chunk<T, CS>   vector_chunk_type;                             //!< A vector chunk.
-        typedef vector_chunk<T, CS> * vector_chunk_pointer;                          //!< A pointer to vector chunk.
-        static const size_type       vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
     public:
-
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
         *
         * A safe iterator that calls a functor if the value at the current
