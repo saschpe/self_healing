@@ -18,9 +18,6 @@
 #include "child.hpp"
 #include "../checksummed_array.hpp"
 
-#include <boost/config.hpp>
-#include <boost/detail/workaround.hpp>
-
 #ifdef BOOST_SELF_HEALING_DEBUG
 #   include <iostream>
 #endif

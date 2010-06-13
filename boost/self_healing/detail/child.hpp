@@ -15,8 +15,6 @@
 #ifndef BOOST_SELF_HEALING_CHILD_HPP
 #define BOOST_SELF_HEALING_CHILD_HPP
 
-#include <boost/config.hpp>
-#include <boost/detail/workaround.hpp>
 #include <boost/throw_exception.hpp>
 
 #ifdef BOOST_SELF_HEALING_DEBUG

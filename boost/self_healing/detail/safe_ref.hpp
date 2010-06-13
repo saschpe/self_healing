@@ -16,7 +16,6 @@
 #ifndef BOOST_SELF_HEALING_SAFE_REF_HPP
 #define BOOST_SELF_HEALING_SAFE_REF_HPP
 
-#include <boost/config.hpp>
 #include <boost/function.hpp>
 
 #include <ostream>
