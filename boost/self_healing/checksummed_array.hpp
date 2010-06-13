@@ -481,27 +481,27 @@ namespace boost { namespace self_healing {
 
     // comparisons
     template<class T, std::size_t N>
-    bool operator==(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator==(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
     template<class T, std::size_t N>
-    bool operator<(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator<(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
     template<class T, std::size_t N>
-    bool operator!=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator!=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return !(x == y);
     }
     template<class T, std::size_t N>
-    bool operator>(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator>(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return y < x;
     }
     template<class T, std::size_t N>
-    bool operator<=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator<=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return !(y < x);
     }
     template<class T, std::size_t N>
-    bool operator>=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator>=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
         return !(x < y);
     }
 
