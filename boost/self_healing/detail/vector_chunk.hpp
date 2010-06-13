@@ -30,7 +30,7 @@
 namespace boost { namespace self_healing {
 
     template <class T, std::size_t CS>
-    class vector;
+    class vector; // forward declaration
 
     /*! \brief Vector element storage chunk.
     *
@@ -47,27 +47,29 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T         value_type;       //!< The type of elements stored in the <code>checksummed_array</code>.
-        typedef const T & const_reference;  //!< A const reference to an element.
+        typedef T               value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef const T &       const_reference;    //!< A const reference to an element.
+        typedef vector<T, CS>   parent_type;
+        typedef vector<T, CS> * parent_pointer;
 
         /*! Default constructor.
         * \param parent The parent vector.
         * \param value An initial value that is set for all elements.
         */
-        explicit vector_chunk(vector<value_type, CS> *const parent = 0, const_reference value = 0)
-            : child<vector<value_type, CS> >(parent), checksummed_array<value_type, CS>(value) {}
+        explicit vector_chunk(parent_pointer const parent = 0, const_reference value = 0)
+            : child<parent_type>(parent), checksummed_array<value_type, CS>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent An optional pointer to the parent to check against.
         * \return true, if the internal structure and data is valid.
         * \see check_parent()
         */
-        bool is_valid(vector<value_type, CS> *const parent = 0) const {
+        bool is_valid(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector_chunk<T, CS>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.
-            return child<vector<value_type, CS> >::is_valid(parent) &&
+            return child<parent_type>::is_valid(parent) &&
                    checksummed_array<value_type, CS>::is_valid();
         }
     };
