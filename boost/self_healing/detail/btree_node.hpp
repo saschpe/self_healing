@@ -15,11 +15,11 @@
 #ifndef BOOST_SELF_HEALING_BTREE_NODE_HPP
 #define BOOST_SELF_HEALING_BTREE_NODE_HPP
 
-#include "./child.hpp"
+#include "child.hpp"
+#include "btree_leaf.hpp"
 
-#include <boost/config.hpp>
-#include <boost/detail/workaround.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/variant.hpp>
 
 #ifdef BOOST_SELF_HEALING_DEBUG
 #   include <iostream>
@@ -30,28 +30,34 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    template <class T, std::size_t CS = 64>
-    class btree_leaf;   // forward declaration
+    template <class T, std::size_t L, std::size_t CS>
+    class btree_leaf; // forward declaration
 
     /*! \brief TODO.
     *
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param CS The size 
+    * \param L Optional amount of children of nodes.
+    * \param CS Optional (chunk) storage capacity of leaves.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child
     */
-    template <class T, std::size_t CS = 64>
-    class btree_node : public child<btree_node<T, CS> >
+    template <class T, std::size_t L = 8, std::size_t CS = 64>
+    class btree_node : public child<btree_node<T, L, CS> >
     {
+        // private type definitions
+        typedef btree_node<T, L, CS>    node_type;
+
     public:
         // type definitions
-        typedef T                   value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
-        typedef const T &           const_reference;    //!< A const reference to an element.
-        typedef btree_node<T, CS>    parent_type;        //!< The type of the parent.
-        typedef btree_node<T, CS> *  parent_pointer;     //!< Pointer to parent objects.
+        typedef T                       value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef const T &               const_reference;    //!< A const reference to an element.
+        typedef btree_node<T, L, CS>    parent_type;        //!< The type of the parent.
+        typedef btree_node<T, L, CS> *  parent_pointer;     //!< Pointer to parent objects.
+        typedef btree_leaf<T, L, CS>    leaf_type;
 
+    public:
         /*! Default constructor.
         * \param parent The parent B-tree.
         * \param value An initial value that is set for all elements.
@@ -79,21 +85,19 @@ namespace boost { namespace self_healing {
                 return false;
             };
         }
-    private:
 
+    private:
         void check_children() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::btree_node<T, CS>::check_children" << std::endl;
 #endif
-
+            //TODO: implement
         }
 
-        /*! Children may be either nodes or leaves
+        /*! Children may be either be nodes or leaves
         */
-        union {
-            btree_node<T, CS> nodes;
-            btree_leaf<T, CS> leaves;
-        } m_children;
+        //TODO: add node_type and fix it, check back guarantees of variant
+        boost::variant<leaf_type> m_children;
     };
 
 } } // namespace boost::self_healing
