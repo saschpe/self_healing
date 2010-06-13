@@ -35,8 +35,8 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T         sibling_type;     //!< The type of the sibling class.
-        typedef T *       sibling_pointer;  //!< Pointer to sibling class.
+        typedef T   sibling_type;       //!< The type of the sibling class.
+        typedef T * sibling_pointer;    //!< Pointer to sibling class.
 
         /*! Default constructor.
         * \param next Pointer to the next sibling.
@@ -187,5 +187,3 @@ namespace boost { namespace self_healing {
 
 
 #endif // BOOST_SELF_HEALING_SIBLING_HPP
-
-
