@@ -261,9 +261,9 @@ namespace boost { namespace self_healing {
 
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last) {
-            check_storage();
             resize(last - first);
             size_type i = 0;
+            check_storage();
             for (InputIterator it = first; it != last; it++) {
                 m_head[i / CS][i % CS] = *it;
                 i++;
@@ -274,9 +274,9 @@ namespace boost { namespace self_healing {
         }
         template <class Size, class TT>
         void assign(Size n, const TT &x = TT()) {
-            check_storage();
             resize(n);
             size_type i = 0;
+            check_storage();
             for (; i < n; i++) {
                 m_head[i / CS][i % CS] = x;
             }
@@ -334,10 +334,10 @@ namespace boost { namespace self_healing {
                     std::length_error e("unable to reserve capacity: " + to_string(new_capacity));
                     boost::throw_exception(e);
                 }
-                // check_storage(); // Already done in capacity() method call
 
                 const vector_chunk_pointer new_head = new vector_chunk_type[new_chunk_count];
 
+                check_storage();
                 if (m_head) {
                     // copy values from old location to new location
                     for (size_type i = 0; i < size(); i++) {
@@ -367,10 +367,21 @@ namespace boost { namespace self_healing {
         const_reference back() const { check_storage(); return m_tail.back(); }
 
         // modifiers
-        iterator insert(iterator it) {
-            //TODO:
+        iterator insert(iterator position, const_reference value) {
+            // reserve space if vector is full
+            if (size() == capacity()) {
+                reserve(capacity() + 1);
+            }
+
+            // move all elements one field backwards to make room for the new one
+            // copy values from back to front.
+            reverse_iterator rit = rend();
+            while (rit != position) {
+                *rit = *(rit + 1);
+            }
+            *position = value;
+            return position;
         }
-        iterator insert(iterator it, const_reference value);
         void insert(iterator it, size_type, const_reference value) {
             //TODO:
         }
