@@ -321,29 +321,34 @@ namespace boost { namespace self_healing {
         }
 
         /*! Reserve storage capacity.
-        * \param new_capacity The storage capacity to reserve.
+        * \param new_capacity The (minimum) storage capacity to reserve.
         * \throws std::length_error
         */
         void reserve(size_type new_capacity) {
             if (capacity() < new_capacity) {
+
+                const size_type new_chunk_count = std::ceil(static_cast<float>(new_capacity) / CS);
+                new_capacity = new_chunk_count * CS;
+
                 if (new_capacity > max_size()) {
                     std::length_error e("unable to reserve capacity: " + to_string(new_capacity));
                     boost::throw_exception(e);
                 }
                 // check_storage(); // Already done in capacity() method call
 
-                const vector_chunk_pointer old_head = m_head;
-                const size_type new_chunk_count = std::ceil(new_capacity / CS);
+                const vector_chunk_pointer new_head = new vector_chunk_type[new_chunk_count];
 
-                m_head = new vector_chunk_type[new_chunk_count];
+                if (m_head) {
+                    // copy values from old location to new location
+                    for (size_type i = 0; i < size(); i++) {
+                        new_head[i / CS][i % CS] = m_head[i / CS][i % CS];
+                    };
+                    delete[] m_head;
+                }
+
+                m_head = new_head;
+                m_tail = &new_head[new_chunk_count - 1]; // set to address of last chunk
                 m_chunks = new_chunk_count;
-
-                // copy values from old location to new
-                for (size_type i = 0; i < size(); i++) {
-                    m_head[i / CS][i % CS] = old_head[i / CS][i % CS];
-                };
-
-                delete[] old_head;
             }
         }
 
@@ -405,8 +410,23 @@ namespace boost { namespace self_healing {
             return first;
         }
 
-        void push_back(const_reference value) { insert(end(), value); }
-        void pop_back() { erase(--end()); }
+        void push_back(const_reference value) {
+            if (size() < capacity()) {
+                // vector is not full yet
+                operator[](m_size1) = value;
+                m_size1++;
+                m_size2++;
+                m_size3++;
+            } else {
+                insert(end(), value);
+            }
+        }
+        void pop_back() {
+            check_size();
+            m_size1--;
+            m_size2--;
+            m_size3--;
+        }
 
         void clear() {
             if (!empty()) {
