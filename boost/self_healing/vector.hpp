@@ -394,9 +394,18 @@ namespace boost { namespace self_healing {
 
             // move all elements n fields backwards to make room for the new
             // elements. iterate from back to front.
-            iterator it = end() - 1;
+            iterator source = begin() + (size() - 1); // source is last element
+            iterator target = source + n; // target is n steps to the right
+            while (source >= position) {
+                *target = *source;
+                source--;
+                target--;
+            }
 
-            //TODO
+            // insert 'n' new elements of 'value' at 'position'
+            for (iterator it = position; it != position + n; it++) {
+                *it = value;
+            }
         }
         template <class InputIterator>
         void insert(iterator position, InputIterator first, InputIterator last) {
