@@ -22,7 +22,7 @@
 #ifndef BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
 #define BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
 
-#include "./detail/safe_ref.hpp"
+#include "detail/safe_ref.hpp"
 
 #include <boost/config.hpp>
 #include <boost/crc.hpp>

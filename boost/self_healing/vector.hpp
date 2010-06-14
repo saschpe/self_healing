@@ -16,9 +16,9 @@
 #ifndef BOOST_SELF_HEALING_VECTOR_HPP
 #define BOOST_SELF_HEALING_VECTOR_HPP
 
-#include "./detail/safe_ref.hpp"
-#include "./detail/vector_chunk.hpp"
-#include "./detail/utility.hpp"
+#include "detail/safe_ref.hpp"
+#include "detail/vector_chunk.hpp"
+#include "detail/utility.hpp"
 
 #include <boost/config.hpp>
 #include <boost/detail/iterator.hpp>
