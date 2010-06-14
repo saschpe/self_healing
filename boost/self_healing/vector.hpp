@@ -368,25 +368,49 @@ namespace boost { namespace self_healing {
 
         // modifiers
         iterator insert(iterator position, const_reference value) {
-            // reserve space if vector is full
+            // reserve space if needed
             if (size() == capacity()) {
                 reserve(capacity() + 1);
             }
 
-            // move all elements one field backwards to make room for the new one
-            // copy values from back to front.
-            reverse_iterator rit = rend();
-            while (rit != position) {
-                *rit = *(rit + 1);
+            // move all elements one field backwards to make room for the new
+            // element. iterate from back to front.
+            iterator it = end() - 1;
+            while (it > position) {
+                *it = *(it - 1);
+                it--;
             }
             *position = value;
             return position;
         }
-        void insert(iterator it, size_type, const_reference value) {
-            //TODO:
+        void insert(iterator position, size_type n, const_reference value) {
+            if (n == 0) {
+                return;
+            }
+            // reserve slightly more space if needed, simpler computation
+            if (size() + n >= capacity()) {
+                reserve(capacity() + n);
+            }
+
+            // move all elements n fields backwards to make room for the new
+            // elements. iterate from back to front.
+            iterator it = end() - 1;
+
+            //TODO
         }
         template <class InputIterator>
-        void insert(iterator, InputIterator, InputIterator) {
+        void insert(iterator position, InputIterator first, InputIterator last) {
+            const difference_type n = last - first;
+            if (n <= 0) {
+                return;
+            }
+            // reserve slightly more space if needed, simpler computation
+            if (size() + n >= capacity()) {
+                reserve(capacity() + n);
+            }
+
+            // move all elements n fields backwards to make room for the new
+            // elements. iterate from back to front.
             //TODO:
         }
 
