@@ -420,7 +420,21 @@ namespace boost { namespace self_healing {
 
             // move all elements n fields backwards to make room for the new
             // elements. iterate from back to front.
-            //TODO:
+            iterator source = begin() + (size() - 1); // source is last element
+            iterator target = source + n; // target is n steps to the right
+            while (source >= position) {
+                *target = *source;
+                source--;
+                target--;
+            }
+
+            // insert range [first, last) of new elements at 'position'
+            iterator to = position, it = first;
+            while (it != last) {
+                *to = *it;
+                to++;
+                it++;
+            }
         }
 
         iterator erase(iterator position)  {
