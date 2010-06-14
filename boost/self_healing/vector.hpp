@@ -374,25 +374,39 @@ namespace boost { namespace self_healing {
             //TODO:
         }
 
-        iterator erase(iterator)  {
-            //TODO:
-        }
-        iterator erase(iterator, iterator) {
-            //TODO:
-        }
-
-        void push_back(const_reference value) {
-            if (size() == capacity()) {
-                //TODO:
-
+        iterator erase(iterator position)  {
+            if (position + 1 != end()) {
+                iterator it = position + 1;
+                // move all elements one position backwards
+                while (it != end()) {
+                    *(it - 1) = *it;
+                    it++;
+                }
+                check_size();
+                m_size1--;
+                m_size2--;
+                m_size3--;
             }
+            return position;
         }
-        void pop_back() {
+        iterator erase(iterator first, iterator last) {
+            iterator res = first, it = last;
+
+            // move elements after the erase-range forward
+            while (it != end()) {
+                *res++ = *it++;
+            }
+            // reduce the size accordingly
+            const size_type diff = last - first;
             check_size();
-            m_size1--;
-            m_size2--;
-            m_size3--;
+            m_size1 -= diff;
+            m_size2 -= diff;
+            m_size3 -= diff;
+            return first;
         }
+
+        void push_back(const_reference value) { insert(end(), value); }
+        void pop_back() { erase(--end()); }
 
         void clear() {
             if (!empty()) {
