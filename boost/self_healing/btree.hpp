@@ -17,9 +17,9 @@
 #ifndef BOOST_SELF_HEALING_BTREE_HPP
 #define BOOST_SELF_HEALING_BTREE_HPP
 
-#include "./detail/safe_ref.hpp"
-#include "./detail/btree_leaf.hpp"
-#include "./detail/btree_node.hpp"
+#include "detail/safe_ref.hpp"
+#include "detail/btree_leaf.hpp"
+#include "detail/btree_node.hpp"
 
 #include <boost/config.hpp>
 #include <boost/detail/iterator.hpp>
