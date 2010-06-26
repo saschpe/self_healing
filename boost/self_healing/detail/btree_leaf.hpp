@@ -62,7 +62,7 @@ namespace boost { namespace self_healing {
         * \param previous Pointer to the previous leaf sibling.
         * \param value An initial value that is set for all elements.
         */
-        explicit btree_leaf(parent_pointer const parent = 0, sibling_pointer next = 0, sibling_pointer const previous = 0, const_reference value = 0)
+        explicit btree_leaf(parent_pointer const parent = 0, sibling_pointer const next = 0, sibling_pointer const previous = 0, const_reference value = 0)
             : child<parent_type>(parent), sibling<sibling_type>(next, previous), checksummed_array<value_type, CS>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.
@@ -71,7 +71,7 @@ namespace boost { namespace self_healing {
         * \param previous Optional pointer to the previous sibling to check against.
         * \return true, if the internal structure and data is valid.
         */
-        bool is_valid(parent_pointer const parent = 0, sibling_pointer next = 0, sibling_pointer const previous = 0) const {
+        bool is_valid(parent_pointer const parent = 0, sibling_pointer const next = 0, sibling_pointer const previous = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::btree_leaf<T, CS>::is_valid()" << std::endl;
 #endif
