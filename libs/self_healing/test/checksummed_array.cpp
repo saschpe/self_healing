@@ -78,7 +78,6 @@ int main()
 
     checksummed_array<int, 8> *pa = new checksummed_array<int, 8>(3);
     cout << "pointer to checksummed_array: " << *pa << endl;
-    delete pa;
 
     auto_ptr<checksummed_array<int, 8> > apa(pa);
     cout << "auto_ptr to checksummed_array size: " << apa->size() << endl;
