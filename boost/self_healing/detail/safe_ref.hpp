@@ -49,12 +49,6 @@ namespace boost { namespace self_healing {
         explicit safe_ref(reference value, function_type update)
             : value(value), update(update) {}
 
-        /*! Copy constructor.
-        * \param other The other reference instance to copy from.
-        */
-        safe_ref(const safe_ref &other)
-            : value(other.value), update(other.update) {}
-
         safe_ref& operator=(const_reference rhs) { value = rhs; update(); return *this; }
         safe_ref& operator=(const safe_ref &rhs) { value = rhs.value; update = rhs.update; return *this; }
 
