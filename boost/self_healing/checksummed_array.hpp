@@ -87,14 +87,6 @@ namespace boost { namespace self_healing {
                 : p(rhs), check(check), update(update) {}
 
         public:
-            /*! Copy constructor.
-            * \param other The other iterator instance to copy from.
-            */
-            iterator(const iterator &other)
-                : p(other.p), check(other.check), update(other.update) {}
-
-            iterator& operator=(const iterator &rhs) { p = rhs.p; check = rhs.check; update = rhs.update; return *this; }
-
             iterator operator+(difference_type n) const { return iterator(p + n, check, update); }
             iterator operator-(difference_type n) const { return iterator(p - n, check, update); }
             difference_type operator+(const iterator &rhs) const { return  p + rhs.p; }
