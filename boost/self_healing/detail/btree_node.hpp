@@ -31,7 +31,7 @@
 namespace boost { namespace self_healing {
 
     template <class T, std::size_t L, std::size_t CS>
-    class btree_leaf; // forward declaration
+    class btree_leaf; // forward declaration to break circular dependency
 
     /*! \brief TODO.
     *
@@ -94,10 +94,10 @@ namespace boost { namespace self_healing {
             //TODO: implement
         }
 
-        /*! Children may be either be nodes or leaves
+        /*! Children may be either be nodes or leaves.
+        * \note To break recursion, node_type has to be put into a boost::recursive_wrapper.
         */
-        //TODO: add node_type and fix it, check back guarantees of variant
-        boost::variant<leaf_type> children;
+        boost::variant<boost::recursive_wrapper<node_type>, leaf_type> children;
     };
 
 } } // namespace boost::self_healing
