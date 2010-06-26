@@ -41,10 +41,8 @@ namespace boost { namespace self_healing {
         * \param previous Pointer to the previous sibling.
         * \throws std::invalid_argument Thrown if a sibling pointer is invalid.
         */
-        explicit sibling(sibling_pointer const next = 0, sibling_pointer const previous = 0) {
-            set_next(next);
-            set_previous(previous);
-        }
+        explicit sibling(sibling_pointer const next = 0, sibling_pointer const previous = 0)
+            : next1(next), previous1(previous), next2(next), previous2(previous), next3(next), previous3(previous) {}
 
         /*! Set a new next sibling.
         * \param next Pointer to the new next sibling.

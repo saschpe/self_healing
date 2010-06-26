@@ -42,9 +42,8 @@ namespace boost { namespace self_healing {
         * \param parent The parent.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
-        explicit child(parent_pointer const parent = 0) {
-            set_parent(parent);
-        }
+        explicit child(parent_pointer const parent = 0)
+            : parent1(parent), parent2(parent), parent3(parent) {}
 
         /*! Set a new parent.
         * \param parent Pointer to the new parent.
