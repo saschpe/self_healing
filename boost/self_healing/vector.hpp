@@ -86,7 +86,7 @@ namespace boost { namespace self_healing {
             * \param index The index to start with.
             */
             explicit iterator(vector_pointer const parent, size_type index)
-                : child<vector_type>(parent), m_i(index) {}
+                : child<vector_type>(parent), i(index) {}
 
         public:
             /*! Default constructor.
@@ -94,45 +94,45 @@ namespace boost { namespace self_healing {
             *          there to satisfy some bad STL algorithms.
             */
             iterator()
-                : child<vector_type>(0), m_i(-1) {}
+                : child<vector_type>(0), i(-1) {}
 
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             */
             iterator(const iterator &other)
-                : child<vector_type>(other.parent()), m_i(other.m_i) {}
+                : child<vector_type>(other.parent()), i(other.i) {}
 
-            iterator& operator=(const iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
+            iterator& operator=(const iterator &rhs) { i = rhs.i; set_parent(rhs.parent()); return *this; }
 
-            iterator operator+(difference_type n) const { return iterator(child<vector_type>::parent(), m_i + n); }
-            iterator operator-(difference_type n) const { return iterator(child<vector_type>::parent(), m_i - n); }
-            difference_type operator+(const iterator &rhs) const { return m_i + rhs.m_i; }
-            difference_type operator-(const iterator &rhs) const { return m_i - rhs.m_i; }
+            iterator operator+(difference_type n) const { return iterator(child<vector_type>::parent(), i + n); }
+            iterator operator-(difference_type n) const { return iterator(child<vector_type>::parent(), i - n); }
+            difference_type operator+(const iterator &rhs) const { return i + rhs.i; }
+            difference_type operator-(const iterator &rhs) const { return i - rhs.i; }
 
-            iterator& operator+=(difference_type n) { m_i += n; return *this; }
-            iterator& operator-=(difference_type n) { m_i -= n; return *this; }
-            iterator& operator++() { ++m_i; return *this; }
-            iterator& operator++(int) { m_i++; return *this; }
-            iterator& operator--() { --m_i; return *this; }
-            iterator& operator--(int) { m_i--; return *this; }
+            iterator& operator+=(difference_type n) { i += n; return *this; }
+            iterator& operator-=(difference_type n) { i -= n; return *this; }
+            iterator& operator++() { ++i; return *this; }
+            iterator& operator++(int) { i++; return *this; }
+            iterator& operator--() { --i; return *this; }
+            iterator& operator--(int) { i--; return *this; }
 
             // comparison
-            bool operator==(const iterator& other) const { return m_i == other.m_i; }
-            bool operator!=(const iterator& other) const { return m_i != other.m_i; }
-            bool operator>(const iterator &other) const { return m_i > other.m_i; }
-            bool operator>=(const iterator &other) const { return m_i >= other.m_i; }
-            bool operator<(const iterator &other) const { return m_i < other.m_i; }
-            bool operator<=(const iterator &other) const { return m_i <= other.m_i; }
+            bool operator==(const iterator& other) const { return i == other.i; }
+            bool operator!=(const iterator& other) const { return i != other.i; }
+            bool operator>(const iterator &other) const { return i > other.i; }
+            bool operator>=(const iterator &other) const { return i >= other.i; }
+            bool operator<(const iterator &other) const { return i < other.i; }
+            bool operator<=(const iterator &other) const { return i <= other.i; }
 
-            reference operator*() const { return child<vector_type>::parent()->at(m_i); }
-            operator const_iterator() const { return const_iterator(child<vector_type>::parent(), m_i); }
+            reference operator*() const { return child<vector_type>::parent()->at(i); }
+            operator const_iterator() const { return const_iterator(child<vector_type>::parent(), i); }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
             */
-            friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.m_i; }
+            friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.i; }
 
         private:
-            size_type m_i;                          //!< Internal index to the current element.
+            size_type i;    //!< Internal index to the current element.
         };
 
         /*! A const (random access) iterator used to iterate through the <code>vector</code>.
@@ -146,45 +146,45 @@ namespace boost { namespace self_healing {
             * \param index The index to start with.
             */
             explicit const_iterator(vector_pointer const parent, size_type index)
-                : child<vector_type>(parent), m_i(index) {}
+                : child<vector_type>(parent), i(index) {}
 
         public:
             /*! Copy constructor.
             * \param other The other const_iterator instance to copy from.
             */
             const_iterator(const const_iterator &other)
-                : child<vector_type>(other.parent()), m_i(other.m_i) {}
+                : child<vector_type>(other.parent()), i(other.i) {}
 
-            const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
+            const_iterator& operator=(const const_iterator &rhs) { i = rhs.i; set_parent(rhs.parent()); return *this; }
 
-            const_iterator operator+(difference_type n) const { return const_iterator(child<vector_type>::parent(), m_i + n); }
-            const_iterator operator-(difference_type n) const { return const_iterator(child<vector_type>::parent(), m_i - n); }
-            difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }
-            difference_type operator-(const const_iterator &rhs) const { return m_i - rhs.m_i; }
+            const_iterator operator+(difference_type n) const { return const_iterator(child<vector_type>::parent(), i + n); }
+            const_iterator operator-(difference_type n) const { return const_iterator(child<vector_type>::parent(), i - n); }
+            difference_type operator+(const const_iterator &rhs) const { return i + rhs.i; }
+            difference_type operator-(const const_iterator &rhs) const { return i - rhs.i; }
 
-            const_iterator& operator+=(difference_type n) { m_i += n; return *this; }
-            const_iterator& operator-=(difference_type n) { m_i -= n; return *this; }
-            const_iterator& operator++() { ++m_i; return *this; }
-            const_iterator& operator++(int) { m_i++; return *this; }
-            const_iterator& operator--() { --m_i; return *this; }
-            const_iterator& operator--(int) { m_i--; return *this; }
+            const_iterator& operator+=(difference_type n) { i += n; return *this; }
+            const_iterator& operator-=(difference_type n) { i -= n; return *this; }
+            const_iterator& operator++() { ++i; return *this; }
+            const_iterator& operator++(int) { i++; return *this; }
+            const_iterator& operator--() { --i; return *this; }
+            const_iterator& operator--(int) { i--; return *this; }
 
             // comparison
-            bool operator==(const const_iterator& other) const { return m_i == other.m_i; }
-            bool operator!=(const const_iterator& other) const { return m_i != other.m_i; }
-            bool operator>(const const_iterator &other) const { return m_i > other.m_i; }
-            bool operator>=(const const_iterator &other) const { return m_i >= other.m_i; }
-            bool operator<(const const_iterator &other) const { return m_i < other.m_i; }
-            bool operator<=(const const_iterator &other) const { return m_i <= other.m_i; }
+            bool operator==(const const_iterator& other) const { return i == other.i; }
+            bool operator!=(const const_iterator& other) const { return i != other.i; }
+            bool operator>(const const_iterator &other) const { return i > other.i; }
+            bool operator>=(const const_iterator &other) const { return i >= other.i; }
+            bool operator<(const const_iterator &other) const { return i < other.i; }
+            bool operator<=(const const_iterator &other) const { return i <= other.i; }
 
-            const_reference operator*() const { return child<vector_type>::parent()->at(m_i); }
+            const_reference operator*() const { return child<vector_type>::parent()->at(i); }
 
             /*! Overload for operator<<() of std::ostream to print a const_iterator.
             */
-            friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) { return os << it.m_i; }
+            friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) { return os << it.i; }
 
         private:
-            size_type m_i;  //!< Internal index to the current element.
+            size_type i;    //!< Internal index to the current element.
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
@@ -211,14 +211,14 @@ namespace boost { namespace self_healing {
         /*! Default constructor.
         */
         explicit vector()
-            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {}
+            : head(0), size1(0), chunks(0), size2(0), tail(0), size3(0) {}
 
         /*! Constructor to initialize vector with a custom size and an optional fill value.
         * \param n Custom initial vector size.
         * \param x Optional value to fill the vector with.
         */
         vector(size_type n, const_reference x = value_type())
-            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
+            : head(0), size1(0), chunks(0), size2(0), tail(0), size3(0) {
             assign(n, x);
         }
 
@@ -228,7 +228,7 @@ namespace boost { namespace self_healing {
         */
         template <class InputIterator>
         vector(InputIterator first, InputIterator last)
-            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
+            : head(0), size1(0), chunks(0), size2(0), tail(0), size3(0) {
             assign(first, last);
         }
 
@@ -236,7 +236,7 @@ namespace boost { namespace self_healing {
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
         vector(const vector_type &rhs)
-            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
+            : head(0), size1(0), chunks(0), size2(0), tail(0), size3(0) {
             assign(rhs.begin(), rhs.end());
         }
 
@@ -244,7 +244,7 @@ namespace boost { namespace self_healing {
         * \param rhs The other <code>std::vector</code> to copy from.
         */
         vector(const std::vector<value_type> &rhs)
-            : m_head(0), m_size1(0), m_chunks(0), m_size2(0), m_tail(0), m_size3(0) {
+            : head(0), size1(0), chunks(0), size2(0), tail(0), size3(0) {
             assign(rhs.begin(), rhs.end());
         }
 
@@ -252,7 +252,7 @@ namespace boost { namespace self_healing {
         */
         ~vector() {
             check_storage();
-            delete[] m_head;
+            delete[] head;
         }
 
         vector_type& operator=(const vector_type &rhs) {
@@ -265,12 +265,12 @@ namespace boost { namespace self_healing {
             size_type i = 0;
             check_storage();
             for (InputIterator it = first; it != last; it++) {
-                m_head[i / CS][i % CS] = *it;
+                head[i / CS][i % CS] = *it;
                 i++;
             }
-            m_size1 = i;
-            m_size2 = i;
-            m_size3 = i;
+            size1 = i;
+            size2 = i;
+            size3 = i;
         }
         template <class Size, class TT>
         void assign(Size n, const TT &x = TT()) {
@@ -278,11 +278,11 @@ namespace boost { namespace self_healing {
             size_type i = 0;
             check_storage();
             for (; i < n; i++) {
-                m_head[i / CS][i % CS] = x;
+                head[i / CS][i % CS] = x;
             }
-            m_size1 = i;
-            m_size2 = i;
-            m_size3 = i;
+            size1 = i;
+            size2 = i;
+            size3 = i;
         }
 
         // iterator support
@@ -298,14 +298,14 @@ namespace boost { namespace self_healing {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // capacity
-        size_type size() const { check_size(); return m_size1; }
+        size_type size() const { check_size(); return size1; }
         bool empty() const { return size() == 0; }
         size_type max_size() const {
             // determin how much chunks fit into memory and thus how much elements we can have
             const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * CS;
             return std::min(max_elems, std::numeric_limits<difference_type>::max());
         }
-        size_type capacity() const { check_storage(); return m_chunks * vector_chunk_type::size(); }
+        size_type capacity() const { check_storage(); return chunks * vector_chunk_type::size(); }
 
         void resize(size_type new_size, value_type item = T()) {
             if (new_size > size()) {
@@ -338,33 +338,33 @@ namespace boost { namespace self_healing {
                 const vector_chunk_pointer new_head = new vector_chunk_type[new_chunk_count];
 
                 check_storage();
-                if (m_head) {
+                if (head) {
                     // copy values from old location to new location
                     for (size_type i = 0; i < size(); i++) {
-                        new_head[i / CS][i % CS] = m_head[i / CS][i % CS];
+                        new_head[i / CS][i % CS] = head[i / CS][i % CS];
                     };
-                    delete[] m_head;
+                    delete[] head;
                 }
 
-                m_head = new_head;
-                m_tail = &new_head[new_chunk_count - 1]; // set to address of last chunk
-                m_chunks = new_chunk_count;
+                head = new_head;
+                tail = &new_head[new_chunk_count - 1]; // set to address of last chunk
+                chunks = new_chunk_count;
             }
         }
 
         // operator[]
-        reference operator[](size_type i) { check_storage(); return m_head[i / CS][i % CS]; }
-        const_reference operator[](size_type i) const { check_storage(); return m_head[i / CS][(i % CS)]; }
+        reference operator[](size_type i) { check_storage(); return head[i / CS][i % CS]; }
+        const_reference operator[](size_type i) const { check_storage(); return head[i / CS][(i % CS)]; }
 
         // at() with range check
         reference at(size_type i) { rangecheck(i); return operator[](i); }
         const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
 
         // front() and back()
-        reference front() { check_storage(); return m_head.front(); }
-        const_reference front() const { check_storage; return m_head.front(); }
-        reference back() { check_storage(); return m_tail.back(); }
-        const_reference back() const { check_storage(); return m_tail.back(); }
+        reference front() { check_storage(); return head.front(); }
+        const_reference front() const { check_storage; return head.front(); }
+        reference back() { check_storage(); return tail.back(); }
+        const_reference back() const { check_storage(); return tail.back(); }
 
         // modifiers
         iterator insert(iterator position, const_reference value) {
@@ -446,9 +446,9 @@ namespace boost { namespace self_healing {
                     it++;
                 }
                 check_size();
-                m_size1--;
-                m_size2--;
-                m_size3--;
+                size1--;
+                size2--;
+                size3--;
             }
             return position;
         }
@@ -462,28 +462,28 @@ namespace boost { namespace self_healing {
             // reduce the size accordingly
             const size_type diff = last - first;
             check_size();
-            m_size1 -= diff;
-            m_size2 -= diff;
-            m_size3 -= diff;
+            size1 -= diff;
+            size2 -= diff;
+            size3 -= diff;
             return first;
         }
 
         void push_back(const_reference value) {
             if (size() < capacity()) {
                 // vector is not full yet
-                operator[](m_size1) = value;
-                m_size1++;
-                m_size2++;
-                m_size3++;
+                operator[](size1) = value;
+                size1++;
+                size2++;
+                size3++;
             } else {
                 insert(end(), value);
             }
         }
         void pop_back() {
             check_size();
-            m_size1--;
-            m_size2--;
-            m_size3--;
+            size1--;
+            size2--;
+            size3--;
         }
 
         void clear() {
@@ -493,12 +493,12 @@ namespace boost { namespace self_healing {
         }
 
         void swap(vector<value_type> &rhs) {
-            boost::swap(m_head, rhs.m_head);
-            boost::swap(m_size1, rhs.m_size1);
-            boost::swap(m_tail, rhs.m_tail);
-            boost::swap(m_size2, rhs.m_size2);
-            boost::swap(m_chunks, rhs.m_chunks);
-            boost::swap(m_size3, rhs.m_size3);
+            boost::swap(head, rhs.head);
+            boost::swap(size1, rhs.size1);
+            boost::swap(tail, rhs.tail);
+            boost::swap(size2, rhs.size2);
+            boost::swap(chunks, rhs.chunks);
+            boost::swap(size3, rhs.size3);
             check_storage();
             check_size();
         }
@@ -529,9 +529,9 @@ namespace boost { namespace self_healing {
                 // check all parts of the data structure
                 check_storage();
                 check_size();
-                for (int i = 0; i < m_chunks; i++) {
+                for (int i = 0; i < chunks; i++) {
                     // compute address of next chunk
-                    vector_chunk_pointer chunk = m_head + i * vector_chunk_size;
+                    vector_chunk_pointer chunk = head + i * vector_chunk_size;
                     chunk->is_valid(this);
                 }
                 return true;
@@ -549,18 +549,18 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::check_storage()" << std::endl;
 #endif
-            if (m_head == 0 && m_tail == 0) {
+            if (head == 0 && tail == 0) {
                 // Both are 0, this means nothing seems to be alloced yet
                 // We're fine if the other values reflect that
-                if (size() == 0 && m_chunks == 0) {
+                if (size() == 0 && chunks == 0) {
                     return;
                 }
                 /*check_size();*/
                 //TODO: Maybe do a simpler check here instead
-            } else if (m_head == 0) {
+            } else if (head == 0) {
                 // Only head is null, could be error with tail or head
 
-            } else if (m_tail == 0) {
+            } else if (tail == 0) {
                 // Only tail is null, could be error with tail or head
 
             } else {
@@ -584,38 +584,38 @@ namespace boost { namespace self_healing {
             std::cout << "boost::self_healing::vector<T, CS>::check_size()" << std::endl;
 #endif
             // check and repair size via TMR voting
-            const bool equal_13 = m_size1 == m_size3;
-            const bool equal_23 = m_size2 == m_size3;
-            const bool equal_12 = m_size1 == m_size2;
+            const bool equal_13 = size1 == size3;
+            const bool equal_23 = size2 == size3;
+            const bool equal_12 = size1 == size2;
 
             if (equal_12 && equal_13 && equal_23) {
                 // all fine
             } else if (equal_13) {
-                const_cast<size_type &>(m_size2) = m_size1; // fix m_size1 as the others are equal
+                const_cast<size_type &>(size2) = size1; // fix m_size1 as the others are equal
                 // all fine
             } else if (equal_23) {
-                const_cast<size_type &>(m_size1) = m_size2; // fix m_size1 as the others are equal
+                const_cast<size_type &>(size1) = size2; // fix m_size1 as the others are equal
                 // all fine
             } else if (equal_12) {
-                const_cast<size_type &>(m_size3) = m_size1; // fix m_size3 as the others are equal
+                const_cast<size_type &>(size3) = size1; // fix m_size3 as the others are equal
                 // all fine
             } else {
                 std::runtime_error e("size error");         // all three sizes differ
                 boost::throw_exception(e);
             }
 
-            if (m_size1 > capacity()) {
+            if (size1 > capacity()) {
                 std::runtime_error e("size is bigger than capacity");
                 boost::throw_exception(e);
             }
         }
 
-        vector_chunk_pointer m_head;    //!< Pointer to the first chunk of an array of vector_chunk instances.
-        size_type m_size1;              //!< Counts how much elements are stored currently in all chunks.
-        size_type m_chunks;             //!< Chunk counter.
-        size_type m_size2;
-        vector_chunk_pointer m_tail;    //!< Pointer to the last chunk in the array of vector_chunk instances.
-        size_type m_size3;
+        vector_chunk_pointer head;  //!< Pointer to the first chunk of an array of vector_chunk instances.
+        size_type size1;            //!< Counts how much elements are stored currently in all chunks.
+        size_type chunks;           //!< Chunk counter.
+        size_type size2;
+        vector_chunk_pointer tail;  //!< Pointer to the last chunk in the array of vector_chunk instances.
+        size_type size3;
     };
 
     // comparisons

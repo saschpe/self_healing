@@ -84,46 +84,46 @@ namespace boost { namespace self_healing {
             * \param update TODO.
             */
             explicit iterator(value_type *rhs, function_type check, function_type update)
-                : m_p(rhs), check(check), update(update) {}
+                : p(rhs), check(check), update(update) {}
 
         public:
             /*! Copy constructor.
             * \param other The other iterator instance to copy from.
             */
             iterator(const iterator &other)
-                : m_p(other.m_p), check(other.check), update(other.update) {}
+                : p(other.p), check(other.check), update(other.update) {}
 
-            iterator& operator=(const iterator &rhs) { m_p = rhs.m_p; check = rhs.check; update = rhs.update; return *this; }
+            iterator& operator=(const iterator &rhs) { p = rhs.p; check = rhs.check; update = rhs.update; return *this; }
 
-            iterator operator+(difference_type n) const { return iterator(m_p + n, check, update); }
-            iterator operator-(difference_type n) const { return iterator(m_p - n, check, update); }
-            difference_type operator+(const iterator &rhs) const { return m_p + rhs.m_p; }
-            difference_type operator-(const iterator &rhs) const { return m_p - rhs.m_p; }
+            iterator operator+(difference_type n) const { return iterator(p + n, check, update); }
+            iterator operator-(difference_type n) const { return iterator(p - n, check, update); }
+            difference_type operator+(const iterator &rhs) const { return  p + rhs.p; }
+            difference_type operator-(const iterator &rhs) const { return p - rhs.p; }
 
-            iterator& operator+=(difference_type n) { m_p += n; return *this; }
-            iterator& operator-=(difference_type n) { m_p -= n; return *this; }
-            iterator& operator++() { ++m_p; return *this; }
-            iterator& operator++(int) { m_p++; return *this; }
-            iterator& operator--() { --m_p; return *this; }
-            iterator& operator--(int) { m_p--; return *this; }
+            iterator& operator+=(difference_type n) { p += n; return *this; }
+            iterator& operator-=(difference_type n) { p -= n; return *this; }
+            iterator& operator++() { ++p; return *this; }
+            iterator& operator++(int) { p++; return *this; }
+            iterator& operator--() { --p; return *this; }
+            iterator& operator--(int) { p--; return *this; }
 
             // Comparison
-            bool operator==(const iterator& other) const { return m_p == other.m_p; }
-            bool operator!=(const iterator& other) const { return m_p != other.m_p; }
-            bool operator>(const iterator &other) const { return m_p > other.m_p; }
-            bool operator>=(const iterator &other) const { return m_p >= other.m_p; }
-            bool operator<(const iterator &other) const { return m_p < other.m_p; }
-            bool operator<=(const iterator &other) const { return m_p <= other.m_p; }
+            bool operator==(const iterator& other) const { return p == other.p; }
+            bool operator!=(const iterator& other) const { return p != other.p; }
+            bool operator>(const iterator &other) const { return p > other.p; }
+            bool operator>=(const iterator &other) const { return p >= other.p; }
+            bool operator<(const iterator &other) const { return p < other.p; }
+            bool operator<=(const iterator &other) const { return p <= other.p; }
 
-            reference operator*() const { check(); return reference(*m_p, update); }
-            operator const_iterator() const { return m_p; }
+            reference operator*() const { check(); return reference(*p, update); }
+            operator const_iterator() const { return p; }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
             */
-            friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.m_p; }
+            friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.p; }
 
         private:
-            value_type *m_p;        //!< Internal pointer to the current position in the checksummed_array.
+            value_type *p;          //!< Internal pointer to the current position in the checksummed_array.
             function_type check;    //!< Called to check the consistency of the corresponding checksummed_array instance.
             function_type update;   //!< Called to update the checksums of the corresponding checksummed_array instance.
         };

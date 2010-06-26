@@ -62,15 +62,15 @@ namespace boost { namespace self_healing {
                 std::invalid_argument e("parent argument is null");
                 boost::throw_exception(e);
             };
-            m_parent1 = parent;
-            m_parent2 = parent;
-            m_parent3 = parent;
+            parent1 = parent;
+            parent2 = parent;
+            parent3 = parent;
         }
 
         /*! Accessor to get the chunk's parent.
         * \return Pointer to the parent.
         */
-        parent_pointer parent() const { check_parent(); return m_parent1; }
+        parent_pointer parent() const { check_parent(); return parent1; }
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent Optional pointer to the parent to check against.
@@ -103,23 +103,23 @@ namespace boost { namespace self_healing {
             if (parent) {
                 // If a valid parent pointer was given we simply check against
                 // it and fix the internal pointer if needed.
-                if (m_parent1 != parent) { const_cast<parent_pointer &>(m_parent1) = parent; }
-                if (m_parent2 != parent) { const_cast<parent_pointer &>(m_parent2) = parent; }
-                if (m_parent3 != parent) { const_cast<parent_pointer &>(m_parent3) = parent; }
+                if (parent1 != parent) { const_cast<parent_pointer &>(parent1) = parent; }
+                if (parent2 != parent) { const_cast<parent_pointer &>(parent2) = parent; }
+                if (parent3 != parent) { const_cast<parent_pointer &>(parent3) = parent; }
             } else {
                 // check and repair size via TMR voting
-                const bool equal_13 = m_parent1 == m_parent3;
-                const bool equal_23 = m_parent2 == m_parent3;
-                const bool equal_12 = m_parent2 == m_parent2;
+                const bool equal_13 = parent1 == parent3;
+                const bool equal_23 = parent2 == parent3;
+                const bool equal_12 = parent2 == parent2;
 
                 if (equal_12 && equal_13 && equal_23) {
                     // all fine
                 } else if (equal_13) {
-                    const_cast<parent_pointer &>(m_parent2) = m_parent1; // fix m_parent2 as the others are equal
+                    const_cast<parent_pointer &>(parent2) = parent1; // fix parent2 as the others are equal
                 } else if (equal_23) {
-                    const_cast<parent_pointer &>(m_parent1) = m_parent2; // fix m_parent1 as the others are equal
+                    const_cast<parent_pointer &>(parent1) = parent2; // fix m_parent1 as the others are equal
                 } else if (equal_12) {
-                    const_cast<parent_pointer &>(m_parent3) = m_parent1; // fix m_parent3 as the others are equal
+                    const_cast<parent_pointer &>(parent3) = parent1; // fix parent3 as the others are equal
                 } else {
                     std::runtime_error e("parent error");
                     boost::throw_exception(e);
@@ -127,9 +127,9 @@ namespace boost { namespace self_healing {
             }
         }
 
-        parent_pointer m_parent1;   //!< Pointer to the parent class instance.
-        parent_pointer m_parent2;   //!< Pointer to the parent class instance.
-        parent_pointer m_parent3;   //!< Pointer to the parent class instance.
+        parent_pointer parent1;     //!< Pointer to the parent class instance.
+        parent_pointer parent2;     //!< Pointer to the parent class instance.
+        parent_pointer parent3;     //!< Pointer to the parent class instance.
     };
 
 } } // namespace boost::self_healing

@@ -63,15 +63,15 @@ namespace boost { namespace self_healing {
                 std::invalid_argument e("next sibling argument is null");
                 boost::throw_exception(e);
             };
-            m_next1 = next;
-            m_next2 = next;
-            m_next3 = next;
+            next1 = next;
+            next2 = next;
+            next3 = next;
         }
 
         /*! Accessor to get the next sibling.
         * \return Pointer to the next sibling.
         */
-        sibling_pointer next() const { check_siblings(); return m_next1; }
+        sibling_pointer next() const { check_siblings(); return next1; }
 
         /*! Set a new previous sibling.
         * \param next Pointer to the new previous sibling.
@@ -81,15 +81,15 @@ namespace boost { namespace self_healing {
                 std::invalid_argument e("previous sibling argument is null");
                 boost::throw_exception(e);
             };
-            m_previous1 = previous;
-            m_previous2 = previous;
-            m_previous3 = previous;
+            previous1 = previous;
+            previous2 = previous;
+            previous3 = previous;
         }
 
         /*! Accessor to get the previous sibling.
         * \return Pointer to the previous sibling.
         */
-        sibling_pointer previous() const { check_siblings(); return m_previous1; }
+        sibling_pointer previous() const { check_siblings(); return previous1; }
 
         /*! Validity check that tries to correct minor faults silently.
         * \param next Optional pointer to the next sibling to check against.
@@ -123,23 +123,23 @@ namespace boost { namespace self_healing {
             if (next) {
                 // If a valid next sibling pointer was given we simply check against
                 // it and fix the internal pointer if needed.
-                if (m_next1 != next) { const_cast<sibling_pointer &>(m_next1) = next; }
-                if (m_next2 != next) { const_cast<sibling_pointer &>(m_next2) = next; }
-                if (m_next3 != next) { const_cast<sibling_pointer &>(m_next3) = next; }
+                if (next1 != next) { const_cast<sibling_pointer &>(next1) = next; }
+                if (next2 != next) { const_cast<sibling_pointer &>(next2) = next; }
+                if (next3 != next) { const_cast<sibling_pointer &>(next3) = next; }
             } else {
                 // check and repair size via TMR voting
-                const bool equal_13 = m_next1 == m_next3;
-                const bool equal_23 = m_next2 == m_next3;
-                const bool equal_12 = m_next2 == m_next2;
+                const bool equal_13 = next1 == next3;
+                const bool equal_23 = next2 == next3;
+                const bool equal_12 = next2 == next2;
 
                 if (equal_12 && equal_13 && equal_23) {
                     // all fine
                 } else if (equal_13) {
-                    const_cast<sibling_pointer &>(m_next2) = m_next1; // fix m_next2 as the others are equal
+                    const_cast<sibling_pointer &>(next2) = next1; // fix m_next2 as the others are equal
                 } else if (equal_23) {
-                    const_cast<sibling_pointer &>(m_next1) = m_next2; // fix m_next1 as the others are equal
+                    const_cast<sibling_pointer &>(next1) = next2; // fix m_next1 as the others are equal
                 } else if (equal_12) {
-                    const_cast<sibling_pointer &>(m_next3) = m_next1; // fix m_next3 as the others are equal
+                    const_cast<sibling_pointer &>(next3) = next1; // fix m_next3 as the others are equal
                 } else {
                     std::runtime_error e("parent error");
                     boost::throw_exception(e);
@@ -149,23 +149,23 @@ namespace boost { namespace self_healing {
             if (previous) {
                 // If a valid previous sibling pointer was given we simply check against
                 // it and fix the internal pointer if needed.
-                if (m_previous1 != previous) { const_cast<sibling_pointer &>(m_previous1) = previous; }
-                if (m_previous2 != previous) { const_cast<sibling_pointer &>(m_previous2) = previous; }
-                if (m_previous3 != previous) { const_cast<sibling_pointer &>(m_previous3) = previous; }
+                if (previous1 != previous) { const_cast<sibling_pointer &>(previous1) = previous; }
+                if (previous2 != previous) { const_cast<sibling_pointer &>(previous2) = previous; }
+                if (previous3 != previous) { const_cast<sibling_pointer &>(previous3) = previous; }
             } else {
                 // check and repair size via TMR voting
-                const bool equal_13 = m_previous1 == m_previous3;
-                const bool equal_23 = m_previous2 == m_previous3;
-                const bool equal_12 = m_previous2 == m_previous2;
+                const bool equal_13 = previous1 == previous3;
+                const bool equal_23 = previous2 == previous3;
+                const bool equal_12 = previous2 == previous2;
 
                 if (equal_12 && equal_13 && equal_23) {
                     // all fine
                 } else if (equal_13) {
-                    const_cast<sibling_pointer &>(m_previous2) = m_previous1; // fix m_previous2 as the others are equal
+                    const_cast<sibling_pointer &>(previous2) = previous1; // fix m_previous2 as the others are equal
                 } else if (equal_23) {
-                    const_cast<sibling_pointer &>(m_previous1) = m_previous2; // fix m_previous1 as the others are equal
+                    const_cast<sibling_pointer &>(previous1) = previous2; // fix m_previous1 as the others are equal
                 } else if (equal_12) {
-                    const_cast<sibling_pointer &>(m_previous3) = m_previous1; // fix m_previous3 as the others are equal
+                    const_cast<sibling_pointer &>(previous3) = previous1; // fix m_previous3 as the others are equal
                 } else {
                     std::runtime_error e("parent error");
                     boost::throw_exception(e);
@@ -173,12 +173,12 @@ namespace boost { namespace self_healing {
             }
         }
 
-        sibling_pointer m_next1;
-        sibling_pointer m_previous1;
-        sibling_pointer m_next2;
-        sibling_pointer m_previous2;
-        sibling_pointer m_next3;
-        sibling_pointer m_previous3;
+        sibling_pointer next1;
+        sibling_pointer previous1;
+        sibling_pointer next2;
+        sibling_pointer previous2;
+        sibling_pointer next3;
+        sibling_pointer previous3;
     };
 
 } } // namespace boost::self_healing

@@ -360,7 +360,7 @@ namespace boost { namespace self_healing {
         }
 
     private:
-        node_type m_root[3];
+        node_type root[3];
         //TODO
     };
 

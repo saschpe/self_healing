@@ -97,7 +97,7 @@ namespace boost { namespace self_healing {
         /*! Children may be either be nodes or leaves
         */
         //TODO: add node_type and fix it, check back guarantees of variant
-        boost::variant<leaf_type> m_children;
+        boost::variant<leaf_type> children;
     };
 
 } } // namespace boost::self_healing
