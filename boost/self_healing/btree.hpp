@@ -92,18 +92,10 @@ namespace boost { namespace self_healing {
         public:
             /*! Default constructor.
             * \remarks This constructor does not build a valid iterator instance, it is just
-            *          there to satisfy some bad STL algorithms.
+            *          there to satisfy some STL algorithms.
             */
             iterator()
                 : child<tree_type>(0), m_i(-1) {}
-
-            /*! Copy constructor.
-            * \param other The other iterator instance to copy from.
-            */
-            iterator(const iterator &other)
-                : child<tree_type>(other.parent()), m_i(other.m_i) {}
-
-            iterator& operator=(const iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
 
             iterator operator+(difference_type n) const { return iterator(child<tree_type>::parent(), m_i + n); }
             iterator operator-(difference_type n) const { return iterator(child<tree_type>::parent(), m_i - n); }
@@ -152,14 +144,6 @@ namespace boost { namespace self_healing {
                 : child<btree<value_type, CS> >(parent), m_i(index) {}
 
         public:
-            /*! Copy constructor.
-            * \param other The other const_iterator instance to copy from.
-            */
-            const_iterator(const const_iterator &other)
-                : child<tree_type>(other.parent()), m_i(other.m_i) {}
-
-            const_iterator& operator=(const const_iterator &rhs) { m_i = rhs.m_i; set_parent(rhs.parent()); return *this; }
-
             const_iterator operator+(difference_type n) const { return const_iterator(child<tree_type>::parent(), m_i + n); }
             const_iterator operator-(difference_type n) const { return const_iterator(child<tree_type>::parent(), m_i - n); }
             difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }

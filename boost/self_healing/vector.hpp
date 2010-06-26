@@ -91,18 +91,10 @@ namespace boost { namespace self_healing {
         public:
             /*! Default constructor.
             * \remarks This constructor does not build a valid iterator instance, it is just
-            *          there to satisfy some bad STL algorithms.
+            *          there to satisfy some STL algorithms.
             */
             iterator()
                 : child<vector_type>(0), i(-1) {}
-
-            /*! Copy constructor.
-            * \param other The other iterator instance to copy from.
-            */
-            iterator(const iterator &other)
-                : child<vector_type>(other.parent()), i(other.i) {}
-
-            iterator& operator=(const iterator &rhs) { i = rhs.i; set_parent(rhs.parent()); return *this; }
 
             iterator operator+(difference_type n) const { return iterator(child<vector_type>::parent(), i + n); }
             iterator operator-(difference_type n) const { return iterator(child<vector_type>::parent(), i - n); }
@@ -149,14 +141,6 @@ namespace boost { namespace self_healing {
                 : child<vector_type>(parent), i(index) {}
 
         public:
-            /*! Copy constructor.
-            * \param other The other const_iterator instance to copy from.
-            */
-            const_iterator(const const_iterator &other)
-                : child<vector_type>(other.parent()), i(other.i) {}
-
-            const_iterator& operator=(const const_iterator &rhs) { i = rhs.i; set_parent(rhs.parent()); return *this; }
-
             const_iterator operator+(difference_type n) const { return const_iterator(child<vector_type>::parent(), i + n); }
             const_iterator operator-(difference_type n) const { return const_iterator(child<vector_type>::parent(), i - n); }
             difference_type operator+(const const_iterator &rhs) const { return i + rhs.i; }
