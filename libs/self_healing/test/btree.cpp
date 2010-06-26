@@ -17,7 +17,7 @@ int main()
 {
     std::cout << "testing class boost::self_healing::btree<>" << std::endl;
 
-    boost::self_healing::btree<char> t;
+    boost::self_healing::btree<float> tree;
 
     return 0;
 }
