@@ -32,7 +32,7 @@
 namespace boost { namespace self_healing {
 
     template <class T, std::size_t L, std::size_t CS>
-    class btree_node; // forward declaration
+    class btree_node; // forward declaration to break circular dependency
 
     /*! \brief TODO.
     *
