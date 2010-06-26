@@ -46,14 +46,6 @@ namespace boost { namespace self_healing {
             set_previous(previous);
         }
 
-        /*! Copy constructor.
-        * \param other The other sibling instance to copy from.
-        */
-        sibling(const sibling &other) {
-            set_next(other.next());
-            set_previous(other.previous());
-        }
-
         /*! Set a new next sibling.
         * \param next Pointer to the new next sibling.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.

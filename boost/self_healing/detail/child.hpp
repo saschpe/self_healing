@@ -46,13 +46,6 @@ namespace boost { namespace self_healing {
             set_parent(parent);
         }
 
-        /*! Copy constructor.
-        * \param other The other child instance to copy from.
-        */
-        child(const child &other) {
-            set_parent(other.parent());
-        }
-
         /*! Set a new parent.
         * \param parent Pointer to the new parent.
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
