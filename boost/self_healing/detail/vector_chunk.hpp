@@ -54,7 +54,12 @@ namespace boost { namespace self_healing {
         * \param value An initial value that is set for all elements.
         */
         explicit vector_chunk(parent_pointer const parent = 0, const_reference value = 0)
-            : child<parent_type>(parent), array<value_type, CS>(value) {}
+            : child<parent_type>(parent), array<value_type, CS>(value) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+            std::cout << "boost::self_healing::vector_chunk<T, CS>::vector_chunk()"
+                      << " parent: " << parent << " value: " << value << std::endl;
+#endif
+        }
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent An optional pointer to the parent to check against.
