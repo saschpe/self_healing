@@ -12,13 +12,20 @@ set(CMAKE_MODULE_PATH "${self_healing_SOURCE_DIR}/cmake/modules")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -ansi -pedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBOOST_SELF_HEALING_DEBUG")
 
+# compile-time options
+option(FIXING_CHECKS "Data structure checks also fix issues" on)
+option(BUILD_TESTS "Build tests" on)
+
+if(FIXING_CHECKS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_SELF_HEALING_FIXING_CHECKS")
+endif()
+
+# dependency checks
 find_package(Boost 1.42.0 REQUIRED)
 find_package(Doxygen)
 find_package(Docutils)
 
 include_directories(${Boost_INCLUDE_DIRS})
-
-option(BUILD_TESTS "Build tests" on)
 
 if(DOXYGEN_FOUND OR DOCUTILS_FOUND)
     # cleanup $build/doc on "make clean"

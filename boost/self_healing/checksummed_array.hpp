@@ -290,11 +290,19 @@ namespace boost { namespace self_healing {
             if (equal_12 && equal_13 && equal_23) {
                 return;             // all fine
             } else if (equal_13) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<checksum_type &>(crc2) = crc1;   // fix crc2 as the others are equal
-                return;             // all fine
+#else
+                std::runtime_error e("fixable checksum error");
+                boost::throw_exception(e);
+#endif
             } else if (equal_23) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<checksum_type &>(crc1) = crc2;   // fix crc1 as the others are equal
-                return;             // all fine
+#else
+                std::runtime_error e("fixable checksum error");
+                boost::throw_exception(e);
+#endif
             } else if (equal_12) {
                 // The computed checksum over the content is not the same as
                 // the stored onces, thus the content was maliciously changed
