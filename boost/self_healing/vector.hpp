@@ -534,13 +534,17 @@ namespace boost { namespace self_healing {
             std::cout << "boost::self_healing::vector<T, CS>::check_storage()" << std::endl;
 #endif
             if (head == 0 && tail == 0) {
-                // Both are 0, this means nothing seems to be alloced yet
-                // We're fine if the other values reflect that
-                if (size() == 0 && chunks == 0) {
-                    return;
+                // Both are 0, this means nothing seems to be allocated yet
+                if (chunks != 0) {
+                    const_cast<size_type &>(chunks) = 0;    // fix a wrong chunk count
                 }
-                /*check_size();*/
-                //TODO: Maybe do a simpler check here instead
+                if (size() == 0) {
+                    return;                                 // all fine
+                } else {
+                    // size indicates that we should have something actually
+                    std::runtime_error e("metadata mismatch error");
+                    boost::throw_exception(e);
+                }
             } else if (head == 0) {
                 // Only head is null, could be error with tail or head
 
