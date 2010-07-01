@@ -191,7 +191,6 @@ namespace boost { namespace self_healing {
         typedef std::reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
 
-
         /*! Default constructor.
         */
         explicit vector()

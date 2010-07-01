@@ -140,7 +140,6 @@ namespace boost { namespace self_healing {
         typedef std::reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
 
-
         /*! Constructor.
         * \param value An initial value that is set for all elements.
         */
@@ -252,7 +251,7 @@ namespace boost { namespace self_healing {
             };
         }
 
-        /*! Overload for operator<<() of std::ostream to print a vector.
+        /*! Overload for operator<<() of std::ostream to print an array.
         * \param os TODO.
         * \param array The array instance to print.
         */
@@ -403,7 +402,6 @@ namespace boost { namespace self_healing {
         typedef std::reverse_iterator<iterator, value_type> reverse_iterator;
         typedef std::reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
-
 
         // iterator support
         iterator begin() { return iterator(reinterpret_cast<pointer>(this)); }
