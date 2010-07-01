@@ -529,7 +529,6 @@ namespace boost { namespace self_healing {
 
     private:
         void check_storage() const {
-            //TODO: Check and repair head and tail pointers
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::check_storage()" << std::endl;
 #endif
@@ -546,13 +545,25 @@ namespace boost { namespace self_healing {
                     boost::throw_exception(e);
                 }
             } else if (head == 0) {
-                // Only head is null, could be error with tail or head
+                if (tail != 0 && chunks != 0) {
+                    // indicates damage to head, fix head
+                } else if (tail != 0) {
+
+                } else if (chunks != 0) {
+
+                }
+                // only head is null, could be error with tail or head
 
             } else if (tail == 0) {
-                // Only tail is null, could be error with tail or head
+                // only tail is null, could be error with tail or head
 
             } else {
-                // Both are non-0, further checks
+                // Both are non-0, further checks.
+                if (head < tail) {
+                    // so good so far
+                } else {
+                    // serious
+                }
 
             }
             /*size_type chunk_count = ((m_tail + vector_chunk_size) - m_head) / vector_chunk_size;
