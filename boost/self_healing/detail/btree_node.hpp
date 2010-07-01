@@ -51,11 +51,11 @@ namespace boost { namespace self_healing {
 
     public:
         // type definitions
-        typedef T                       value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef T                       value_type;         //!< The type of elements stored in the <code>btree_node</code>.
         typedef const T &               const_reference;    //!< A const reference to an element.
         typedef btree_node<T, L, CS>    parent_type;        //!< The type of the parent.
         typedef btree_node<T, L, CS> *  parent_pointer;     //!< Pointer to parent objects.
-        typedef btree_leaf<T, L, CS>    leaf_type;
+        typedef btree_leaf<T, L, CS>    leaf_type;          //!< The type of the leaves that may be children of <code>btree_node</code>
 
     public:
         /*! Default constructor.
