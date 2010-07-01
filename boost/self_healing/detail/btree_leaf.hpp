@@ -18,7 +18,7 @@
 #include "child.hpp"
 #include "btree_node.hpp"
 #include "sibling.hpp"
-#include "../checksummed_array.hpp"
+#include "../array.hpp"
 
 #include <boost/throw_exception.hpp>
 
@@ -42,14 +42,14 @@ namespace boost { namespace self_healing {
     * \param L Optional amount of children of nodes.
     * \param CS Optional (chunk) storage capacity of leaves.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
-    * \see child, sibling, checksummed_array
+    * \see child, sibling, array
     */
     template <class T, std::size_t L = 8, std::size_t CS = 64>
-    class btree_leaf : public child<btree_node<T, L, CS> >, public sibling<btree_leaf<T, L, CS> >, public checksummed_array<T, CS>
+    class btree_leaf : public child<btree_node<T, L, CS> >, public sibling<btree_leaf<T, L, CS> >, public array<T, CS>
     {
     public:
         // type definitions
-        typedef T                       value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef T                       value_type;         //!< The type of elements stored in the <code>array</code>.
         typedef const T &               const_reference;    //!< A const reference to an element.
         typedef btree_node<T, L, CS>    parent_type;        //!< The type of the parent.
         typedef btree_node<T, L, CS> *  parent_pointer;     //!< Pointer to parent objects.
@@ -63,7 +63,7 @@ namespace boost { namespace self_healing {
         * \param value An initial value that is set for all elements.
         */
         explicit btree_leaf(parent_pointer const parent = 0, sibling_pointer const next = 0, sibling_pointer const previous = 0, const_reference value = 0)
-            : child<parent_type>(parent), sibling<sibling_type>(next, previous), checksummed_array<value_type, CS>(value) {}
+            : child<parent_type>(parent), sibling<sibling_type>(next, previous), array<value_type, CS>(value) {}
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent Optional pointer to the parent to check against.
@@ -78,7 +78,7 @@ namespace boost { namespace self_healing {
             // call the is_valid methods of all base classes.
             return child<parent_type>::is_valid(parent) &&
                    sibling<sibling_type>::is_valid(next, previous) &&
-                   checksummed_array<value_type, CS>::is_valid();
+                   array<value_type, CS>::is_valid();
         }
     };
 

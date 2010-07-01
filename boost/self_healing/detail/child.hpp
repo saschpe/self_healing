@@ -28,7 +28,7 @@ namespace boost { namespace self_healing {
 
     /*! A class to express parent-child relationship.
     * \param P The type of the parent data structure.
-    * \see checksummed_array
+    * \see array
     */
     template <class P>
     class child

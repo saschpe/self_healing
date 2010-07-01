@@ -59,13 +59,13 @@ if(BUILD_TESTS)
     add_executable(test-safe-ref libs/self_healing/test/safe_ref.cpp)
     add_test(safe-ref ${EXECUTABLE_OUTPUT_PATH}/test-safe-ref)
 
-    # tests related to class checksummed_array
-    add_executable(test-checksummed_array libs/self_healing/test/checksummed_array.cpp)
-    add_test(checksummed_array ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array)
-    add_executable(test-checksummed_array-iterators libs/self_healing/test/checksummed_array-iterators.cpp)
-    add_test(checksummed_array-iterators ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-iterators)
-    add_executable(test-checksummed_array-faults libs/self_healing/test/checksummed_array-faults.cpp)
-    add_test(checksummed_array-faults ${EXECUTABLE_OUTPUT_PATH}/test-checksummed_array-faults)
+    # tests related to class checksummed array
+    add_executable(test-array libs/self_healing/test/array.cpp)
+    add_test(array ${EXECUTABLE_OUTPUT_PATH}/test-array)
+    add_executable(test-array-iterators libs/self_healing/test/array-iterators.cpp)
+    add_test(array-iterators ${EXECUTABLE_OUTPUT_PATH}/test-array-iterators)
+    add_executable(test-array-faults libs/self_healing/test/array-faults.cpp)
+    add_test(array-faults ${EXECUTABLE_OUTPUT_PATH}/test-array-faults)
 
     # tests related to class vector helper class vector_chunk
     add_executable(test-vector-chunk libs/self_healing/test/vector-chunk.cpp)

@@ -1,4 +1,4 @@
-/* Test case for class checksummed_array.
+/* Test case for class checksummed array.
  *
  * (C) Copyright Sascha Peilicke 2010.
  *
@@ -9,7 +9,7 @@
  * 27 April 2010 - Initial Revision (Sascha Peilicke)
  */
 
-#include <boost/self_healing/checksummed_array.hpp>
+#include <boost/self_healing/array.hpp>
 
 #include <iostream>
 #include <cassert>
@@ -18,14 +18,14 @@
 
 int main()
 {
-    std::cout << "testing class boost::self_healing::vector<> fault injection" << std::endl;
+    std::cout << "testing class boost::self_healing::array<> fault injection" << std::endl;
 
-    boost::self_healing::checksummed_array<int, 8> a, ca;
+    boost::self_healing::array<int, 8> a, ca;
     for (std::size_t i = 0; i < a.size(); i++) {
         std::cout << "a[" << i << "] = " << i << std::endl;
         a[i] = i;
     }
-    std::cout << "checksummed_array: " << a << std::endl;
+    std::cout << "array: " << a << std::endl;
 
     ca = a;
     utility::print_raw(&ca, sizeof(ca));

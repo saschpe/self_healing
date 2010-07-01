@@ -1,13 +1,13 @@
 /*! \file
 * \brief Checksummed array.
 *
-* This file contains the class checksummed_array, a self-healing STL container
+* This file contains the class checksummed array, a self-healing STL container
 * (as wrapper) for arrays of constant size with checksumming. This allows to
 * monitor the validity of the array's content.
 *
-* This class is based on boost::checksummed_array by Nicolai M. Josuttis.
+* This class is based on boost::array by Nicolai M. Josuttis.
 * See
-*      http://www.boost.org/libs/checksummed_array/
+*      http://www.boost.org/libs/array
 * for documentation.
 *
 * (C) Copyright Sascha Peilicke 2010.
@@ -19,8 +19,8 @@
 * 20 April 2010 - Initial Revision (Sascha Peilicke)
 */
 
-#ifndef BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
-#define BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
+#ifndef BOOST_SELF_HEALING_ARRAY_HPP
+#define BOOST_SELF_HEALING_ARRAY_HPP
 
 #include "detail/safe_ref.hpp"
 
@@ -45,19 +45,19 @@ namespace boost { namespace self_healing {
     * A checksummed array of constant size.
     *
     * \param T The data type of the stored values.
-    * \param N The size of the checksummed_array.
+    * \param N The size of the checksummed array.
     */
     template <class T, std::size_t N>
-    class checksummed_array
+    class array
     {
         // private type definitions
         typedef typename safe_ref<T>::function_type function_type;
 
     public:
         // type definitions
-        typedef T               value_type;         //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef T               value_type;         //!< The type of elements stored in the <code>array</code>.
         class                   iterator;           //!< Forward declaration of class iterator.
-        typedef const T *       const_iterator;     //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
+        typedef const T *       const_iterator;     //!< A const (random access) iterator used to iterate through the <code>array</code>.
         //typedef safe_ptr<T>     pointer;            //!< A pointer to the element.
         typedef const T *       const_pointer;      //!< A const pointer to the element.
         typedef safe_ref<T>     reference;          //!< A reference to an element.
@@ -66,7 +66,7 @@ namespace boost { namespace self_healing {
         typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
         typedef unsigned int    checksum_type;      //!< The type of the internal checksums
 
-        /*! \brief A (random access) iterator used to iterate through the <code>checksummed_array</code>.
+        /*! \brief A (random access) iterator used to iterate through the <code>array</code>.
         *
         * A safe iterator that calls a function object if the value at the
         * current position is changed. Checksumms are also updated correctly if
@@ -76,7 +76,7 @@ namespace boost { namespace self_healing {
         */
         class iterator : public std::iterator<std::random_access_iterator_tag, value_type>
         {
-            friend class checksummed_array;
+            friend class array;
 
             /*! Private constructor.
             * \param rhs TODO.
@@ -115,9 +115,9 @@ namespace boost { namespace self_healing {
             friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.p; }
 
         private:
-            value_type *p;          //!< Internal pointer to the current position in the checksummed_array.
-            function_type check;    //!< Called to check the consistency of the corresponding checksummed_array instance.
-            function_type update;   //!< Called to update the checksums of the corresponding checksummed_array instance.
+            value_type *p;          //!< Internal pointer to the current position in the checksummed array.
+            function_type check;    //!< Called to check the consistency of the corresponding checksummed array instance.
+            function_type update;   //!< Called to update the checksums of the corresponding checksummed array instance.
         };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
@@ -144,7 +144,7 @@ namespace boost { namespace self_healing {
         /*! Constructor.
         * \param value An initial value that is set for all elements.
         */
-        checksummed_array(const_reference value = 0) { update_checksums(); fill(value); }
+        array(const_reference value = 0) { update_checksums(); fill(value); }
 
         // iterator support
         iterator begin() {  return iterator(elements, check_checksums_functor(this), update_checksums_functor(this)); }
@@ -181,7 +181,7 @@ namespace boost { namespace self_healing {
         /*! Swap with other checksummed array (note: linear complexity).
         * \param other The other checksummed array to swap with.
         */
-        void swap(checksummed_array<value_type, N> &other) {
+        void swap(array<value_type, N> &other) {
             for (size_type i = 0; i < N; ++i) {
                 boost::swap(elements[i], other.elements[i]);
             }
@@ -198,11 +198,11 @@ namespace boost { namespace self_healing {
         //pointer data() { return elements; }
 
         /*! Assignment operator with type conversion.
-        * \param other The other checksummed_array to copy contents from.
-        * \return Reference to the new checksummed_array.
+        * \param other The other checksummed array to copy contents from.
+        * \return Reference to the new checksummed array.
         */
         template <typename T2>
-        checksummed_array<value_type, N>& operator=(const checksummed_array<T2, N> &other) {
+        array<value_type, N>& operator=(const array<T2, N> &other) {
             for (size_type i = 0; i < size(); i++) {
                 elements[i] = other.elements[i];
             }
@@ -225,7 +225,7 @@ namespace boost { namespace self_healing {
         */
         static void rangecheck(size_type index) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::checksummed_array<T, N>::rangecheck(" << index << ")" << std::endl;
+            std::cout << "boost::self_healing::array<T, N>::rangecheck(" << index << ")" << std::endl;
 #endif
             if (index >= size()) {
                 std::out_of_range e("index out of range");
@@ -239,14 +239,14 @@ namespace boost { namespace self_healing {
         */
         bool is_valid() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::checksummed_array<T, N>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::array<T, N>::is_valid()" << std::endl;
 #endif
             try {
                 check_checksums();
                 return true;
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::checksummed_array<T, N>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::array<T, N>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -256,7 +256,7 @@ namespace boost { namespace self_healing {
         * \param os TODO.
         * \param array The array instance to print.
         */
-        friend std::ostream &operator<<(std::ostream &os, const boost::self_healing::checksummed_array<T, N> &array)
+        friend std::ostream &operator<<(std::ostream &os, const boost::self_healing::array<T, N> &array)
         {
             os << "[";
             for (std::size_t i = 0; i < array.size(); i++) {
@@ -279,7 +279,7 @@ namespace boost { namespace self_healing {
         */
         void check_checksums() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::checksummed_array<T, N>::check_checksums()" << std::endl;
+            std::cout << "boost::self_healing::array<T, N>::check_checksums()" << std::endl;
 #endif
             boost::crc_32_type crc3;
             crc3.process_bytes(&elements, N * sizeof(value_type));
@@ -298,7 +298,7 @@ namespace boost { namespace self_healing {
             } else if (equal_12) {
                 // The computed checksum over the content is not the same as
                 // the stored onces, thus the content was maliciously changed
-                // and the checksummed_array is invalid.
+                // and the checksummed array is invalid.
                 std::runtime_error e("data error");
                 boost::throw_exception(e);
             } else {
@@ -308,28 +308,28 @@ namespace boost { namespace self_healing {
             }
         }
 
-        /*! A private functor that calls check_checksums() for a given checksummed_array instance if called itself.
+        /*! A private functor that calls check_checksums() for a given checksummed array instance if called itself.
         */
         class check_checksums_functor
         {
         public:
             /*! Constructor.
-            * \param parent The checksummed_array instance for which to call check_checksums().
+            * \param parent The checksummed array instance for which to call check_checksums().
             */
-            explicit check_checksums_functor(checksummed_array<value_type, N> *parent)
+            explicit check_checksums_functor(array<value_type, N> *parent)
                 : m_parent(parent) {}
 
             void operator()() { m_parent->check_checksums(); }
 
         private:
-            checksummed_array<value_type, N> *m_parent; //!< Internal reference to owning parent checksummed_array instance.
+            array<value_type, N> *m_parent; //!< Internal reference to owning parent checksummed array instance.
         };
 
         /*! Compute and store CRC checksums.
         */
         void update_checksums() {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::checksummed_array<T, N>::update_checksums()" << std::endl;
+            std::cout << "boost::self_healing::array<T, N>::update_checksums()" << std::endl;
 #endif
             boost::crc_32_type crc;
             crc.process_bytes(&elements, N * sizeof(value_type));
@@ -337,39 +337,39 @@ namespace boost { namespace self_healing {
             crc2 = crc1;
         }
 
-        /*! A private functor that calls update_checksums() for a given checksummed_array instance if called itself.
+        /*! A private functor that calls update_checksums() for a given checksummed array instance if called itself.
         */
         class update_checksums_functor
         {
         public:
             /*! Constructor.
-            * \param parent The checksummed_array instance for wich to call update_checksums().
+            * \param parent The checksummed array instance for wich to call update_checksums().
             */
-            explicit update_checksums_functor(checksummed_array<value_type, N> *parent)
+            explicit update_checksums_functor(array<value_type, N> *parent)
                 : m_parent(parent) {}
 
             void operator()() { m_parent->update_checksums(); }
 
         private:
-            checksummed_array<value_type, N> *m_parent; //!< Internal reference to owning parent checksummed_array instance.
+            array<value_type, N> *m_parent; //!< Internal reference to owning parent checksummed array instance.
         };
 
         checksum_type crc1;         //!< Internal first checksum.
-        value_type elements[N];     //!< Internal fixed-size checksummed_array of elements of type T.
+        value_type elements[N];     //!< Internal fixed-size checksummed array of elements of type T.
         checksum_type crc2;         //!< Internal second checksum (backup).
     };
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-    /*! Partial template specialization for the corner case of a zero sized checksummed_array.
+    /*! Partial template specialization for the corner case of a zero sized checksummed array.
      */
     template<class T>
-    class checksummed_array<T, 0>
+    class array<T, 0>
     {
     public:
         // type definitions
-        typedef T              value_type;      //!< The type of elements stored in the <code>checksummed_array</code>.
-        typedef T *            iterator;        //!< A (random access) iterator used to iterate through the <code>checksummed_array</code>.
-        typedef const T *      const_iterator;  //!< A const (random access) iterator used to iterate through the <code>checksummed_array</code>.
+        typedef T              value_type;      //!< The type of elements stored in the <code>array</code>.
+        typedef T *            iterator;        //!< A (random access) iterator used to iterate through the <code>array</code>.
+        typedef const T *      const_iterator;  //!< A const (random access) iterator used to iterate through the <code>array</code>.
         typedef T *            pointer;         //!< A pointer to the element.
         typedef const T *      const_pointer;   //!< A const pointer to the element.
         typedef T &            reference;       //!< A reference to an element.
@@ -437,18 +437,18 @@ namespace boost { namespace self_healing {
         static size_type max_size() { return 0; }
         enum { static_size = 0 };
 
-        void swap(checksummed_array<value_type, 0> &) {}
+        void swap(array<value_type, 0> &) {}
 
         // direct access to data (read-only)
         const_pointer data() const { return 0; }
         pointer data() { return 0; }
 
-        // use checksummed_array as C checksummed_array (direct read/write access to data)
+        // return checksummed array as C array (direct read/write access to data)
         pointer c_array() { return 0; }
 
         // assignment with type conversion
         template <typename T2>
-        checksummed_array<value_type, 0>& operator=(const checksummed_array<T2, 0> &) { return *this; }
+        array<value_type, 0>& operator=(const array<T2, 0> &) { return *this; }
 
         // assign one value to all elements
         void assign(const_reference value) { fill(value); }
@@ -456,7 +456,7 @@ namespace boost { namespace self_healing {
 
         // check range (may be private because it is static)
         static reference failed_rangecheck() {
-            std::out_of_range e("attempt to access element of an empty checksummed_array");
+            std::out_of_range e("attempt to access element of an empty checksummed array");
             boost::throw_exception(e);
 #if defined(BOOST_NO_EXCEPTIONS) || !defined(BOOST_MSVC)
             //
@@ -473,38 +473,38 @@ namespace boost { namespace self_healing {
 
     // comparisons
     template<class T, std::size_t N>
-    inline bool operator==(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator==(const array<T, N> &x, const array<T, N> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
     template<class T, std::size_t N>
-    inline bool operator<(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator<(const array<T, N> &x, const array<T, N> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
     template<class T, std::size_t N>
-    inline bool operator!=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator!=(const array<T, N> &x, const array<T, N> &y) {
         return !(x == y);
     }
     template<class T, std::size_t N>
-    inline bool operator>(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator>(const array<T, N> &x, const array<T, N> &y) {
         return y < x;
     }
     template<class T, std::size_t N>
-    inline bool operator<=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator<=(const array<T, N> &x, const array<T, N> &y) {
         return !(y < x);
     }
     template<class T, std::size_t N>
-    inline bool operator>=(const checksummed_array<T, N> &x, const checksummed_array<T, N> &y) {
+    inline bool operator>=(const array<T, N> &x, const array<T, N> &y) {
         return !(x < y);
     }
 
     /*! Global swap().
     */
     template<class T, std::size_t N>
-    inline void swap(checksummed_array<T, N> &x, checksummed_array<T, N> &y) {
+    inline void swap(array<T, N> &x, array<T, N> &y) {
         x.swap(y);
     }
 
 } } // namespace boost::self_healing
 
 
-#endif // BOOST_SELF_HEALING_CHECKSUMMED_ARRAY_HPP
+#endif // BOOST_SELF_HEALING_ARRAY_HPP
