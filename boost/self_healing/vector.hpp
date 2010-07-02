@@ -635,10 +635,10 @@ namespace boost { namespace self_healing {
                 boost::throw_exception(e);
             }
 
-            if (size1 > capacity()) {
+            /*if (size1 > capacity()) {
                 std::runtime_error e("size is bigger than capacity");
                 boost::throw_exception(e);
-            }
+            }*/
         }
 
         vector_chunk_pointer head;  //!< Pointer to the first chunk of an array of vector_chunk instances.
