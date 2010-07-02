@@ -554,83 +554,60 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::check_storage()" << std::endl;
 #endif
-            /*if (head == 0 && tail == 0) {
-                // Both are 0, this means nothing seems to be allocated yet
-                if (chunks != 0) {
-                    const_cast<size_type &>(chunks) = 0;    // fix a wrong chunk count
+
+            const vector_chunk_pointer test_head = dynamic_cast<vector_chunk_pointer>(head);
+            const vector_chunk_pointer test_tail = dynamic_cast<vector_chunk_pointer>(tail);
+            const size_type estimated_min_chunks = std::ceil(size() * CS);
+
+#ifdef BOOST_SELF_HEALING_DEBUG
+            std::cout << "boost::self_healing::vector<T, CS>::check_storage()"
+                      << " head: " << test_head << " tail: " << test_tail << " this: " << this << std::endl;
+#endif
+
+            if (test_head && test_tail) {
+                // compute the chunk counter difference and fix chunk counter if needed
+                const size_type head_tail_diff_abs = static_cast<size_type>((tail - head) / sizeof(vector_chunk_type));
+                if (chunks != head_tail_diff_abs + 1) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+                    std::cout << "boost::self_healing::vector<T, CS>::check_storage() fix chunk counter" << std::endl;
+#endif
+                    const_cast<size_type &>(chunks) = head_tail_diff_abs + 1;
                 }
-                if (size() == 0) {
-                    return;                                 // all fine
-                } else {
-                    // size indicates that we should have something actually
-                    std::runtime_error e("metadata mismatch error");
+            } else if (test_head) {
+                if (estimated_min_chunks > chunks) {
+                    // chunk counter was damaged and shows less than real, this may lead to a chunks loss
+                    std::runtime_error e("tail and chunk counter error");
                     boost::throw_exception(e);
+                    //TODO: see if fixable
+                    //const_cast<size_type &>(chunks) = estimated_min_chunks;
                 }
-            } else if (head == 0) {
-                if (tail != 0 && chunks != 0) {
-                    // indicates damage to head, fix head
-                } else if (tail != 0) {
-
-                } else if (chunks != 0) {
-
+                const_cast<vector_chunk_pointer &>(tail) = &head[chunks];
+            } else if (test_tail) {
+                if (estimated_min_chunks > chunks) {
+                    // chunk counter was damaged and shows less than real, this may lead to a chunks loss
+                    std::runtime_error e("head and chunk counter error");
+                    boost::throw_exception(e);
+                    //TODO: see if fixable
+                    //const_cast<size_type &>(chunks) = estimated_min_chunks;
                 }
-                // only head is null, could be error with tail or head
-
-            } else if (tail == 0) {
-                // only tail is null, could be error with tail or head
-
+                const_cast<vector_chunk_pointer &>(head) = tail - (chunks - 1) * sizeof(vector_chunk_type);
             } else {
-                // Both are non-0, further checks.
-            }*/
-
-            //TODO: Platform-dependant pointer dereference checks.
-
-            /*const bool head_parent_ok = head[0].parent() == this;
-            const bool tail_parent_ok = tail->parent() == this;
-#ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, CS>::check_storage()"
-                    << "head: " << head << " tail: " << tail
-                    << " this: " << this <<  std::endl;
-#endif
-
-            if (head_parent_ok && tail_parent_ok) {
-
-            } else if (head_parent_ok) {
-
-            } else if (tail_parent_ok) {
-
-            } else {
-
-            }
-            */
-
-            if (head <= tail) { // so good so far
-                /*vector_chunk_pointer tmp = head + chunks * sizeof(vector_chunk);
-                if (tmp == tail) {
-
-                } else {
-#ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, CS>::check_storage()"
-                      << "head or tail pointer damaged" << std::endl;
-#endif
-                }*/
-            } else {
-#ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, CS>::check_storage() tail points before head" << std::endl;
-#endif
-            // serious
-            }
-
-            /*size_type chunk_count = ((m_tail + vector_chunk_size) - m_head) / vector_chunk_size;
-
-            if (m_chunks != chunk_count) {
-                //TODO: Repair chunk count
-
-                std::runtime_error e("chunk count error");
+                std::runtime_error e("head and tail pointer error");
                 boost::throw_exception(e);
-            }*/
-            //std::runtime_error e("head or tail error");
-            //boost::throw_exception(e);
+            }
+
+            if (test_head->parent() != this) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+                std::cout << "boost::self_healing::vector<T, CS>::check_storage() fix parent of head" << std::endl;
+#endif
+                test_head->set_parent(const_cast<vector_pointer>(this));
+            }
+            if (test_tail->parent() != this) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+                std::cout << "boost::self_healing::vector<T, CS>::check_storage() fix parent of tail" << std::endl;
+#endif
+                test_tail->set_parent(const_cast<vector_pointer>(this));
+            }
         }
 
         void check_size() const {
