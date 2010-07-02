@@ -555,6 +555,10 @@ namespace boost { namespace self_healing {
             std::cout << "boost::self_healing::vector<T, CS>::check_storage()" << std::endl;
 #endif
 
+            if (head == 0 && tail == 0 && chunks == 0) {
+                return; // initial case where nothing is allocated yet
+            }
+
             const vector_chunk_pointer test_head = dynamic_cast<vector_chunk_pointer>(head);
             const vector_chunk_pointer test_tail = dynamic_cast<vector_chunk_pointer>(tail);
             const size_type estimated_min_chunks = std::ceil(size() * CS);
