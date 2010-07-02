@@ -296,7 +296,7 @@ namespace boost { namespace self_healing {
                 return;             // all fine
             } else if (equal_12) {
                 // The computed checksum over the content is not the same as
-                // the stored onces, thus the content was maliciously changed
+                // the stored ones, thus the content was maliciously changed
                 // and the checksummed array is invalid.
                 std::runtime_error e("data error");
                 boost::throw_exception(e);
