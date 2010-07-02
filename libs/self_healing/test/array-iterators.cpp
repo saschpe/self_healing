@@ -33,17 +33,17 @@ int main()
     }
 
     cout << "locate the largest element, O(n)" << endl;
-    array<int, 16>::iterator largest = max_element(a.begin(), a.end());
+    array<int, 16>::const_iterator largest = max_element(a.begin(), a.end());
 
     cout << "testing iterator value assignment" << endl;
     array<int, 16>::iterator tmp_it = a.begin();
-    *tmp_it = 99;
+    *(tmp_it - 3) = 99;
 
     cout << "it + value: " << tmp_it + 1 << endl;
 
     array<int, 16>::reverse_iterator tmp_rit = a.rbegin();
     //TODO: fix this, the functor is not called here !!!
-    *tmp_rit = 99;
+    *(tmp_rit + 2) = 99;
 
     const int* cit = a.begin();
     cout << cit << endl;
