@@ -32,6 +32,9 @@ int main()
         *it += 1;
     }
 
+    cout << "locate the largest element, O(n)" << endl;
+    array<int, 16>::iterator largest = max_element(a.begin(), a.end());
+
     cout << "testing iterator value assignment" << endl;
     array<int, 16>::iterator tmp_it = a.begin();
     *tmp_it = 99;
@@ -50,7 +53,7 @@ int main()
     cout << "numbers: " << a << endl;
 
     cout << "locate the largest element, O(n)" << endl;
-    array<int, 16>::iterator largest = max_element(a.begin(), a.end());
+    largest = max_element(a.begin(), a.end());
 
     array<int, 16>::const_iterator tmp_cit = a.begin();
     cout << "testing array<>::const_iterator " << tmp_cit << endl;
