@@ -38,34 +38,38 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    /*! \brief Self-healing B-tree.
+    /*! \brief Self-healing multiset that uses a B-tree internally.
     *
     * TODO.
     *
-    * \param T The data type of the stored values.
+    * \param Key The data type of the stored values.
+    * \param Compare TODO.
     * \param L Optional amount of children of nodes.
     * \param CS Optional (chunk) storage capacity of leaves.
     * \remarks The chunk size should be chosen based on CPU cache size.
     * \see multiset_leaf, multiset_node
     */
-    template <class T, std::size_t L = 8, std::size_t CS = 64>
+    template <class Key, class Compare = less<Key>, std::size_t L = 8, std::size_t CS = 64>
     class multiset
     {
         // private type definitions
-        typedef multiset<T, L. CS>      multiset_type;
-        typedef multiset<T, L. CS> *    multiset_pointer;
-        typedef multiset_node<T, L, CS> leaf_type;
-        typedef multiset_node<T, L, CS> node_type;
+        typedef multiset<Key, Compare, L, CS>      multiset_type;
+        typedef multiset<Key, Compare, L, CS> *    multiset_pointer;
+        typedef multiset_node<Key, L, CS> leaf_type;
+        typedef multiset_node<Key, L, CS> node_type;
 
     public:
         // type definitions
-        typedef T               value_type;         //!< The type of elements stored in the <code>multiset</code>.
+        typedef Key             key_type;           //!<
+        typedef Key             value_type;         //!< The type of elements stored in the <code>multiset</code>.
+        typedef Compare         key_compare;
+        typedef Compare         value_compare;
         class                   iterator;           //!< Forward declaration of class iterator.
         class                   const_iterator;     //!< Forward declaration of class const_iterator.
-        typedef T *             pointer;            //!< A pointer to an element.
-        typedef const T *       const_pointer;      //!< A const pointer to an element.
-        typedef safe_ref<T>     reference;          //!< A reference to an element.
-        typedef const T &       const_reference;    //!< A const reference to an element.
+        typedef Key *           pointer;            //!< A pointer to an element.
+        typedef const Key *     const_pointer;      //!< A const pointer to an element.
+        typedef safe_ref<Key>   reference;          //!< A reference to an element.
+        typedef const Key &     const_reference;    //!< A const reference to an element.
         typedef std::size_t     size_type;          //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
         typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
 
@@ -196,57 +200,51 @@ namespace boost { namespace self_healing {
 #endif
 
         /*! Default constructor.
+        * \param compare TODO.
         */
-        explicit multiset() {}
-
-        /*! Constructor to initialize the B-tree with a custom size and an optional fill value.
-        * \param n Custom initial B-tree size.
-        * \param x Optional value to fill the B-tree with.
-        */
-        multiset(size_type n, const_reference x = value_type()) {
-            assign(n, x);
+        explicit multiset(const Compare &compare = Compare()) {
+            //TODO
         }
 
-        /*! Constructor to initialize the B-tree with a custom value range supplied by an iterator.
+        /*! Constructor to initialize multiset with a custom value range supplied by an iterator.
         * \param first Begin of value range.
         * \param last End of value range.
+        * \param compare TODO.
         */
         template <class InputIterator>
-        multiset(InputIterator first, InputIterator last) {
-            assign(first, last);
+        multiset(InputIterator first, InputIterator last, const Compare &compare = Compare()) {
+            //TODO
         }
 
-        /*! Copy constructor to copy from a <code>multiset</code>.
-        * \param rhs The other <code>multiset</code> to copy from.
+        /*! Copy constructor to copy from a <code>boost::self_healing::multiset</code>.
+        * \param rhs The other <code>boost::self_healing::multiset</code> to copy from.
         */
-        multiset(const multiset_type&rhs) {
-            assign(rhs.begin(), rhs.end());
+        multiset(const multiset<Key, Compare, L, CS> &rhs) {
+            //TODO
+        }
+
+        /*! Copy constructor to copy from a <code>std::multiset</code>.
+        * \param rhs The other <code>std::multiset</code> to copy from.
+        */
+        multiset(const std::multiset<Key, Compare> &rhs) {
+            //TODO
         }
 
         /*! Destructor.
         */
         ~multiset() {
-            //TODO:
+            //TODO
         }
 
-        multiset_type & operator=(const multiset_type &rhs) {
-            assign(rhs.begin(), rhs.end());
-        };
-
-        template <class InputIterator>
-            //TODO:
-        void assign(InputIterator first, InputIterator last) {
-        }
-        template <class Size, class TT>
-        void assign(Size n, const TT &x = TT()) {
-            //TODO:
+        multiset<Key, Compare, L, CS>& operator=(const multiset<Key, Compare, L, CS> &rhs) {
+            //TODO
         }
 
-        // iterator support
-        iterator begin() {}
-        const_iterator begin() const {}
-        iterator end() {}
-        const_iterator end() const {}
+        // iterators
+        iterator begin();
+        const_iterator begin() const;
+        iterator end();
+        const_iterator end() const;
 
         // reverse iterator support
         reverse_iterator rbegin() { return reverse_iterator(end()); }
@@ -255,58 +253,32 @@ namespace boost { namespace self_healing {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // capacity
-        size_type size() const {}
-        bool empty() const { return size() == 0; }
-        size_type max_size() const {
-            // determin how much chunks fit into memory and thus how much elements we can have
-            //const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * CS;
-            //return std::min(max_elems, std::numeric_limits<difference_type>::max());
-        }
-        size_type capacity() const {}
-
-        // operator[]
-        reference operator[](size_type i) {}
-        const_reference operator[](size_type i) const {}
-
-        // at() with range check
-        reference at(size_type i) { rangecheck(i); return operator[](i); }
-        const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
-
-        // front() and back()
-        reference front() {}
-        const_reference front() const {}
-        reference back() {}
-        const_reference back() const {}
+        bool empty() const;
+        size_type size() const;
+        size_type max_size() const;
 
         // modifiers
-        iterator insert(iterator it) {
-            //TODO:
-        }
-        iterator insert(iterator it, const_reference value);
-        void insert(iterator it, size_type, const_reference value) {
-            //TODO:
-        }
+        iterator insert(const value_type &value);
+        iterator insert(iterator, const value_type &value);
         template <class InputIterator>
-        void insert(iterator, InputIterator, InputIterator) {
-            //TODO:
-        }
+        void insert(InputIterator first, InputIterator last);
 
-        iterator erase(iterator)  {
-            //TODO:
-        }
-        iterator erase(iterator, iterator) {
-            //TODO:
-        }
+        void erase(iterator pos);
+        size_type erase(const key_type &key);
+        void erase(iterator first, iterator last);
+        void swap(multiset<Key, Compare, L, CS> &rhs);
+        void clear();
 
-        void clear() {
-            if (!empty()) {
-                erase(begin(), end());
-            }
-        }
+        // Observers
+        key_compare key_comp () const;
+        value_compare value_comp () const;
 
-        void swap(multiset<value_type> &rhs) {
-            //TODO:
-        }
+        // multiset operations
+        iterator find(const key_type &key) const;
+        size_type count(const key_type &key) const;
+        iterator lower_bound(const key_type &key) const;
+        iterator upper_bound(const key_type &key) const;
+        pair<iterator, iterator> equal_range(const key_type &key) const;
 
         /*! Check index validity against size.
         * \param index The index to check.
@@ -314,7 +286,7 @@ namespace boost { namespace self_healing {
         */
         void rangecheck(size_type index) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::multiset<T, L, CS>::rangecheck(" << index << ")" << std::endl;
+            std::cout << "boost::self_healing::multiset<Key, Compare, L, CS>::rangecheck(" << index << ")" << std::endl;
 #endif
             if (index >= size()) {
                 std::out_of_range e("index out of range");
@@ -328,7 +300,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::multiset<T, L, CS>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::multiset<Key, Compare, L, CS>::is_valid()" << std::endl;
 #endif
             try {
                 // check all parts of the data structure
@@ -336,7 +308,7 @@ namespace boost { namespace self_healing {
                 return true;
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::multiset<T, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::multiset<Key, Compare, L, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -348,35 +320,35 @@ namespace boost { namespace self_healing {
     };
 
     // comparisons
-    template <class T, std::size_t L, std::size_t CS>
-    inline bool operator==(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
+    template <class Key, class Compare, std::size_t L, std::size_t CS>
+    inline bool operator==(const multiset<Key, L, CS> &x, const multiset<Key, L, CS> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
-    template <class T, std::size_t L, std::size_t CS>
-    inline bool operator<(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
+    template <class Key, class Compare, std::size_t L, std::size_t CS>
+    inline bool operator<(const multiset<Key, Compare, L, CS> &x, const multiset<Key, Compare, L, CS> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
-    template <class T, std::size_t L, std::size_t CS>
-    inline bool operator!=(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
+    template <class Key, class Compare , std::size_t L, std::size_t CS>
+    inline bool operator!=(const multiset<Key, Compare, L, CS> &x, const multiset<Key, Compare, L, CS> &y) {
         return !(x == y);
     }
-    template <class T, std::size_t L, std::size_t CS>
-    inline bool operator>(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
+    template <class Key, class Compare, std::size_t L, std::size_t CS>
+    inline bool operator>(const multiset<Key, Compare, L, CS> &x, const multiset<Key, Compare, L, CS> &y) {
         return y < x;
     }
-    template <class T, std::size_t L, std::size_t CS>
-    inline bool operator<=(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
+    template <class Key, class Compare, std::size_t L, std::size_t CS>
+    inline bool operator<=(const multiset<Key, Compare, L, CS> &x, const multiset<Key, Compare, L, CS> &y) {
         return !(y < x);
     }
-    template <class T, std::size_t L, std::size_t CS>
-    inline bool operator>=(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
+    template <class Key, class Compare, std::size_t L, std::size_t CS>
+    inline bool operator>=(const multiset<Key, Compare, L, CS> &x, const multiset<Key, Compare, L, CS> &y) {
         return !(x < y);
     }
 
     /*! Global swap function.
     */
-    template <class T, std::size_t L, std::size_t CS>
-    inline void swap(multiset<T, L, CS> &x, multiset<T, L, CS> &y) {
+    template <class Key, class Compare, std::size_t L, std::size_t CS>
+    inline void swap(multiset<Key, Compare, L, CS> &x, multiset<Key, Compare, L, CS> &y) {
         x.swap(y);
     }
 
