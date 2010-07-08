@@ -1,4 +1,4 @@
-/* Test case for class btree.
+/* Test case for class multiset-node.
  *
  * (C) Copyright Sascha Peilicke 2010.
  *
@@ -9,15 +9,16 @@
  * 31 May 2010 - Initial Revision (Sascha Peilicke)
  */
 
-#include <boost/self_healing/btree.hpp>
+#include <boost/self_healing/detail/multiset_node.hpp>
 
 #include <iostream>
 
 int main()
 {
-    std::cout << "testing class boost::self_healing::btree<> fault injection" << std::endl;
+    std::cout << "testing class boost::self_healing::multiset_node<>" << std::endl;
 
-    boost::self_healing::btree<char> t;
+    boost::self_healing::multiset_node<int, 2, 2> parent;
+    boost::self_healing::multiset_node<int, 2, 2> child(&parent);
 
     return 0;
 }

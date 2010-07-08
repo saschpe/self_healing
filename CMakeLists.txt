@@ -79,19 +79,19 @@ if(BUILD_TESTS)
     add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
     add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 
-    # tests related to class btree helper classes btree_node and btree_leaf
-    add_executable(test-btree-node libs/self_healing/test/btree-node.cpp)
-    add_test(btree-node ${EXECUTABLE_OUTPUT_PATH}/test-btree-node)
-    add_executable(test-btree-leaf libs/self_healing/test/btree-leaf.cpp)
-    add_test(btree-leaf ${EXECUTABLE_OUTPUT_PATH}/test-btree-leaf)
+    # tests related to class multiset helper classes multiset_node and multiset_leaf
+    add_executable(test-multiset-node libs/self_healing/test/multiset-node.cpp)
+    add_test(multiset-node ${EXECUTABLE_OUTPUT_PATH}/test-multiset-node)
+    add_executable(test-multiset-leaf libs/self_healing/test/multiset-leaf.cpp)
+    add_test(multiset-leaf ${EXECUTABLE_OUTPUT_PATH}/test-multiset-leaf)
 
-    # tests related to class btree
-    #add_executable(test-btree libs/self_healing/test/btree.cpp)
-    #add_test(btree ${EXECUTABLE_OUTPUT_PATH}/test-btree)
-    #add_executable(test-btree-iterators libs/self_healing/test/btree-iterators.cpp)
-    #add_test(btree-iterators ${EXECUTABLE_OUTPUT_PATH}/test-btree-iterators)
-    #add_executable(test-btree-faults libs/self_healing/test/btree-faults.cpp)
-    #add_test(btree-faults ${EXECUTABLE_OUTPUT_PATH}/test-btree-faults)
+    # tests related to class multiset
+    #add_executable(test-multiset libs/self_healing/test/multiset.cpp)
+    #add_test(multiset ${EXECUTABLE_OUTPUT_PATH}/test-multiset)
+    #add_executable(test-multiset-iterators libs/self_healing/test/multiset-iterators.cpp)
+    #add_test(multiset-iterators ${EXECUTABLE_OUTPUT_PATH}/test-multiset-iterators)
+    #add_executable(test-multiset-faults libs/self_healing/test/multiset-faults.cpp)
+    #add_test(multiset-faults ${EXECUTABLE_OUTPUT_PATH}/test-multiset-faults)
 endif()
 
 # installation
