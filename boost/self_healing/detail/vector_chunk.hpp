@@ -1,5 +1,5 @@
 /*! \file
-* \brief Vector chunk.
+* \brief Vector internal chunk.
 *
 * This file contains the class vector_chunk.
 *
