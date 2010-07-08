@@ -106,8 +106,8 @@ namespace boost { namespace self_healing {
             iterator& operator--(int) { i--; return *this; }
 
             // comparison
-            bool operator==(const iterator& other) const { return i == other.i; }
-            bool operator!=(const iterator& other) const { return i != other.i; }
+            bool operator==(const iterator &other) const { return i == other.i; }
+            bool operator!=(const iterator &other) const { return i != other.i; }
             bool operator>(const iterator &other) const { return i > other.i; }
             bool operator>=(const iterator &other) const { return i >= other.i; }
             bool operator<(const iterator &other) const { return i < other.i; }
@@ -151,8 +151,8 @@ namespace boost { namespace self_healing {
             const_iterator& operator--(int) { i--; return *this; }
 
             // comparison
-            bool operator==(const const_iterator& other) const { return i == other.i; }
-            bool operator!=(const const_iterator& other) const { return i != other.i; }
+            bool operator==(const const_iterator &other) const { return i == other.i; }
+            bool operator!=(const const_iterator &other) const { return i != other.i; }
             bool operator>(const const_iterator &other) const { return i > other.i; }
             bool operator>=(const const_iterator &other) const { return i >= other.i; }
             bool operator<(const const_iterator &other) const { return i < other.i; }
@@ -495,7 +495,7 @@ namespace boost { namespace self_healing {
             }
         }
 
-        void swap(vector<value_type> &rhs) {
+        void swap(vector_reference rhs) {
             boost::swap(head, rhs.head);
             boost::swap(size1, rhs.size1);
             boost::swap(tail, rhs.tail);

@@ -61,8 +61,9 @@ namespace boost { namespace self_healing {
         typedef T               value_type;         //!< The type of elements stored in the <code>array</code>.
         class                   iterator;           //!< Forward declaration of class iterator.
         typedef const T *       const_iterator;     //!< A const (random access) iterator used to iterate through the <code>array</code>.
-        //typedef safe_ptr<T>     pointer;            //!< A pointer to the element.
-        typedef const T *       const_pointer;      //!< A const pointer to the element.
+        //typedef safe_ptr<T>     pointer;            //!< A pointer to an element.
+        typedef T *             pointer;            //!< A pointer to an element.
+        typedef const T *       const_pointer;      //!< A const pointer to an element.
         typedef safe_ref<T>     reference;          //!< A reference to an element.
         typedef const T &       const_reference;    //!< A const reference to an element.
         typedef std::size_t     size_type;          //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
@@ -86,7 +87,7 @@ namespace boost { namespace self_healing {
             * \param check TODO.
             * \param update TODO.
             */
-            explicit iterator(value_type *rhs, function_type check, function_type update)
+            explicit iterator(pointer rhs, function_type check, function_type update)
                 : p(rhs), check(check), update(update) {}
 
         public:
@@ -103,8 +104,8 @@ namespace boost { namespace self_healing {
             iterator& operator--(int) { p--; return *this; }
 
             // Comparison
-            bool operator==(const iterator& other) const { return p == other.p; }
-            bool operator!=(const iterator& other) const { return p != other.p; }
+            bool operator==(const iterator &other) const { return p == other.p; }
+            bool operator!=(const iterator &other) const { return p != other.p; }
             bool operator>(const iterator &other) const { return p > other.p; }
             bool operator>=(const iterator &other) const { return p >= other.p; }
             bool operator<(const iterator &other) const { return p < other.p; }
@@ -118,7 +119,7 @@ namespace boost { namespace self_healing {
             friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.p; }
 
         private:
-            value_type *p;          //!< Internal pointer to the current position in the checksummed array.
+            pointer p;              //!< Internal pointer to the current position in the checksummed array.
             function_type check;    //!< Called to check the consistency of the corresponding checksummed array instance.
             function_type update;   //!< Called to update the checksums of the corresponding checksummed array instance.
         };
