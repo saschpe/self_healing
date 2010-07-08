@@ -29,6 +29,12 @@ necessary to build this project:
  - CMake_ 2.6 or later
  - Boost_ 1.42.0 or later
 
+Futhermore there are several optional prerequisites that enable further
+functionality (like API documentation generated from the sources):
+
+ - Doxygen_ 1.6.3 or later
+ - Python Docutils_ 0.6 or later
+
 
 Installation
 ------------
@@ -72,7 +78,7 @@ Notes
 -----
 
 This file is written in reStructuredText_ and can be converted to HTML with
-Python docutils_. Use the following command::
+Python Docutils_. Use the following command::
 
     $ rst2html README.txt > README.html
 
@@ -80,6 +86,7 @@ Python docutils_. Use the following command::
 .. _Git: http://git.or.cz/index.html
 .. _CMake: http://www.cmake.org/
 .. _Boost: http://www.boost.org/
+.. _Doxygen: http://www.stack.nl/~dimitri/doxygen/index.html
 .. _reStructuredText: http://en.wikipedia.org/wiki/Restructured_text
 .. _docutils: http://docutils.sourceforge.net/
 

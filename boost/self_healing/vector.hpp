@@ -53,6 +53,7 @@ namespace boost { namespace self_healing {
         // private type definitions
         typedef vector<T, CS>         vector_type;
         typedef vector<T, CS> *       vector_pointer;
+        typedef vector<T, CS> &       vector_reference;
         typedef vector_chunk<T, CS>   vector_chunk_type;    //!< A vector chunk.
         typedef vector_chunk<T, CS> * vector_chunk_pointer; //!< A pointer to vector chunk.
 
@@ -72,11 +73,7 @@ namespace boost { namespace self_healing {
 
     public:
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
-        *
-        * A safe iterator that calls a functor if the value at the current
-        * position is changed. Checksumms are also updated correctly if the
-        * iterator is dereferenced.
-        */
+       */
         class iterator : public child<vector_type>, public std::iterator<std::random_access_iterator_tag, value_type>
         {
             friend class vector;
@@ -109,8 +106,8 @@ namespace boost { namespace self_healing {
             iterator& operator--(int) { i--; return *this; }
 
             // comparison
-            bool operator==(const iterator& other) const { return i == other.i; }
-            bool operator!=(const iterator& other) const { return i != other.i; }
+            bool operator==(const iterator &other) const { return i == other.i; }
+            bool operator!=(const iterator &other) const { return i != other.i; }
             bool operator>(const iterator &other) const { return i > other.i; }
             bool operator>=(const iterator &other) const { return i >= other.i; }
             bool operator<(const iterator &other) const { return i < other.i; }
@@ -154,8 +151,8 @@ namespace boost { namespace self_healing {
             const_iterator& operator--(int) { i--; return *this; }
 
             // comparison
-            bool operator==(const const_iterator& other) const { return i == other.i; }
-            bool operator!=(const const_iterator& other) const { return i != other.i; }
+            bool operator==(const const_iterator &other) const { return i == other.i; }
+            bool operator!=(const const_iterator &other) const { return i != other.i; }
             bool operator>(const const_iterator &other) const { return i > other.i; }
             bool operator>=(const const_iterator &other) const { return i >= other.i; }
             bool operator<(const const_iterator &other) const { return i < other.i; }
@@ -191,7 +188,6 @@ namespace boost { namespace self_healing {
         typedef std::reverse_iterator<const_iterator, value_type> const_reverse_iterator;
 #endif
 
-
         /*! Default constructor.
         */
         explicit vector()
@@ -219,7 +215,7 @@ namespace boost { namespace self_healing {
         /*! Copy constructor to copy from a <code>boost::self_healing::vector</code>.
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
-        vector(const vector_type &rhs)
+        vector(const vector_reference rhs)
             : head(0), size1(0), chunks(0), size2(0), tail(0), size3(0) {
             assign(rhs.begin(), rhs.end());
         }
@@ -239,7 +235,7 @@ namespace boost { namespace self_healing {
             delete[] head;
         }
 
-        vector_type& operator=(const vector_type &rhs) {
+        vector_reference operator=(const vector_reference rhs) {
             assign(rhs.begin(), rhs.end());
         };
 
@@ -310,7 +306,6 @@ namespace boost { namespace self_healing {
         */
         void reserve(size_type new_capacity) {
             if (capacity() < new_capacity) {
-
                 const size_type new_chunk_count = std::ceil(static_cast<float>(new_capacity) / CS);
                 new_capacity = new_chunk_count * CS;
 
@@ -320,6 +315,11 @@ namespace boost { namespace self_healing {
                 }
 
                 const vector_chunk_pointer new_head = new vector_chunk_type[new_chunk_count];
+
+                // set this vector as the parent of all vector chunks
+                for (size_type c = 0; c < new_chunk_count; c++) {
+                    new_head[c].set_parent(this);
+                }
 
                 check_storage();
                 if (head) {
@@ -365,6 +365,12 @@ namespace boost { namespace self_healing {
                 it--;
             }
             *position = value;
+
+            // adjust size accordingly
+            size1++;
+            size2++;
+            size3++;
+
             return position;
         }
         void insert(iterator position, size_type n, const_reference value) {
@@ -376,15 +382,23 @@ namespace boost { namespace self_healing {
                 reserve(capacity() + n);
             }
 
-            // move all elements n fields backwards to make room for the new
-            // elements. iterate from back to front.
-            iterator source = begin() + (size() - 1); // source is last element
-            iterator target = source + n; // target is n steps to the right
-            while (source >= position) {
-                *target = *source;
-                source--;
-                target--;
+            // if we already have elements, we may have to move them backwards
+            if (size() != 0) {
+                // move all elements n fields backwards to make room for the new
+                // elements. iterate from back to front.
+                iterator source = begin() + (size() - 1); // source is last element
+                iterator target = source + n; // target is n steps to the right
+                while (source >= position) {
+                    *target = *source;
+                    source--;
+                    target--;
+                }
             }
+
+            // adjust size accordingly
+            size1 += n;
+            size2 += n;
+            size3 += n;
 
             // insert 'n' new elements of 'value' at 'position'
             for (iterator it = position; it != position + n; it++) {
@@ -411,6 +425,11 @@ namespace boost { namespace self_healing {
                 source--;
                 target--;
             }
+
+            // adjust size accordingly
+            size1 += n;
+            size2 += n;
+            size3 += n;
 
             // insert range [first, last) of new elements at 'position'
             iterator to = position, it = first;
@@ -476,7 +495,7 @@ namespace boost { namespace self_healing {
             }
         }
 
-        void swap(vector<value_type> &rhs) {
+        void swap(vector_reference rhs) {
             boost::swap(head, rhs.head);
             boost::swap(size1, rhs.size1);
             boost::swap(tail, rhs.tail);
@@ -495,7 +514,7 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::rangecheck(" << index << ")" << std::endl;
 #endif
-            if (index >= size()) {
+            if (index != 0 && index >= size()) { // size() is 0 initially
                 std::out_of_range e("index out of range");
                 boost::throw_exception(e);
             }
@@ -529,38 +548,67 @@ namespace boost { namespace self_healing {
 
     private:
         void check_storage() const {
-            //TODO: Check and repair head and tail pointers
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, CS>::check_storage()" << std::endl;
 #endif
-            if (head == 0 && tail == 0) {
-                // Both are 0, this means nothing seems to be alloced yet
-                // We're fine if the other values reflect that
-                if (size() == 0 && chunks == 0) {
-                    return;
-                }
-                /*check_size();*/
-                //TODO: Maybe do a simpler check here instead
-            } else if (head == 0) {
-                // Only head is null, could be error with tail or head
 
-            } else if (tail == 0) {
-                // Only tail is null, could be error with tail or head
-
-            } else {
-                // Both are non-0, further checks
-
+            if (head == 0 && tail == 0 && chunks == 0) {
+                return; // initial case where nothing is allocated yet
             }
-            /*size_type chunk_count = ((m_tail + vector_chunk_size) - m_head) / vector_chunk_size;
 
-            if (m_chunks != chunk_count) {
-                //TODO: Repair chunk count
+            const vector_chunk_pointer test_head = dynamic_cast<vector_chunk_pointer>(head);
+            const vector_chunk_pointer test_tail = dynamic_cast<vector_chunk_pointer>(tail);
+            const size_type estimated_min_chunks = std::ceil(size() * CS);
 
-                std::runtime_error e("chunk count error");
+#ifdef BOOST_SELF_HEALING_DEBUG
+            std::cout << "boost::self_healing::vector<T, CS>::check_storage()"
+                      << " head: " << test_head << " tail: " << test_tail << " this: " << this << std::endl;
+#endif
+
+            if (test_head && test_tail) {
+                // compute the chunk counter difference and fix chunk counter if needed
+                const size_type head_tail_diff_abs = static_cast<size_type>((tail - head) / sizeof(vector_chunk_type));
+                if (chunks != head_tail_diff_abs + 1) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+                    std::cout << "boost::self_healing::vector<T, CS>::check_storage() fix chunk counter" << std::endl;
+#endif
+                    const_cast<size_type &>(chunks) = head_tail_diff_abs + 1;
+                }
+            } else if (test_head) {
+                if (estimated_min_chunks > chunks) {
+                    // chunk counter was damaged and shows less than real, this may lead to a chunks loss
+                    std::runtime_error e("tail and chunk counter error");
+                    boost::throw_exception(e);
+                    //TODO: see if fixable
+                    //const_cast<size_type &>(chunks) = estimated_min_chunks;
+                }
+                const_cast<vector_chunk_pointer &>(tail) = &head[chunks];
+            } else if (test_tail) {
+                if (estimated_min_chunks > chunks) {
+                    // chunk counter was damaged and shows less than real, this may lead to a chunks loss
+                    std::runtime_error e("head and chunk counter error");
+                    boost::throw_exception(e);
+                    //TODO: see if fixable
+                    //const_cast<size_type &>(chunks) = estimated_min_chunks;
+                }
+                const_cast<vector_chunk_pointer &>(head) = tail - (chunks - 1) * sizeof(vector_chunk_type);
+            } else {
+                std::runtime_error e("head and tail pointer error");
                 boost::throw_exception(e);
-            }*/
-            std::runtime_error e("head or tail error");
-            boost::throw_exception(e);
+            }
+
+            if (test_head->parent() != this) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+                std::cout << "boost::self_healing::vector<T, CS>::check_storage() fix parent of head" << std::endl;
+#endif
+                test_head->set_parent(const_cast<vector_pointer>(this));
+            }
+            if (test_tail->parent() != this) {
+#ifdef BOOST_SELF_HEALING_DEBUG
+                std::cout << "boost::self_healing::vector<T, CS>::check_storage() fix parent of tail" << std::endl;
+#endif
+                test_tail->set_parent(const_cast<vector_pointer>(this));
+            }
         }
 
         void check_size() const {
@@ -603,10 +651,10 @@ namespace boost { namespace self_healing {
                 boost::throw_exception(e);
             }
 
-            if (size1 > capacity()) {
+            /*if (size1 > capacity()) {
                 std::runtime_error e("size is bigger than capacity");
                 boost::throw_exception(e);
-            }
+            }*/
         }
 
         vector_chunk_pointer head;  //!< Pointer to the first chunk of an array of vector_chunk instances.

@@ -80,7 +80,7 @@ namespace utility {
     void print_raw(const void * const obj, std::size_t size)
     {
         std::cout << ".";
-        for (std::size_t i; i < size; i++) {
+        for (std::size_t i = 0; i < size; i++) {
             std::cout << *(reinterpret_cast<const char *>(obj) + i);
         }
         std::cout << "." << std::endl;

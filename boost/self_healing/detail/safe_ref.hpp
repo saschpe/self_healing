@@ -37,7 +37,7 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T                            value_type;        //!< The type of elements stored in the <code>checksummed_array</code>.
+        typedef T                            value_type;        //!< The type of elements stored.
         typedef T &                          reference;
         typedef const T &                    const_reference;   //!< A const reference to an element.
         typedef boost::function<void (void)> function_type;
