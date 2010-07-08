@@ -49,5 +49,36 @@ int main()
     copy(C.begin(), C.end(), ostream_iterator<int>(cout, " "));
     cout << endl;
 
+    // Create a multiset of integers.
+    boost::self_healing::multiset<int>  si;
+
+    for (boost::self_healing::multiset<int>::value_type j = 0; j < 2; j++) {
+        for (boost::self_healing::multiset<int>::value_type i = 0; i < 10; ++i) {
+            // Insert values with a hint.
+            si.insert(si.begin (), i);
+        }
+    }
+    // Print out the multiset.
+    cout << si << std::endl;
+
+    // Make another multiset and an empty multiset.
+    boost::self_healing::multiset<int> si2, result;
+    for (boost::self_healing::multiset<int>::value_type i = 0; i < 10; i++) {
+        si2.insert(i + 5);
+    }
+
+    cout << si2 << endl;
+
+    // Try a couple of set algorithms.
+    std::set_union(si.begin(), si.end(), si2.begin(), si2.end(), inserter(result, result.begin()));
+
+    cout << "Union:\n" << result << endl;
+
+    result.erase(result.begin(), result.end());
+
+    set_intersection(si.begin(), si.end(), si2.begin(), si2.end(), inserter(result, result.begin()));
+
+    cout << "Intersection:\n" << result << endl;
+
     return 0;
 }
