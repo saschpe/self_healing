@@ -303,6 +303,7 @@ namespace boost { namespace self_healing {
 #endif
             try {
                 // check all parts of the data structure
+                check_root();
                 //TODO
                 return true;
             } catch (const std::runtime_error &e) {
@@ -314,8 +315,32 @@ namespace boost { namespace self_healing {
         }
 
     private:
-        node_type root[3];
-        //TODO
+        void check_root() const {
+#ifdef BOOST_SELF_HEALING_DEBUG
+            std::cout << "boost::self_healing::multise<Key, Compare, L, CS>::check_root()" << std::endl;
+#endif
+            // check and repair root via TMR voting
+            const bool equal_13 = root1 == root3;
+            const bool equal_23 = root2 == root3;
+            const bool equal_12 = root1 == root2;
+
+            if (equal_12 && equal_13 && equal_23) {
+                // all fine
+            } else if (equal_13) {
+                const_cast<node_type &>(root2) = root1; // fix root2 as the others are equal
+            } else if (equal_23) {
+                const_cast<node_type &>(root1) = root2; // fix root1 as the others are equal
+            } else if (equal_12) {
+                const_cast<node_type &>(root3) = root2; // fix root3 as the others are equal
+            } else {
+                std::runtime_error e("root node error"); // all three roots differ
+                boost::throw_exception(e);
+            }
+        }
+
+        node_type root1;
+        node_type root2;
+        node_type root3;
     };
 
     // comparisons
