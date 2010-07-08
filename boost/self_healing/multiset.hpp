@@ -56,6 +56,7 @@ namespace boost { namespace self_healing {
         // private type definitions
         typedef multiset<Key, Compare, L, CS>   multiset_type;
         typedef multiset<Key, Compare, L, CS> * multiset_pointer;
+        typedef multiset<Key, Compare, L, CS> & multiset_reference;
         typedef multiset_node<Key, L, CS>       leaf_type;
         typedef multiset_node<Key, L, CS>       node_type;
 
@@ -88,7 +89,7 @@ namespace boost { namespace self_healing {
             * \param index The index to start with.
             */
             explicit iterator(tree_pointer const parent, size_type index)
-                : child<multiset_type>(parent), m_i(index) {}
+                : child<multiset_type>(parent), i(index) {}
 
         public:
             /*! Default constructor.
@@ -96,37 +97,37 @@ namespace boost { namespace self_healing {
             *          there to satisfy some STL algorithms.
             */
             iterator()
-                : child<multiset_type>(0), m_i(-1) {}
+                : child<multiset_type>(0), i(-1) {}
 
-            iterator operator+(difference_type n) const { return iterator(child<multiset_type>::parent(), m_i + n); }
-            iterator operator-(difference_type n) const { return iterator(child<multiset_type>::parent(), m_i - n); }
-            difference_type operator+(const iterator &rhs) const { return m_i + rhs.m_i; }
-            difference_type operator-(const iterator &rhs) const { return m_i - rhs.m_i; }
+            iterator operator+(difference_type n) const { return iterator(child<multiset_type>::parent(), i + n); }
+            iterator operator-(difference_type n) const { return iterator(child<multiset_type>::parent(), i - n); }
+            difference_type operator+(const iterator &rhs) const { return i + rhs.i; }
+            difference_type operator-(const iterator &rhs) const { return i - rhs.i; }
 
-            iterator& operator+=(difference_type n) { m_i += n; return *this; }
-            iterator& operator-=(difference_type n) { m_i -= n; return *this; }
-            iterator& operator++() { ++m_i; return *this; }
-            iterator& operator++(int) { m_i++; return *this; }
-            iterator& operator--() { --m_i; return *this; }
-            iterator& operator--(int) { m_i--; return *this; }
+            iterator& operator+=(difference_type n) { i += n; return *this; }
+            iterator& operator-=(difference_type n) { i -= n; return *this; }
+            iterator& operator++() { ++i; return *this; }
+            iterator& operator++(int) { i++; return *this; }
+            iterator& operator--() { --i; return *this; }
+            iterator& operator--(int) { i--; return *this; }
 
             // comparison
-            bool operator==(const iterator& other) const { return m_i == other.m_i; }
-            bool operator!=(const iterator& other) const { return m_i != other.m_i; }
-            bool operator>(const iterator &other) const { return m_i > other.m_i; }
-            bool operator>=(const iterator &other) const { return m_i >= other.m_i; }
-            bool operator<(const iterator &other) const { return m_i < other.m_i; }
-            bool operator<=(const iterator &other) const { return m_i <= other.m_i; }
+            bool operator==(const iterator &other) const { return i == other.i; }
+            bool operator!=(const iterator &other) const { return i != other.i; }
+            bool operator>(const iterator &other) const { return i > other.i; }
+            bool operator>=(const iterator &other) const { return i >= other.i; }
+            bool operator<(const iterator &other) const { return i < other.i; }
+            bool operator<=(const iterator &other) const { return i <= other.i; }
 
-            reference operator*() const { return child<multiset_type>::parent()->at(m_i); }
-            operator const_iterator() const { return const_iterator(child<multiset_type>::parent(), m_i); }
+            reference operator*() const { return child<multiset_type>::parent()->at(i); }
+            operator const_iterator() const { return const_iterator(child<multiset_type>::parent(), i); }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
             */
-            friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.m_i; }
+            friend std::ostream &operator<<(std::ostream &os, const iterator &it) { return os << it.i; }
 
         private:
-            size_type m_i;                          //!< Internal index to the current element.
+            size_type i;    //!< Internal index to the current element.
         };
 #endif
 
@@ -142,37 +143,37 @@ namespace boost { namespace self_healing {
             * \param index The index to start with.
             */
             explicit const_iterator(tree_pointer const parent, size_type index)
-                : child<multiset_type>(parent), m_i(index) {}
+                : child<multiset_type>(parent), i(index) {}
 
         public:
-            const_iterator operator+(difference_type n) const { return const_iterator(child<multiset_type>::parent(), m_i + n); }
-            const_iterator operator-(difference_type n) const { return const_iterator(child<multiset_type>::parent(), m_i - n); }
-            difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }
-            difference_type operator-(const const_iterator &rhs) const { return m_i - rhs.m_i; }
+            const_iterator operator+(difference_type n) const { return const_iterator(child<multiset_type>::parent(), i + n); }
+            const_iterator operator-(difference_type n) const { return const_iterator(child<multiset_type>::parent(), i - n); }
+            difference_type operator+(const const_iterator &rhs) const { return i + rhs.i; }
+            difference_type operator-(const const_iterator &rhs) const { return i - rhs.i; }
 
-            const_iterator& operator+=(difference_type n) { m_i += n; return *this; }
-            const_iterator& operator-=(difference_type n) { m_i -= n; return *this; }
-            const_iterator& operator++() { ++m_i; return *this; }
-            const_iterator& operator++(int) { m_i++; return *this; }
-            const_iterator& operator--() { --m_i; return *this; }
-            const_iterator& operator--(int) { m_i--; return *this; }
+            const_iterator& operator+=(difference_type n) { i += n; return *this; }
+            const_iterator& operator-=(difference_type n) { i -= n; return *this; }
+            const_iterator& operator++() { ++i; return *this; }
+            const_iterator& operator++(int) { i++; return *this; }
+            const_iterator& operator--() { --i; return *this; }
+            const_iterator& operator--(int) { i--; return *this; }
 
             // comparison
-            bool operator==(const const_iterator& other) const { return m_i == other.m_i; }
-            bool operator!=(const const_iterator& other) const { return m_i != other.m_i; }
-            bool operator>(const const_iterator &other) const { return m_i > other.m_i; }
-            bool operator>=(const const_iterator &other) const { return m_i >= other.m_i; }
-            bool operator<(const const_iterator &other) const { return m_i < other.m_i; }
-            bool operator<=(const const_iterator &other) const { return m_i <= other.m_i; }
+            bool operator==(const const_iterator &other) const { return i == other.i; }
+            bool operator!=(const const_iterator &other) const { return i != other.i; }
+            bool operator>(const const_iterator &other) const { return i > other.i; }
+            bool operator>=(const const_iterator &other) const { return i >= other.i; }
+            bool operator<(const const_iterator &other) const { return i < other.i; }
+            bool operator<=(const const_iterator &other) const { return i <= other.i; }
 
-            const_reference operator*() const { return child<multiset_type>::parent()->at(m_i); }
+            const_reference operator*() const { return child<multiset_type>::parent()->at(i); }
 
             /*! Overload for operator<<() of std::ostream to print a const_iterator.
             */
-            friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) { return os << it.m_i; }
+            friend std::ostream &operator<<(std::ostream &os, const const_iterator &it) { return os << it.i; }
 
         private:
-            size_type m_i;  //!< Internal index to the current element.
+            size_type i;    //!< Internal index to the current element.
         };
 #endif
 
@@ -216,7 +217,7 @@ namespace boost { namespace self_healing {
         /*! Copy constructor to copy from a <code>boost::self_healing::multiset</code>.
         * \param rhs The other <code>boost::self_healing::multiset</code> to copy from.
         */
-        multiset(const multiset<Key, Compare, L, CS> &rhs) {
+        multiset(const multiset_reference rhs) {
             //TODO
         }
 
@@ -233,7 +234,7 @@ namespace boost { namespace self_healing {
             //TODO
         }
 
-        multiset_type& operator=(const multiset<Key, Compare, L, CS> &rhs) {
+        multiset_type& operator=(const multiset_reference rhs) {
             //TODO
         }
 
@@ -255,27 +256,28 @@ namespace boost { namespace self_healing {
         size_type max_size() const;
 
         // modifiers
-        iterator insert(const value_type &value);
-        iterator insert(iterator, const value_type &value);
+        iterator insert(const_reference value);
+        iterator insert(iterator pos, const_reference value);
         template <class InputIterator>
         void insert(InputIterator first, InputIterator last);
 
         void erase(iterator pos);
-        size_type erase(const key_type &key);
+        size_type erase(const_reference key);
         void erase(iterator first, iterator last);
-        void swap(multiset<Key, Compare, L, CS> &rhs);
+        void swap(multiset_reference rhs);
         void clear();
 
-        // Observers
-        key_compare key_comp () const;
-        value_compare value_comp () const;
+        // observers
+        // TODO: check back
+        key_compare key_comp() const { return Compare; }
+        value_compare value_comp() const { return Compare; }
 
         // multiset operations
-        iterator find(const key_type &key) const;
-        size_type count(const key_type &key) const;
-        iterator lower_bound(const key_type &key) const;
-        iterator upper_bound(const key_type &key) const;
-        std::pair<iterator, iterator> equal_range(const key_type &key) const;
+        iterator find(const_reference key) const;
+        size_type count(const_reference key) const;
+        iterator lower_bound(const_reference key) const;
+        iterator upper_bound(const_reference key) const;
+        std::pair<iterator, iterator> equal_range(const_reference key) const;
 
         /*! Check index validity against size.
         * \param index The index to check.
