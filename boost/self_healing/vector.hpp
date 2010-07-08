@@ -52,8 +52,8 @@ namespace boost { namespace self_healing {
     {
         // private type definitions
         typedef vector<T, CS>         vector_type;
-        typedef vector<T, CS> &       vector_reference;
         typedef vector<T, CS> *       vector_pointer;
+        typedef vector<T, CS> &       vector_reference;
         typedef vector_chunk<T, CS>   vector_chunk_type;    //!< A vector chunk.
         typedef vector_chunk<T, CS> * vector_chunk_pointer; //!< A pointer to vector chunk.
 
