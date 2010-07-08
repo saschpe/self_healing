@@ -52,6 +52,7 @@ namespace boost { namespace self_healing {
     {
         // private type definitions
         typedef vector<T, CS>         vector_type;
+        typedef vector<T, CS> &       vector_reference;
         typedef vector<T, CS> *       vector_pointer;
         typedef vector_chunk<T, CS>   vector_chunk_type;    //!< A vector chunk.
         typedef vector_chunk<T, CS> * vector_chunk_pointer; //!< A pointer to vector chunk.
@@ -214,7 +215,7 @@ namespace boost { namespace self_healing {
         /*! Copy constructor to copy from a <code>boost::self_healing::vector</code>.
         * \param rhs The other <code>boost::self_healing::vector</code> to copy from.
         */
-        vector(const vector_type &rhs)
+        vector(const vector_reference rhs)
             : head(0), size1(0), chunks(0), size2(0), tail(0), size3(0) {
             assign(rhs.begin(), rhs.end());
         }
@@ -234,7 +235,7 @@ namespace boost { namespace self_healing {
             delete[] head;
         }
 
-        vector_type& operator=(const vector_type &rhs) {
+        vector_reference operator=(const vector_reference rhs) {
             assign(rhs.begin(), rhs.end());
         };
 
