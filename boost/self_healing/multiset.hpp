@@ -87,7 +87,7 @@ namespace boost { namespace self_healing {
             * \param index The index to start with.
             */
             explicit iterator(tree_pointer const parent, size_type index)
-                : child<tree_type>(parent), m_i(index) {}
+                : child<multiset_type>(parent), m_i(index) {}
 
         public:
             /*! Default constructor.
@@ -95,10 +95,10 @@ namespace boost { namespace self_healing {
             *          there to satisfy some STL algorithms.
             */
             iterator()
-                : child<tree_type>(0), m_i(-1) {}
+                : child<multiset_type>(0), m_i(-1) {}
 
-            iterator operator+(difference_type n) const { return iterator(child<tree_type>::parent(), m_i + n); }
-            iterator operator-(difference_type n) const { return iterator(child<tree_type>::parent(), m_i - n); }
+            iterator operator+(difference_type n) const { return iterator(child<multiset_type>::parent(), m_i + n); }
+            iterator operator-(difference_type n) const { return iterator(child<multiset_type>::parent(), m_i - n); }
             difference_type operator+(const iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -117,8 +117,8 @@ namespace boost { namespace self_healing {
             bool operator<(const iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const iterator &other) const { return m_i <= other.m_i; }
 
-            reference operator*() const { return child<tree_type>::parent()->at(m_i); }
-            operator const_iterator() const { return const_iterator(child<tree_type>::parent(), m_i); }
+            reference operator*() const { return child<multiset_type>::parent()->at(m_i); }
+            operator const_iterator() const { return const_iterator(child<multiset_type>::parent(), m_i); }
 
             /*! Overload for operator<<() of std::ostream to print an iterator.
             */
@@ -141,11 +141,11 @@ namespace boost { namespace self_healing {
             * \param index The index to start with.
             */
             explicit const_iterator(tree_pointer const parent, size_type index)
-                : child<multiset<value_type, CS> >(parent), m_i(index) {}
+                : child<multiset_type>(parent), m_i(index) {}
 
         public:
-            const_iterator operator+(difference_type n) const { return const_iterator(child<tree_type>::parent(), m_i + n); }
-            const_iterator operator-(difference_type n) const { return const_iterator(child<tree_type>::parent(), m_i - n); }
+            const_iterator operator+(difference_type n) const { return const_iterator(child<multiset_type>::parent(), m_i + n); }
+            const_iterator operator-(difference_type n) const { return const_iterator(child<multiset_type>::parent(), m_i - n); }
             difference_type operator+(const const_iterator &rhs) const { return m_i + rhs.m_i; }
             difference_type operator-(const const_iterator &rhs) const { return m_i - rhs.m_i; }
 
@@ -164,7 +164,7 @@ namespace boost { namespace self_healing {
             bool operator<(const const_iterator &other) const { return m_i < other.m_i; }
             bool operator<=(const const_iterator &other) const { return m_i <= other.m_i; }
 
-            const_reference operator*() const { return child<tree_type>::parent()->at(m_i); }
+            const_reference operator*() const { return child<multiset_type>::parent()->at(m_i); }
 
             /*! Overload for operator<<() of std::ostream to print a const_iterator.
             */
