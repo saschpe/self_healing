@@ -52,8 +52,8 @@ namespace boost { namespace self_healing {
     {
         // private type definitions
         typedef array<T, N>                         array_type;
-        typedef array<T, N> &                       array_reference;
         typedef array<T, N> *                       array_pointer;
+        typedef array<T, N> &                       array_reference;
         typedef typename safe_ref<T>::function_type function_type;
 
     public:
