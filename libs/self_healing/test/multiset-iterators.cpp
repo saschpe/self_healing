@@ -1,4 +1,4 @@
-/* Test case for class btree.
+/* Test case for class multiset.
  *
  * (C) Copyright Sascha Peilicke 2010.
  *
@@ -9,15 +9,15 @@
  * 31 May 2010 - Initial Revision (Sascha Peilicke)
  */
 
-#include <boost/self_healing/btree.hpp>
+#include <boost/self_healing/multiset.hpp>
 
 #include <iostream>
 
 int main()
 {
-    std::cout << "testing class boost::self_healing::btree<> iterators" << std::endl;
+    std::cout << "testing class boost::self_healing::multiset<> iterators" << std::endl;
 
-    boost::self_healing::btree<char> t;
+    boost::self_healing::multiset<char> set;
 
     return 0;
 }
