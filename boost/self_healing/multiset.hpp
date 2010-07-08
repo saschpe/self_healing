@@ -53,17 +53,17 @@ namespace boost { namespace self_healing {
     class multiset
     {
         // private type definitions
-        typedef multiset<Key, Compare, L, CS>      multiset_type;
-        typedef multiset<Key, Compare, L, CS> *    multiset_pointer;
-        typedef multiset_node<Key, L, CS> leaf_type;
-        typedef multiset_node<Key, L, CS> node_type;
+        typedef multiset<Key, Compare, L, CS>   multiset_type;
+        typedef multiset<Key, Compare, L, CS> * multiset_pointer;
+        typedef multiset_node<Key, L, CS>       leaf_type;
+        typedef multiset_node<Key, L, CS>       node_type;
 
     public:
         // type definitions
-        typedef Key             key_type;           //!<
+        typedef Key             key_type;           //!< TODO.
         typedef Key             value_type;         //!< The type of elements stored in the <code>multiset</code>.
-        typedef Compare         key_compare;
-        typedef Compare         value_compare;
+        typedef Compare         key_compare;        //!< TODO.
+        typedef Compare         value_compare;      //!< TODO.
         class                   iterator;           //!< Forward declaration of class iterator.
         class                   const_iterator;     //!< Forward declaration of class const_iterator.
         typedef Key *           pointer;            //!< A pointer to an element.
@@ -75,10 +75,6 @@ namespace boost { namespace self_healing {
 
     public:
         /*! \brief A (random access) iterator used to iterate through the <code>multiset</code>.
-        *
-        * A safe iterator that calls a functor if the value at the current
-        * position is changed. Checksumms are also updated correctly if the
-        * iterator is dereferenced.
         */
         class iterator : public child<multiset_type>, public std::iterator<std::random_access_iterator_tag, value_type>
         {};

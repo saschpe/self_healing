@@ -51,11 +51,11 @@ namespace boost { namespace self_healing {
 
     public:
         // type definitions
-        typedef T                       value_type;         //!< The type of elements stored in the <code>multiset_node</code>.
-        typedef const T &               const_reference;    //!< A const reference to an element.
-        typedef multiset_node<T, L, CS>    parent_type;        //!< The type of the parent.
-        typedef multiset_node<T, L, CS> *  parent_pointer;     //!< Pointer to parent objects.
-        typedef multiset_leaf<T, L, CS>    leaf_type;          //!< The type of the leaves that may be children of <code>multiset_node</code>
+        typedef T                         value_type;       //!< The type of elements stored in the <code>multiset_node</code>.
+        typedef const T &                 const_reference;  //!< A const reference to an element.
+        typedef multiset_node<T, L, CS>   parent_type;      //!< The type of the parent.
+        typedef multiset_node<T, L, CS> * parent_pointer;   //!< Pointer to parent objects.
+        typedef multiset_leaf<T, L, CS>   leaf_type;        //!< The type of the leaves that may be children of <code>multiset_node</code>
 
     public:
         /*! Default constructor.
@@ -72,7 +72,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::multiset_node<T, CS>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::multiset_node<T, L, CS>::is_valid()" << std::endl;
 #endif
             try {
                 // check all parts of the data structure
@@ -80,7 +80,7 @@ namespace boost { namespace self_healing {
                 return child<parent_type>::is_valid(parent);
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::multiset_node<T, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::multiset_node<T, L, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -89,7 +89,7 @@ namespace boost { namespace self_healing {
     private:
         void check_children() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::multiset_node<T, CS>::check_children" << std::endl;
+            std::cout << "boost::self_healing::multiset_node<T, L, CS>::check_children" << std::endl;
 #endif
             //TODO: implement
         }

@@ -73,7 +73,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid(parent_pointer const parent = 0, sibling_pointer const next = 0, sibling_pointer const previous = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::multiset_leaf<T, CS>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::multiset_leaf<T, L, CS>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.
             return child<parent_type>::is_valid(parent) &&
