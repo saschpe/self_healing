@@ -1,9 +1,9 @@
 /*! \file
-* \brief B-Tree.
+* \brief Multiset.
 *
-* This file contains the class b-tree, an self-healing STL-like B-tree
-* with checksumming. This allows to monitor the validity of the B-tree's
-* content.
+* This file contains the class multiset, an self-healing STL multiset that
+* uses a B-tree internally with checksumming. This allows to monitor the
+* validity of the multiset content.
 *
 * (C) Copyright Sascha Peilicke 2010.
 *
@@ -14,12 +14,12 @@
 * 31 May 2010 - Initial Revision (Sascha Peilicke)
 */
 
-#ifndef BOOST_SELF_HEALING_BTREE_HPP
-#define BOOST_SELF_HEALING_BTREE_HPP
+#ifndef BOOST_SELF_HEALING_MULTISET_HPP
+#define BOOST_SELF_HEALING_MULTISET_HPP
 
 #include "detail/safe_ref.hpp"
-#include "detail/btree_leaf.hpp"
-#include "detail/btree_node.hpp"
+#include "detail/multiset_leaf.hpp"
+#include "detail/multiset_node.hpp"
 
 #include <boost/config.hpp>
 #include <boost/detail/iterator.hpp>
@@ -46,20 +46,20 @@ namespace boost { namespace self_healing {
     * \param L Optional amount of children of nodes.
     * \param CS Optional (chunk) storage capacity of leaves.
     * \remarks The chunk size should be chosen based on CPU cache size.
-    * \see btree_leaf, btree_node
+    * \see multiset_leaf, multiset_node
     */
     template <class T, std::size_t L = 8, std::size_t CS = 64>
-    class btree
+    class multiset
     {
         // private type definitions
-        typedef btree<T, L. CS>         tree_type;
-        typedef btree<T, L. CS> *       tree_pointer;
-        typedef btree_node<T, L, CS>    leaf_type;
-        typedef btree_node<T, L, CS>    node_type;
+        typedef multiset<T, L. CS>      multiset_type;
+        typedef multiset<T, L. CS> *    multiset_pointer;
+        typedef multiset_node<T, L, CS> leaf_type;
+        typedef multiset_node<T, L, CS> node_type;
 
     public:
         // type definitions
-        typedef T               value_type;         //!< The type of elements stored in the <code>btree</code>.
+        typedef T               value_type;         //!< The type of elements stored in the <code>multiset</code>.
         class                   iterator;           //!< Forward declaration of class iterator.
         class                   const_iterator;     //!< Forward declaration of class const_iterator.
         typedef T *             pointer;            //!< A pointer to an element.
@@ -70,20 +70,20 @@ namespace boost { namespace self_healing {
         typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
 
     public:
-        /*! \brief A (random access) iterator used to iterate through the <code>btree</code>.
+        /*! \brief A (random access) iterator used to iterate through the <code>multiset</code>.
         *
         * A safe iterator that calls a functor if the value at the current
         * position is changed. Checksumms are also updated correctly if the
         * iterator is dereferenced.
         */
-        class iterator : public child<tree_type>, public std::iterator<std::random_access_iterator_tag, value_type>
+        class iterator : public child<multiset_type>, public std::iterator<std::random_access_iterator_tag, value_type>
         {};
 #if 0
         {
-            friend class btree;
+            friend class multiset;
 
             /*! Private constructor.
-            * \param parent The btree parent.
+            * \param parent The multiset parent.
             * \param index The index to start with.
             */
             explicit iterator(tree_pointer const parent, size_type index)
@@ -129,19 +129,19 @@ namespace boost { namespace self_healing {
         };
 #endif
 
-        /*! A const (random access) iterator used to iterate through the <code>btree</code>.
+        /*! A const (random access) iterator used to iterate through the <code>multiset</code>.
         */
-        class const_iterator : public child<tree_type>, public std::iterator<std::random_access_iterator_tag, value_type>
+        class const_iterator : public child<multiset_type>, public std::iterator<std::random_access_iterator_tag, value_type>
         {};
 #if 0
-            friend class btree;
+            friend class multiset;
 
             /*! Private constructor.
-            * \param parent The btree parent.
+            * \param parent The multiset parent.
             * \param index The index to start with.
             */
             explicit const_iterator(tree_pointer const parent, size_type index)
-                : child<btree<value_type, CS> >(parent), m_i(index) {}
+                : child<multiset<value_type, CS> >(parent), m_i(index) {}
 
         public:
             const_iterator operator+(difference_type n) const { return const_iterator(child<tree_type>::parent(), m_i + n); }
@@ -197,13 +197,13 @@ namespace boost { namespace self_healing {
 
         /*! Default constructor.
         */
-        explicit btree() {}
+        explicit multiset() {}
 
         /*! Constructor to initialize the B-tree with a custom size and an optional fill value.
         * \param n Custom initial B-tree size.
         * \param x Optional value to fill the B-tree with.
         */
-        btree(size_type n, const_reference x = value_type()) {
+        multiset(size_type n, const_reference x = value_type()) {
             assign(n, x);
         }
 
@@ -212,24 +212,24 @@ namespace boost { namespace self_healing {
         * \param last End of value range.
         */
         template <class InputIterator>
-        btree(InputIterator first, InputIterator last) {
+        multiset(InputIterator first, InputIterator last) {
             assign(first, last);
         }
 
-        /*! Copy constructor to copy from a <code>btree</code>.
-        * \param rhs The other <code>btree</code> to copy from.
+        /*! Copy constructor to copy from a <code>multiset</code>.
+        * \param rhs The other <code>multiset</code> to copy from.
         */
-        btree(const tree_type&rhs) {
+        multiset(const multiset_type&rhs) {
             assign(rhs.begin(), rhs.end());
         }
 
         /*! Destructor.
         */
-        ~btree() {
+        ~multiset() {
             //TODO:
         }
 
-        tree_type & operator=(const tree_type &rhs) {
+        multiset_type & operator=(const multiset_type &rhs) {
             assign(rhs.begin(), rhs.end());
         };
 
@@ -304,7 +304,7 @@ namespace boost { namespace self_healing {
             }
         }
 
-        void swap(btree<value_type> &rhs) {
+        void swap(multiset<value_type> &rhs) {
             //TODO:
         }
 
@@ -314,7 +314,7 @@ namespace boost { namespace self_healing {
         */
         void rangecheck(size_type index) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::btree<T, L, CS>::rangecheck(" << index << ")" << std::endl;
+            std::cout << "boost::self_healing::multiset<T, L, CS>::rangecheck(" << index << ")" << std::endl;
 #endif
             if (index >= size()) {
                 std::out_of_range e("index out of range");
@@ -328,7 +328,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::btree<T, L, CS>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::multiset<T, L, CS>::is_valid()" << std::endl;
 #endif
             try {
                 // check all parts of the data structure
@@ -336,7 +336,7 @@ namespace boost { namespace self_healing {
                 return true;
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::btree<T, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::multiset<T, CS>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -349,38 +349,38 @@ namespace boost { namespace self_healing {
 
     // comparisons
     template <class T, std::size_t L, std::size_t CS>
-    inline bool operator==(const btree<T, L, CS> &x, const btree<T, L, CS> &y) {
+    inline bool operator==(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
     template <class T, std::size_t L, std::size_t CS>
-    inline bool operator<(const btree<T, L, CS> &x, const btree<T, L, CS> &y) {
+    inline bool operator<(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
         return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
     }
     template <class T, std::size_t L, std::size_t CS>
-    inline bool operator!=(const btree<T, L, CS> &x, const btree<T, L, CS> &y) {
+    inline bool operator!=(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
         return !(x == y);
     }
     template <class T, std::size_t L, std::size_t CS>
-    inline bool operator>(const btree<T, L, CS> &x, const btree<T, L, CS> &y) {
+    inline bool operator>(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
         return y < x;
     }
     template <class T, std::size_t L, std::size_t CS>
-    inline bool operator<=(const btree<T, L, CS> &x, const btree<T, L, CS> &y) {
+    inline bool operator<=(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
         return !(y < x);
     }
     template <class T, std::size_t L, std::size_t CS>
-    inline bool operator>=(const btree<T, L, CS> &x, const btree<T, L, CS> &y) {
+    inline bool operator>=(const multiset<T, L, CS> &x, const multiset<T, L, CS> &y) {
         return !(x < y);
     }
 
     /*! Global swap function.
     */
     template <class T, std::size_t L, std::size_t CS>
-    inline void swap(btree<T, L, CS> &x, btree<T, L, CS> &y) {
+    inline void swap(multiset<T, L, CS> &x, multiset<T, L, CS> &y) {
         x.swap(y);
     }
 
 } } // namespace boost::self_healing
 
 
-#endif // BOOST_SELF_HEALING_BTREE_HPP
+#endif // BOOST_SELF_HEALING_MULTISET_HPP

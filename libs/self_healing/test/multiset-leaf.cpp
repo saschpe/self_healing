@@ -1,4 +1,4 @@
-/* Test case for class btree-leaf.
+/* Test case for class multiset-leaf.
  *
  * (C) Copyright Sascha Peilicke 2010.
  *
@@ -9,18 +9,18 @@
  * 31 May 2010 - Initial Revision (Sascha Peilicke)
  */
 
-#include <boost/self_healing/detail/btree_leaf.hpp>
+#include <boost/self_healing/detail/multiset_leaf.hpp>
 
 #include <iostream>
 
 int main()
 {
-    std::cout << "testing class boost::self_healing::btree_leaf<>" << std::endl;
+    std::cout << "testing class boost::self_healing::multiset_leaf<>" << std::endl;
 
-    boost::self_healing::btree_node<int, 3, 3> parent;
-    boost::self_healing::btree_leaf<int, 3, 3> leaf1(&parent);
-    boost::self_healing::btree_leaf<int, 3, 3> leaf2(&parent);
-    boost::self_healing::btree_leaf<int, 3, 3> leaf3(&parent);
+    boost::self_healing::multiset_node<int, 3, 3> parent;
+    boost::self_healing::multiset_leaf<int, 3, 3> leaf1(&parent);
+    boost::self_healing::multiset_leaf<int, 3, 3> leaf2(&parent);
+    boost::self_healing::multiset_leaf<int, 3, 3> leaf3(&parent);
 
     leaf1.set_next(&leaf2);
     leaf2.set_next(&leaf3);
