@@ -351,4 +351,17 @@ namespace boost { namespace self_healing {
 } } // namespace boost::self_healing
 
 
+/*! Overload for operator << of std::ostream to print a multiset.
+*/
+template <class Key, class Compare, std::size_t L, std::size_t CS>
+std::ostream &operator<<(std::ostream &os, const boost::self_healing::multiset<Key, Compare, L/, CS> &multiset)
+{
+    os << "[";
+    for (std::size_t i = 0; i < multiset.size(); i++) {
+        os << (i == 0 ? "" : ",") << multiset[i];
+    }
+    return os << "]";
+}
+
+
 #endif // BOOST_SELF_HEALING_MULTISET_HPP
