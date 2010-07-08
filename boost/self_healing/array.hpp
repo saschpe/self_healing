@@ -51,6 +51,9 @@ namespace boost { namespace self_healing {
     class array
     {
         // private type definitions
+        typedef array<T, N>                         array_type;
+        typedef array<T, N> &                       array_reference;
+        typedef array<T, N> *                       array_pointer;
         typedef typename safe_ref<T>::function_type function_type;
 
     public:
@@ -180,7 +183,7 @@ namespace boost { namespace self_healing {
         /*! Swap with other checksummed array (note: linear complexity).
         * \param other The other checksummed array to swap with.
         */
-        void swap(array<value_type, N> &other) {
+        void swap(array_reference other) {
             for (size_type i = 0; i < N; ++i) {
                 boost::swap(elements[i], other.elements[i]);
             }
@@ -201,7 +204,7 @@ namespace boost { namespace self_healing {
         * \return Reference to the new checksummed array.
         */
         template <typename T2>
-        array<value_type, N>& operator=(const array<T2, N> &other) {
+        array_reference operator=(const array<T2, N> &other) {
             for (size_type i = 0; i < size(); i++) {
                 elements[i] = other.elements[i];
             }
@@ -255,7 +258,7 @@ namespace boost { namespace self_healing {
         * \param os TODO.
         * \param array The array instance to print.
         */
-        friend std::ostream &operator<<(std::ostream &os, const boost::self_healing::array<T, N> &array)
+        friend std::ostream &operator<<(std::ostream &os, const array_reference array)
         {
             os << "[";
             for (std::size_t i = 0; i < array.size(); i++) {
@@ -315,13 +318,13 @@ namespace boost { namespace self_healing {
             /*! Constructor.
             * \param parent The checksummed array instance for which to call check_checksums().
             */
-            explicit check_checksums_functor(array<value_type, N> *parent)
-                : m_parent(parent) {}
+            explicit check_checksums_functor(array_pointer parent)
+                : parent(parent) {}
 
-            void operator()() { m_parent->check_checksums(); }
+            void operator()() { parent->check_checksums(); }
 
         private:
-            array<value_type, N> *m_parent; //!< Internal reference to owning parent checksummed array instance.
+            array_pointer parent; //!< Internal reference to owning parent checksummed array instance.
         };
 
         /*! Compute and store CRC checksums.
@@ -344,13 +347,13 @@ namespace boost { namespace self_healing {
             /*! Constructor.
             * \param parent The checksummed array instance for wich to call update_checksums().
             */
-            explicit update_checksums_functor(array<value_type, N> *parent)
-                : m_parent(parent) {}
+            explicit update_checksums_functor(array_pointer parent)
+                : parent(parent) {}
 
-            void operator()() { m_parent->update_checksums(); }
+            void operator()() { parent->update_checksums(); }
 
         private:
-            array<value_type, N> *m_parent; //!< Internal reference to owning parent checksummed array instance.
+            array_pointer parent; //!< Internal reference to owning parent checksummed array instance.
         };
 
         checksum_type crc1;         //!< Internal first checksum.
