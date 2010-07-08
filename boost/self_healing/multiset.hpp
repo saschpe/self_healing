@@ -32,6 +32,7 @@
 #ifdef BOOST_SELF_HEALING_DEBUG
 #   include <iostream>
 #endif
+#include <set>
 #include <stdexcept>
 
 
@@ -49,7 +50,7 @@ namespace boost { namespace self_healing {
     * \remarks The chunk size should be chosen based on CPU cache size.
     * \see multiset_leaf, multiset_node
     */
-    template <class Key, class Compare = less<Key>, std::size_t L = 8, std::size_t CS = 64>
+    template <class Key, class Compare = std::less<Key>, std::size_t L = 8, std::size_t CS = 64>
     class multiset
     {
         // private type definitions
@@ -232,7 +233,7 @@ namespace boost { namespace self_healing {
             //TODO
         }
 
-        multiset<Key, Compare, L, CS>& operator=(const multiset<Key, Compare, L, CS> &rhs) {
+        multiset_type& operator=(const multiset<Key, Compare, L, CS> &rhs) {
             //TODO
         }
 
@@ -274,7 +275,7 @@ namespace boost { namespace self_healing {
         size_type count(const key_type &key) const;
         iterator lower_bound(const key_type &key) const;
         iterator upper_bound(const key_type &key) const;
-        pair<iterator, iterator> equal_range(const key_type &key) const;
+        std::pair<iterator, iterator> equal_range(const key_type &key) const;
 
         /*! Check index validity against size.
         * \param index The index to check.
@@ -317,7 +318,7 @@ namespace boost { namespace self_healing {
 
     // comparisons
     template <class Key, class Compare, std::size_t L, std::size_t CS>
-    inline bool operator==(const multiset<Key, L, CS> &x, const multiset<Key, L, CS> &y) {
+    inline bool operator==(const multiset<Key, Compare, L, CS> &x, const multiset<Key, Compare, L, CS> &y) {
         return std::equal(x.begin(), x.end(), y.begin());
     }
     template <class Key, class Compare, std::size_t L, std::size_t CS>
@@ -354,7 +355,7 @@ namespace boost { namespace self_healing {
 /*! Overload for operator << of std::ostream to print a multiset.
 */
 template <class Key, class Compare, std::size_t L, std::size_t CS>
-std::ostream &operator<<(std::ostream &os, const boost::self_healing::multiset<Key, Compare, L/, CS> &multiset)
+std::ostream &operator<<(std::ostream &os, const boost::self_healing::multiset<Key, Compare, L, CS> &multiset)
 {
     os << "[";
     for (std::size_t i = 0; i < multiset.size(); i++) {
