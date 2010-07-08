@@ -72,11 +72,7 @@ namespace boost { namespace self_healing {
 
     public:
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
-        *
-        * A safe iterator that calls a functor if the value at the current
-        * position is changed. Checksumms are also updated correctly if the
-        * iterator is dereferenced.
-        */
+       */
         class iterator : public child<vector_type>, public std::iterator<std::random_access_iterator_tag, value_type>
         {
             friend class vector;
