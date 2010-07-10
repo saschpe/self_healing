@@ -57,7 +57,7 @@ namespace boost { namespace self_healing {
         typedef multiset<Key, Compare, L, CS>   multiset_type;
         typedef multiset<Key, Compare, L, CS> * multiset_pointer;
         typedef multiset<Key, Compare, L, CS> & multiset_reference;
-        typedef multiset_node<Key, L, CS>       leaf_type;
+        typedef multiset_leaf<Key, L, CS>       leaf_type;
         typedef multiset_node<Key, L, CS>       node_type;
 
     public:
