@@ -46,9 +46,6 @@ namespace boost { namespace self_healing {
     template <class T, std::size_t L = 8, std::size_t CS = 64>
     class multiset_node : public child<multiset_node<T, L, CS> >
     {
-        // private type definitions
-        typedef multiset_node<T, L, CS>    node_type;
-
     public:
         // type definitions
         typedef T                         value_type;       //!< The type of elements stored in the <code>multiset_node</code>.
@@ -56,6 +53,7 @@ namespace boost { namespace self_healing {
         typedef multiset_node<T, L, CS>   parent_type;      //!< The type of the parent.
         typedef multiset_node<T, L, CS> * parent_pointer;   //!< Pointer to parent objects.
         typedef multiset_leaf<T, L, CS>   leaf_type;        //!< The type of the leaves that may be children of <code>multiset_node</code>
+        typedef multiset_node<T, L, CS>   node_type;
 
     public:
         /*! Default constructor.
