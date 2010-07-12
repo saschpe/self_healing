@@ -79,8 +79,6 @@ namespace boost { namespace self_healing {
         /*! \brief A (random access) iterator used to iterate through the <code>multiset</code>.
         */
         class iterator : public child<multiset_type>, public std::iterator<std::random_access_iterator_tag, value_type>
-        {};
-#if 0
         {
             friend class multiset;
 
@@ -88,7 +86,7 @@ namespace boost { namespace self_healing {
             * \param parent The multiset parent.
             * \param index The index to start with.
             */
-            explicit iterator(tree_pointer const parent, size_type index)
+            explicit iterator(multiset_pointer const parent, size_type index)
                 : child<multiset_type>(parent), i(index) {}
 
         public:
@@ -129,20 +127,18 @@ namespace boost { namespace self_healing {
         private:
             size_type i;    //!< Internal index to the current element.
         };
-#endif
 
         /*! A const (random access) iterator used to iterate through the <code>multiset</code>.
         */
         class const_iterator : public child<multiset_type>, public std::iterator<std::random_access_iterator_tag, value_type>
-        {};
-#if 0
+        {
             friend class multiset;
 
             /*! Private constructor.
             * \param parent The multiset parent.
             * \param index The index to start with.
             */
-            explicit const_iterator(tree_pointer const parent, size_type index)
+            explicit const_iterator(multiset_pointer const parent, size_type index)
                 : child<multiset_type>(parent), i(index) {}
 
         public:
@@ -175,7 +171,6 @@ namespace boost { namespace self_healing {
         private:
             size_type i;    //!< Internal index to the current element.
         };
-#endif
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_MSVC_STD_ITERATOR) && !defined(BOOST_NO_STD_ITERATOR_TRAITS)
         typedef std::reverse_iterator<iterator> reverse_iterator;
@@ -239,10 +234,10 @@ namespace boost { namespace self_healing {
         }
 
         // iterators
-        iterator begin();
-        const_iterator begin() const;
-        iterator end();
-        const_iterator end() const;
+        iterator begin() { /*TODO*/ }
+        const_iterator begin() const { /*TODO*/ }
+        iterator end() { /*TODO*/ }
+        const_iterator end() const { /*TODO*/ }
 
         // reverse iterator support
         reverse_iterator rbegin() { return reverse_iterator(end()); }
@@ -251,33 +246,33 @@ namespace boost { namespace self_healing {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // capacity
-        bool empty() const;
-        size_type size() const;
-        size_type max_size() const;
+        bool empty() const { /*TODO*/ }
+        size_type size() const { /*TODO*/ }
+        size_type max_size() const { /*TODO*/ }
 
         // modifiers
-        iterator insert(const_reference value);
-        iterator insert(iterator pos, const_reference value);
+        iterator insert(const_reference value) { /*TODO*/ }
+        iterator insert(iterator pos, const_reference value) { /*TODO*/ }
         template <class InputIterator>
-        void insert(InputIterator first, InputIterator last);
+        void insert(InputIterator first, InputIterator last) { /*TODO*/ }
 
-        void erase(iterator pos);
-        size_type erase(const_reference key);
-        void erase(iterator first, iterator last);
-        void swap(multiset_reference rhs);
-        void clear();
+        void erase(iterator pos) { /*TODO*/ }
+        size_type erase(const_reference key) { /*TODO*/ }
+        void erase(iterator first, iterator last) { /*TODO*/ }
+        void swap(multiset_reference rhs) { /*TODO*/ }
+        void clear() { /*TODO*/ }
 
         // observers
         // TODO: check back
-        key_compare key_comp() const { return Compare; }
-        value_compare value_comp() const { return Compare; }
+        key_compare key_comp() const { /*TODO*/ }
+        value_compare value_comp() const { /*TODO*/ }
 
         // multiset operations
-        iterator find(const_reference key) const;
-        size_type count(const_reference key) const;
-        iterator lower_bound(const_reference key) const;
-        iterator upper_bound(const_reference key) const;
-        std::pair<iterator, iterator> equal_range(const_reference key) const;
+        iterator find(const_reference key) const { /*TODO*/ }
+        size_type count(const_reference key) const { /*TODO*/ }
+        iterator lower_bound(const_reference key) const { /*TODO*/ }
+        iterator upper_bound(const_reference key) const { /*TODO*/ }
+        std::pair<iterator, iterator> equal_range(const_reference key) const { /*TODO*/ }
 
         /*! Check index validity against size.
         * \param index The index to check.
@@ -382,11 +377,12 @@ namespace boost { namespace self_healing {
 /*! Overload for operator << of std::ostream to print a multiset.
 */
 template <class Key, class Compare, std::size_t L, std::size_t CS>
-std::ostream &operator<<(std::ostream &os, const boost::self_healing::multiset<Key, Compare, L, CS> &multiset)
+std::ostream &operator<<(std::ostream &os, const boost::self_healing::multiset<Key, Compare, L, CS> &set)
 {
     os << "[";
-    for (std::size_t i = 0; i < multiset.size(); i++) {
-        os << (i == 0 ? "" : ",") << multiset[i];
+    typedef typename boost::self_healing::multiset<Key, Compare, L, CS>::const_iterator const_iterator;
+    for (const_iterator it = set.begin(); it != set.end(); it++) {
+        os << *it << (it != set.end() - 1 ? "," : "");
     }
     return os << "]";
 }
