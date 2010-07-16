@@ -26,7 +26,7 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    template <class T, std::size_t CS>
+    template <class T, std::size_t Size>
     class vector; // forward declaration
 
     /*! \brief Vector element storage chunk.
@@ -35,28 +35,28 @@ namespace boost { namespace self_healing {
     * vector storage mechanism
     *
     * \param T The data type of the stored values.
-    * \param CS Optional storage capacity of the chunk.
+    * \param Size Optional storage capacity of the chunk.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child, array
     */
-    template <class T, std::size_t CS = 64>
-    class vector_chunk : public child<vector<T, CS> >, public array<T, CS>
+    template <class T, std::size_t Size = 64>
+    class vector_chunk : public child<vector<T, Size> >, public array<T, Size>
     {
     public:
         // type definitions
         typedef T               value_type;         //!< The type of elements stored in the <code>array</code>.
         typedef const T &       const_reference;    //!< A const reference to an element.
-        typedef vector<T, CS>   parent_type;
-        typedef vector<T, CS> * parent_pointer;
+        typedef vector<T, Size>   parent_type;
+        typedef vector<T, Size> * parent_pointer;
 
         /*! Default constructor.
         * \param parent The parent vector.
         * \param value An initial value that is set for all elements.
         */
         explicit vector_chunk(parent_pointer const parent = 0, const_reference value = 0)
-            : child<parent_type>(parent), array<value_type, CS>(value) {
+            : child<parent_type>(parent), array<value_type, Size>(value) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector_chunk<T, CS>::vector_chunk()"
+            std::cout << "boost::self_healing::vector_chunk<T, Size>::vector_chunk()"
                       << " parent: " << parent << " value: " << value << std::endl;
 #endif
         }
@@ -68,11 +68,11 @@ namespace boost { namespace self_healing {
         */
         bool is_valid(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector_chunk<T, CS>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::vector_chunk<T, Size>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.
             return child<parent_type>::is_valid(parent) &&
-                   array<value_type, CS>::is_valid();
+                   array<value_type, Size>::is_valid();
         }
     };
 
