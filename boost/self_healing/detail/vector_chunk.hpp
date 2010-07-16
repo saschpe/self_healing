@@ -44,8 +44,8 @@ namespace boost { namespace self_healing {
     {
     public:
         // type definitions
-        typedef T               value_type;         //!< The type of elements stored in the <code>array</code>.
-        typedef const T &       const_reference;    //!< A const reference to an element.
+        typedef T                 value_type;       //!< The type of elements stored in the <code>array</code>.
+        typedef const T &         const_reference;  //!< A const reference to an element.
         typedef vector<T, Size>   parent_type;
         typedef vector<T, Size> * parent_pointer;
 
