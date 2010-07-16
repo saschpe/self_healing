@@ -17,10 +17,10 @@ int main()
 {
     std::cout << "testing class boost::self_healing::multiset_leaf<>" << std::endl;
 
-    boost::self_healing::multiset_node<int, 3, 3> parent;
-    boost::self_healing::multiset_leaf<int, 3, 3> leaf1(&parent);
-    boost::self_healing::multiset_leaf<int, 3, 3> leaf2(&parent);
-    boost::self_healing::multiset_leaf<int, 3, 3> leaf3(&parent);
+    boost::self_healing::multiset_node<int, 3> parent;
+    boost::self_healing::multiset_leaf<int, 3> leaf1(&parent);
+    boost::self_healing::multiset_leaf<int, 3> leaf2(&parent);
+    boost::self_healing::multiset_leaf<int, 3> leaf3(&parent);
 
     leaf1.set_next(&leaf2);
     leaf2.set_next(&leaf3);

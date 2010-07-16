@@ -31,7 +31,7 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    template <class T, std::size_t Leaves, std::size_t Size>
+    template <class T, std::size_t Slots>
     class multiset_node; // forward declaration to break circular dependency
 
     /*! \brief TODO.
@@ -39,31 +39,30 @@ namespace boost { namespace self_healing {
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param Leaves Optional amount of children of nodes.
-    * \param Size Optional storage capacity of leaves.
+    * \param Slots Optional amount of children of nodes.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child, sibling, array
     */
-    template <class T, std::size_t Leaves = 8, std::size_t Size = 64>
-    class multiset_leaf : public child<multiset_node<T, Leaves, Size> >, public sibling<multiset_leaf<T, Leaves, Size> >, public array<T, Size>
+    template <class T, std::size_t Slots>
+    class multiset_leaf : public multiset_node<T, Slots>
+                        , public sibling<multiset_leaf<T, Slots> >
     {
     public:
         // type definitions
-        typedef T                                value_type;      //!< The type of elements stored in the <code>array</code>.
-        typedef const T &                        const_reference; //!< A const reference to an element.
-        typedef multiset_node<T, Leaves, Size>   parent_type;     //!< The type of the parent.
-        typedef multiset_node<T, Leaves, Size> * parent_pointer;  //!< Pointer to parent objects.
-        typedef multiset_leaf<T, Leaves, Size>   sibling_type;    //!< The type of the siblings.
-        typedef multiset_leaf<T, Leaves, Size> * sibling_pointer; //!< Pointer to sibling objects.
+        typedef T                         value_type;      //!< The type of elements stored in the <code>array</code>.
+        typedef const T &                 const_reference; //!< A const reference to an element.
+        typedef multiset_node<T, Slots>   parent_type;     //!< The type of the parent.
+        typedef multiset_node<T, Slots> * parent_pointer;  //!< Pointer to parent objects.
+        typedef multiset_leaf<T, Slots>   sibling_type;    //!< The type of the siblings.
+        typedef multiset_leaf<T, Slots> * sibling_pointer; //!< Pointer to sibling objects.
 
         /*! Default constructor.
         * \param parent The parent B-tree.
         * \param next Pointer to the next leaf sibling.
         * \param previous Pointer to the previous leaf sibling.
-        * \param value An initial value that is set for all elements.
         */
-        explicit multiset_leaf(parent_pointer const parent = 0, sibling_pointer const next = 0, sibling_pointer const previous = 0, const_reference value = 0)
-            : child<parent_type>(parent), sibling<sibling_type>(next, previous), array<value_type, Size>(value) {}
+        explicit multiset_leaf(parent_pointer const parent = 0, sibling_pointer const next = 0, sibling_pointer const previous = 0)
+            : multiset_node<T, Slots>(parent), sibling<sibling_type>(next, previous) {}
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent Optional pointer to the parent to check against.
@@ -76,9 +75,8 @@ namespace boost { namespace self_healing {
             std::cout << "boost::self_healing::multiset_leaf<T, Leaves, Size>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.
-            return child<parent_type>::is_valid(parent) &&
-                   sibling<sibling_type>::is_valid(next, previous) &&
-                   array<value_type, Size>::is_valid();
+            return multiset_node<value_type, Slots>::is_valid(parent) &&
+                   sibling<sibling_type>::is_valid(next, previous);
         }
     };
 

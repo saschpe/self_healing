@@ -17,8 +17,8 @@ int main()
 {
     std::cout << "testing class boost::self_healing::multiset_node<>" << std::endl;
 
-    boost::self_healing::multiset_node<int, 2, 2> parent;
-    boost::self_healing::multiset_node<int, 2, 2> child(&parent);
+    boost::self_healing::multiset_node<int, 2> parent;
+    boost::self_healing::multiset_node<int, 2> child(&parent);
 
     return 0;
 }
