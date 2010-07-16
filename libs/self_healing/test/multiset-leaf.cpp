@@ -10,6 +10,7 @@
  */
 
 #include <boost/self_healing/detail/multiset_leaf.hpp>
+#include <boost/self_healing/detail/multiset_node.hpp>
 
 #include <iostream>
 

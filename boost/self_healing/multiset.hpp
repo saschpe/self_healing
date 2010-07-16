@@ -59,9 +59,8 @@ namespace boost { namespace self_healing {
         /// has a size of about 256 bytes.
         static const unsigned short max_slots = MULTISET_MAX( 8, 256 / (sizeof(Key)) );
 
-        /// Computed B+ tree parameter: The minimum number of key slots used
-        /// in a leaf. If fewer slots are used, the leaf will be merged or slots
-        /// shifted from it's siblings.
+        /// The minimum number of key slots used in a leaf. If fewer slots are
+        /// used, the leaf will be merged or slots shifted from it's siblings.
         static const unsigned short min_slots = max_slots / 2;
 
         // private type definitions
@@ -89,7 +88,7 @@ namespace boost { namespace self_healing {
         typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
 
     public:
-        /*! \brief A (random access) iterator used to iterate through the <code>multiset</code>.
+        /*! \brief A bidirectional iterator used to iterate through the <code>multiset</code>.
         */
         class iterator : public child<multiset_type>, public std::iterator<std::bidirectional_iterator_tag, value_type>
         {
@@ -141,7 +140,7 @@ namespace boost { namespace self_healing {
             size_type i;    //!< Internal index to the current element.
         };
 
-        /*! A const (random access) iterator used to iterate through the <code>multiset</code>.
+        /*! A const bidirectional iterator used to iterate through the <code>multiset</code>.
         */
         class const_iterator : public child<multiset_type>, public std::iterator<std::bidirectional_iterator_tag, value_type>
         {

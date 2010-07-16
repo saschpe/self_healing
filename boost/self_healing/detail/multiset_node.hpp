@@ -41,7 +41,7 @@ namespace boost { namespace self_healing {
     */
     template <class T, std::size_t Slots>
     class multiset_node : public child<multiset_node<T, Slots> >
-                        , public array<multiset_node<T, Slots> *, Slots + 1>
+                        , public array<boost::variant<multiset_node<T, Slots> *, T>, Slots + 1>
     {
     public:
         // type definitions
@@ -53,7 +53,6 @@ namespace boost { namespace self_healing {
     public:
         /*! Default constructor.
         * \param parent The parent B-tree.
-        * \param value An initial value that is set for all elements.
         */
         explicit multiset_node(parent_pointer const parent = 0)
             : child<parent_type>(parent) {}
@@ -67,16 +66,9 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::multiset_node<T, Slots>::is_valid()" << std::endl;
 #endif
-            try {
-                // check all parts of the data structure
-                return child<parent_type>::is_valid(parent) &&
-                       array<parent_pointer, Slots + 1>::is_valid();
-            } catch (const std::runtime_error &e) {
-#ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::multiset_node<T, Slots>::is_valid() caught runtime error: " << e.what() << std::endl;
-#endif
-                return false;
-            };
+            // check all parts of the data structure
+            return child<parent_type>::is_valid(parent) &&
+                   array<boost::variant<multiset_node<T, Slots> *, T>, Slots + 1>::is_valid();
         }
     };
 

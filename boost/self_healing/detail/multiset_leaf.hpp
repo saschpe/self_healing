@@ -16,9 +16,8 @@
 #define BOOST_SELF_HEALING_MULTISET_LEAF_HPP
 
 #include "child.hpp"
-#include "multiset_node.hpp"
 #include "sibling.hpp"
-#include "../array.hpp"
+#include "multiset_node.hpp"
 
 #include <boost/throw_exception.hpp>
 
@@ -31,15 +30,12 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    template <class T, std::size_t Slots>
-    class multiset_node; // forward declaration to break circular dependency
-
     /*! \brief TODO.
     *
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param Slots Optional amount of children of nodes.
+    * \param Slots Amount of leaf elements.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child, sibling, array
     */
@@ -62,7 +58,7 @@ namespace boost { namespace self_healing {
         * \param previous Pointer to the previous leaf sibling.
         */
         explicit multiset_leaf(parent_pointer const parent = 0, sibling_pointer const next = 0, sibling_pointer const previous = 0)
-            : multiset_node<T, Slots>(parent), sibling<sibling_type>(next, previous) {}
+            : multiset_node<value_type, Slots>(parent), sibling<sibling_type>(next, previous) {}
 
         /*! Validity check that tries to correct minor faults silently.
         * \param parent Optional pointer to the parent to check against.
@@ -72,7 +68,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid(parent_pointer const parent = 0, sibling_pointer const next = 0, sibling_pointer const previous = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::multiset_leaf<T, Leaves, Size>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::multiset_leaf<T, Slots>::is_valid()" << std::endl;
 #endif
             // call the is_valid methods of all base classes.
             return multiset_node<value_type, Slots>::is_valid(parent) &&
