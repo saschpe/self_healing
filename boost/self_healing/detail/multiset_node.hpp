@@ -30,7 +30,7 @@
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
 namespace boost { namespace self_healing {
 
-    template <class T, std::size_t L, std::size_t Size>
+    template <class T, std::size_t Leaves, std::size_t LeafSize>
     class multiset_leaf; // forward declaration to break circular dependency
 
     /*! \brief TODO.
@@ -38,22 +38,22 @@ namespace boost { namespace self_healing {
     * TODO.
     *
     * \param T The data type of the stored values.
-    * \param L Optional amount of children of nodes.
-    * \param Size Optional storage capacity of leaves.
+    * \param Leaves Optional amount of children of nodes.
+    * \param LeafSize Optional storage capacity of leaves.
     * \throws std::invalid_argument Thrown if parent pointer is invalid.
     * \see child
     */
-    template <class T, std::size_t L = 8, std::size_t Size = 64>
-    class multiset_node : public child<multiset_node<T, L, Size> >
+    template <class T, std::size_t Leaves = 8, std::size_t LeafSize = 64>
+    class multiset_node : public child<multiset_node<T, Leaves, LeafSize> >
     {
     public:
         // type definitions
-        typedef T                         value_type;       //!< The type of elements stored in the <code>multiset_node</code>.
-        typedef const T &                 const_reference;  //!< A const reference to an element.
-        typedef multiset_node<T, L, Size>   parent_type;      //!< The type of the parent.
-        typedef multiset_node<T, L, Size> * parent_pointer;   //!< Pointer to parent objects.
-        typedef multiset_leaf<T, L, Size>   leaf_type;        //!< The type of the leaves that may be children of <code>multiset_node</code>
-        typedef multiset_node<T, L, Size>   node_type;
+        typedef T                                    value_type;      //!< The type of elements stored in the <code>multiset_node</code>.
+        typedef const T &                            const_reference; //!< A const reference to an element.
+        typedef multiset_node<T, Leaves, LeafSize>   parent_type;     //!< The type of the parent.
+        typedef multiset_node<T, Leaves, LeafSize> * parent_pointer;  //!< Pointer to parent objects.
+        typedef multiset_leaf<T, Leaves, LeafSize>   leaf_type;       //!< The type of the leaves that may be children of <code>multiset_node</code>
+        typedef multiset_node<T, Leaves, LeafSize>   node_type;
 
     public:
         /*! Default constructor.
@@ -70,7 +70,7 @@ namespace boost { namespace self_healing {
         */
         bool is_valid(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::multiset_node<T, L, Size>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::multiset_node<T, Leaves, LeafSize>::is_valid()" << std::endl;
 #endif
             try {
                 // check all parts of the data structure
@@ -78,7 +78,7 @@ namespace boost { namespace self_healing {
                 return child<parent_type>::is_valid(parent);
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::multiset_node<T, L, Size>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::multiset_node<T, Leaves, LeafSize>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -87,7 +87,7 @@ namespace boost { namespace self_healing {
     private:
         void check_children() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::multiset_node<T, L, Size>::check_children" << std::endl;
+            std::cout << "boost::self_healing::multiset_node<T, Leaves, LeafSize>::check_children" << std::endl;
 #endif
             //TODO: implement
         }
