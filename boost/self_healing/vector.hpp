@@ -493,6 +493,11 @@ namespace boost { namespace self_healing {
             boost::swap(head, rhs.head);
             boost::swap(tail, rhs.tail);
             boost::swap(chunks, rhs.chunks);
+
+            size_type tmp_size = size();
+            set_size(rhs.size());
+            rhs.set_size(tmp_size);
+
             check_storage();
         }
 
