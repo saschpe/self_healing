@@ -70,7 +70,7 @@ namespace boost { namespace self_healing {
         typedef multiset<Key, Compare> *       multiset_pointer;
         typedef multiset<Key, Compare> &       multiset_reference;
 
-        struct node : private child<node>, private sized
+        struct node : public child<node>, public sized
         {
             explicit node(node * const parent = 0)
                 : child<node>(parent) {}
@@ -80,11 +80,7 @@ namespace boost { namespace self_healing {
             bool is_underflow() const { return size() < MAX_SIZE; }
 
             bool is_valid(node * const parent = 0) const {
-                try {
-                    return child<node>::is_valid(parent);
-                } catch (const std::runtime_error &) {
-                    return false;
-                }
+               return child<node>::is_valid(parent) && sized::is_valid();
             }
 
             unsigned short level() const {
