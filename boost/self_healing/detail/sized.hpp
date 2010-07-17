@@ -41,7 +41,6 @@ namespace boost { namespace self_healing {
             size2 = size;
             size3 = size;
         }
-
         size_type size() const { check_size(); return size1; }
 
         /*! Validity check that tries to correct minor faults silently.
