@@ -74,31 +74,34 @@ namespace boost { namespace self_healing {
             explicit node(node * const parent = 0)
                 : child<node>(parent) {}
 
-            bool is_full() const { return slot_use() == MAX_SIZE; }
-            bool is_few() const { return slot_use() <= MAX_SIZE; }
-            bool is_underflow() const { return slot_use() < MAX_SIZE; }
+            bool is_full() const { return size() == MAX_SIZE; }
+            bool is_few() const { return size() <= MAX_SIZE; }
+            bool is_underflow() const { return size() < MAX_SIZE; }
 
             bool is_valid(node * const parent = 0) const {
-                return child<node>::is_valid(parent);
+                try {
+                    return child<node>::is_valid(parent);
+                } catch (const std::runtime_error &) {
+                    return false;
+                }
             }
 
             unsigned short level() const {
                 return level1;
             }
-            unsigned short slot_use() const {
-                return slot_use1;
+            unsigned short size() const {
+                return size;
             }
 
-            unsigned short level1;      //!< Level in the b-tree, if level == 0 -> leaf node
-            unsigned short slot_use1;   //!< Number of key slotuse use, so number of valid children or data pointers
+            unsigned short level1;  //!< Level in the b-tree, if level == 0 -> leaf node
+            unsigned short size1;   //!< Number of key slotuse use, so number of valid children or data pointers
         };
 
-        class inner_node : public node, public array<node *, MAX_SIZE + 1>
+        struct inner_node : public node, public array<node *, MAX_SIZE + 1>
         {
         };
 
-        class leaf_node : public node, public sibling<leaf_node>
-                        , public array<Key, MAX_SIZE>
+        struct leaf_node : public node, public sibling<leaf_node>, public array<Key, MAX_SIZE>
         {
         };
 
