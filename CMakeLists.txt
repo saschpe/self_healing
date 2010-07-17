@@ -74,10 +74,6 @@ if(BUILD_TESTS)
     add_executable(test-array-faults libs/self_healing/test/array-faults.cpp)
     add_test(array-faults ${EXECUTABLE_OUTPUT_PATH}/test-array-faults)
 
-    # tests related to class vector helper class vector_chunk
-    add_executable(test-vector-chunk libs/self_healing/test/vector-chunk.cpp)
-    add_test(vector-chunk ${EXECUTABLE_OUTPUT_PATH}/test-vector-chunk)
-
     # tests related to class vector
     add_executable(test-vector libs/self_healing/test/vector.cpp)
     add_test(vector ${EXECUTABLE_OUTPUT_PATH}/test-vector)
@@ -97,8 +93,8 @@ if(BUILD_TESTS)
     #add_test(multiset ${EXECUTABLE_OUTPUT_PATH}/test-multiset)
     #add_executable(test-multiset-iterators libs/self_healing/test/multiset-iterators.cpp)
     #add_test(multiset-iterators ${EXECUTABLE_OUTPUT_PATH}/test-multiset-iterators)
-    #add_executable(test-multiset-faults libs/self_healing/test/multiset-faults.cpp)
-    #add_test(multiset-faults ${EXECUTABLE_OUTPUT_PATH}/test-multiset-faults)
+    add_executable(test-multiset-faults libs/self_healing/test/multiset-faults.cpp)
+    add_test(multiset-faults ${EXECUTABLE_OUTPUT_PATH}/test-multiset-faults)
 endif()
 
 # installation

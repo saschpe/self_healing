@@ -27,16 +27,16 @@
 namespace boost { namespace self_healing {
 
     /*! A class to express parent-child relationship.
-    * \param P The type of the parent data structure.
+    * \param Parent The type of the parent data structure.
     * \see array
     */
-    template <class P>
+    template <class Parent>
     class child
     {
     public:
         // type definitions
-        typedef P         parent_type;      //!< The type of the parent class.
-        typedef P *       parent_pointer;   //!< Pointer to parent class.
+        typedef Parent   parent_type;    //!< The type of the parent class.
+        typedef Parent * parent_pointer; //!< Pointer to parent class.
 
         /*! Default constructor.
         * \param parent The parent.
@@ -71,14 +71,14 @@ namespace boost { namespace self_healing {
         */
         bool is_valid(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::child<P>::is_valid()" << std::endl;
+            std::cout << "boost::self_healing::child<Parent>::is_valid()" << std::endl;
 #endif
             try {
                 check_parent(parent);
                 return true;
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::child<P>::is_valid() caught runtime error: " << e.what() << std::endl;
+                std::cout << "boost::self_healing::child<Parent>::is_valid() caught runtime error: " << e.what() << std::endl;
 #endif
                 return false;
             };
@@ -90,7 +90,7 @@ namespace boost { namespace self_healing {
         */
         void check_parent(parent_pointer const parent = 0) const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::child<P>::check_parent(" << parent << ")" << std::endl;
+            std::cout << "boost::self_healing::child<Parent>::check_parent(" << parent << ")" << std::endl;
 #endif
             if (parent) {
                 // If a valid parent pointer was given we simply check against
@@ -134,13 +134,12 @@ namespace boost { namespace self_healing {
             }
         }
 
-        parent_pointer parent1;     //!< Pointer to the parent class instance.
-        parent_pointer parent2;     //!< Pointer to the parent class instance.
-        parent_pointer parent3;     //!< Pointer to the parent class instance.
+        parent_pointer parent1; //!< Pointer to the parent class instance.
+        parent_pointer parent2; //!< Pointer to the parent class instance.
+        parent_pointer parent3; //!< Pointer to the parent class instance.
     };
 
 } } // namespace boost::self_healing
 
 
 #endif // BOOST_SELF_HEALING_CHILD_HPP
-
