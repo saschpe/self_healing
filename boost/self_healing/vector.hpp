@@ -65,8 +65,7 @@ namespace boost { namespace self_healing {
         struct chunk : public child<vector_type>, public array<T, ChunkSize>
         {
             explicit chunk(vector_pointer const parent = 0, const T &value = 0)
-                : child<vector_type>(parent), array<T, ChunkSize>(value) {
-            }
+                : child<vector_type>(parent), array<T, ChunkSize>(value) {}
 
             bool is_valid(vector_pointer const parent = 0) const {
                 return child<vector_type>::is_valid(parent) &&
