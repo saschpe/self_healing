@@ -57,8 +57,6 @@ namespace boost { namespace self_healing {
         typedef vector_chunk<T, ChunkSize>   vector_chunk_type;    //!< A vector chunk.
         typedef vector_chunk<T, ChunkSize> * vector_chunk_pointer; //!< A pointer to vector chunk.
 
-        static const std::size_t      vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
-
     public:
         // type definitions
         typedef T               value_type;         //!< The type of elements stored in the <code>vector</code>.
@@ -282,7 +280,7 @@ namespace boost { namespace self_healing {
         bool empty() const { return size() == 0; }
         size_type max_size() const {
             // determin how much chunks fit into memory and thus how much elements we can have
-            const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * ChunkSize;
+            const long int max_elems = std::numeric_limits<size_type>::max() / sizeof(vector_chunk_type) * ChunkSize;
             return std::min(max_elems, std::numeric_limits<difference_type>::max());
         }
         size_type capacity() const { check_storage(); return chunks * vector_chunk_type::size(); }
@@ -534,7 +532,7 @@ namespace boost { namespace self_healing {
                 check_size();
                 for (int i = 0; i < chunks; i++) {
                     // compute address of next chunk
-                    vector_chunk_pointer chunk = head + i * vector_chunk_size;
+                    vector_chunk_pointer chunk = head + i * sizeof(vector_chunk_type);
                     chunk->is_valid(this);
                 }
                 return true;
