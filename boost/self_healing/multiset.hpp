@@ -20,9 +20,10 @@
 #ifndef BOOST_SELF_HEALING_MULTISET_HPP
 #define BOOST_SELF_HEALING_MULTISET_HPP
 
+#include "array.hpp"
+#include "detail/child.hpp"
 #include "detail/safe_ref.hpp"
-#include "detail/multiset_leaf.hpp"
-#include "detail/multiset_node.hpp"
+#include "detail/sibling.hpp"
 
 #include <boost/config.hpp>
 #include <boost/detail/iterator.hpp>
@@ -67,10 +68,44 @@ namespace boost { namespace self_healing {
         typedef multiset<Key, Compare>         multiset_type;
         typedef multiset<Key, Compare> *       multiset_pointer;
         typedef multiset<Key, Compare> &       multiset_reference;
-        typedef multiset_leaf<Key, MAX_SIZE>   leaf_type;
-        typedef multiset_leaf<Key, MAX_SIZE> * leaf_pointer;
-        typedef multiset_node<Key, MAX_SIZE>   node_type;
-        typedef multiset_node<Key, MAX_SIZE> * node_pointer;
+
+        struct node : public child<node>
+        {
+            explicit node(node * const parent = 0)
+                : child<node>(parent) {}
+
+            bool is_full() const { return slot_use() == MAX_SIZE; }
+            bool is_few() const { return slot_use() <= MAX_SIZE; }
+            bool is_underflow() const { return slot_use() < MAX_SIZE; }
+
+            bool is_valid(node * const parent = 0) const {
+                return child<node>::is_valid(parent);
+            }
+
+            unsigned short level() const {
+                return level1;
+            }
+            unsigned short slot_use() const {
+                return slot_use1;
+            }
+
+            unsigned short level1;      //!< Level in the b-tree, if level == 0 -> leaf node
+            unsigned short slot_use1;   //!< Number of key slotuse use, so number of valid children or data pointers
+        };
+
+        class inner_node : public node, public array<node *, MAX_SIZE + 1>
+        {
+        };
+
+        class leaf_node : public node, public sibling<leaf_node>
+                        , public array<Key, MAX_SIZE>
+        {
+        };
+
+        typedef leaf_node    leaf_type;
+        typedef leaf_node *  leaf_pointer;
+        typedef inner_node   node_type;
+        typedef inner_node * node_pointer;
 
     public:
         // type definitions

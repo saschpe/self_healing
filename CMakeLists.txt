@@ -75,12 +75,6 @@ if(BUILD_TESTS)
     add_executable(test-vector-faults libs/self_healing/test/vector-faults.cpp)
     add_test(vector-faults ${EXECUTABLE_OUTPUT_PATH}/test-vector-faults)
 
-    # tests related to class multiset helper classes multiset_node and multiset_leaf
-    add_executable(test-multiset-node libs/self_healing/test/multiset-node.cpp)
-    add_test(multiset-node ${EXECUTABLE_OUTPUT_PATH}/test-multiset-node)
-    add_executable(test-multiset-leaf libs/self_healing/test/multiset-leaf.cpp)
-    add_test(multiset-leaf ${EXECUTABLE_OUTPUT_PATH}/test-multiset-leaf)
-
     # tests related to class multiset
     #add_executable(test-multiset libs/self_healing/test/multiset.cpp)
     #add_test(multiset ${EXECUTABLE_OUTPUT_PATH}/test-multiset)
