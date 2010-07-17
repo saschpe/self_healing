@@ -69,7 +69,7 @@ namespace boost { namespace self_healing {
         typedef multiset<Key, Compare> *       multiset_pointer;
         typedef multiset<Key, Compare> &       multiset_reference;
 
-        struct node : public child<node>
+        struct node : public child<node>, public sized
         {
             explicit node(node * const parent = 0)
                 : child<node>(parent) {}
@@ -89,12 +89,8 @@ namespace boost { namespace self_healing {
             unsigned short level() const {
                 return level1;
             }
-            unsigned short size() const {
-                return size;
-            }
 
             unsigned short level1;  //!< Level in the b-tree, if level == 0 -> leaf node
-            unsigned short size1;   //!< Number of key slotuse use, so number of valid children or data pointers
         };
 
         struct inner_node : public node, public array<node *, MAX_SIZE + 1>
