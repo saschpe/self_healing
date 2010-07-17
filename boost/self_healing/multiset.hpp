@@ -24,6 +24,7 @@
 #include "detail/child.hpp"
 #include "detail/safe_ref.hpp"
 #include "detail/sibling.hpp"
+#include "detail/sized.hpp"
 
 #include <boost/config.hpp>
 #include <boost/detail/iterator.hpp>
@@ -69,7 +70,7 @@ namespace boost { namespace self_healing {
         typedef multiset<Key, Compare> *       multiset_pointer;
         typedef multiset<Key, Compare> &       multiset_reference;
 
-        struct node : public child<node>, public sized
+        struct node : private child<node>, private sized
         {
             explicit node(node * const parent = 0)
                 : child<node>(parent) {}
