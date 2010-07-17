@@ -16,8 +16,9 @@
 #ifndef BOOST_SELF_HEALING_VECTOR_HPP
 #define BOOST_SELF_HEALING_VECTOR_HPP
 
+#include "array.hpp"
+#include "detail/child.hpp"
 #include "detail/safe_ref.hpp"
-#include "detail/vector_chunk.hpp"
 #include "detail/utility.hpp"
 
 #include <boost/config.hpp>
@@ -45,34 +46,35 @@ namespace boost { namespace self_healing {
     * \param T The data type of the stored values.
     * \param ChunkSize Optional storage capacity of the internal chunks.
     * \remarks The chunk size should be chosen based on CPU cache size.
-    * \see std:vector, vector_chunk<T, ChunkSize>
+    * \see std:vector, chunk<T, ChunkSize>
     */
     template <class T, std::size_t ChunkSize = 64>
     class vector
     {
         // private type definitions
-        typedef vector<T, ChunkSize>         vector_type;
-        typedef vector<T, ChunkSize> *       vector_pointer;
-        typedef vector<T, ChunkSize> &       vector_reference;
-        typedef vector_chunk<T, ChunkSize>   vector_chunk_type;    //!< A vector chunk.
-        typedef vector_chunk<T, ChunkSize> * vector_chunk_pointer; //!< A pointer to vector chunk.
+        typedef vector<T, ChunkSize>   vector_type;
+        typedef vector<T, ChunkSize> * vector_pointer;
+        typedef vector<T, ChunkSize> & vector_reference;
 
-        static const std::size_t vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
-
-        struct chunk : public child<vector<T, ChunkSize> >, public array<T, ChunkSize>
+        /*! \brief Vector element storage chunk.
+        *
+        * A chunk is a checksummed array and a child and part of the self-healing
+        * vector storage mechanism
+        * \see child, array
+        */
+        struct chunk : public child<vector_type>, public array<T, ChunkSize>
         {
-            typedef vector<T, ChunkSize>   parent_type;
-            typedef vector<T, ChunkSize> * parent_pointer;
+            explicit chunk(vector_pointer const parent = 0, const T &value = 0)
+                : child<vector_type>(parent), array<T, ChunkSize>(value) {}
 
-            explicit vector_chunk(parent_pointer const parent = 0, const_reference value = 0)
-                : child<parent_type>(parent), array<T, ChunkSize>(value) {
-            }
-
-              bool is_valid(parent_pointer const parent = 0) const {
-                return child<parent_type>::is_valid(parent) &&
+            bool is_valid(vector_pointer const parent = 0) const {
+                return child<vector_type>::is_valid(parent) &&
                        array<T, ChunkSize>::is_valid();
             }
         };
+
+        typedef chunk   chunk_type;    //!< A vector chunk.
+        typedef chunk * chunk_pointer; //!< A pointer to vector chunk.
 
     public:
         // type definitions
@@ -87,7 +89,7 @@ namespace boost { namespace self_healing {
         typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
 
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
-       */
+        */
         class iterator : public child<vector_type>, public std::iterator<std::random_access_iterator_tag, value_type>
         {
             friend class vector;
@@ -296,10 +298,10 @@ namespace boost { namespace self_healing {
         bool empty() const { return size() == 0; }
         size_type max_size() const {
             // determin how much chunks fit into memory and thus how much elements we can have
-            const long int max_elems = std::numeric_limits<size_type>::max() / vector_chunk_size * ChunkSize;
+            const long int max_elems = std::numeric_limits<size_type>::max() / sizeof(chunk_type) * ChunkSize;
             return std::min(max_elems, std::numeric_limits<difference_type>::max());
         }
-        size_type capacity() const { check_storage(); return chunks * vector_chunk_type::size(); }
+        size_type capacity() const { check_storage(); return chunks * chunk_type::size(); }
 
         void resize(size_type new_size, value_type item = T()) {
             if (new_size > size()) {
@@ -328,7 +330,7 @@ namespace boost { namespace self_healing {
                     boost::throw_exception(e);
                 }
 
-                const vector_chunk_pointer new_head = new vector_chunk_type[new_chunk_count];
+                const chunk_pointer new_head = new chunk_type[new_chunk_count];
 
                 // set this vector as the parent of all vector chunks
                 for (size_type c = 0; c < new_chunk_count; c++) {
@@ -548,7 +550,7 @@ namespace boost { namespace self_healing {
                 check_size();
                 for (int i = 0; i < chunks; i++) {
                     // compute address of next chunk
-                    vector_chunk_pointer chunk = head + i * vector_chunk_size;
+                    chunk_pointer chunk = head + i * sizeof(chunk_type);
                     chunk->is_valid(this);
                 }
                 return true;
@@ -570,8 +572,8 @@ namespace boost { namespace self_healing {
                 return; // initial case where nothing is allocated yet
             }
 
-            const vector_chunk_pointer test_head = dynamic_cast<vector_chunk_pointer>(head);
-            const vector_chunk_pointer test_tail = dynamic_cast<vector_chunk_pointer>(tail);
+            const chunk_pointer test_head = dynamic_cast<chunk_pointer>(head);
+            const chunk_pointer test_tail = dynamic_cast<chunk_pointer>(tail);
             const size_type estimated_min_chunks = std::ceil(size() * ChunkSize);
 
 #ifdef BOOST_SELF_HEALING_DEBUG
@@ -581,7 +583,7 @@ namespace boost { namespace self_healing {
 
             if (test_head && test_tail) {
                 // compute the chunk counter difference and fix chunk counter if needed
-                const size_type head_tail_diff_abs = static_cast<size_type>((tail - head) / sizeof(vector_chunk_type));
+                const size_type head_tail_diff_abs = static_cast<size_type>((tail - head) / sizeof(chunk_type));
                 if (chunks != head_tail_diff_abs + 1) {
 #ifdef BOOST_SELF_HEALING_DEBUG
                     std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage() fix chunk counter" << std::endl;
@@ -596,7 +598,7 @@ namespace boost { namespace self_healing {
                     //TODO: see if fixable
                     //const_cast<size_type &>(chunks) = estimated_min_chunks;
                 }
-                const_cast<vector_chunk_pointer &>(tail) = &head[chunks];
+                const_cast<chunk_pointer &>(tail) = &head[chunks];
             } else if (test_tail) {
                 if (estimated_min_chunks > chunks) {
                     // chunk counter was damaged and shows less than real, this may lead to a chunks loss
@@ -605,7 +607,7 @@ namespace boost { namespace self_healing {
                     //TODO: see if fixable
                     //const_cast<size_type &>(chunks) = estimated_min_chunks;
                 }
-                const_cast<vector_chunk_pointer &>(head) = tail - (chunks - 1) * sizeof(vector_chunk_type);
+                const_cast<chunk_pointer &>(head) = tail - (chunks - 1) * sizeof(chunk_type);
             } else {
                 std::runtime_error e("head and tail pointer error");
                 boost::throw_exception(e);
@@ -637,26 +639,11 @@ namespace boost { namespace self_healing {
             if (equal_12 && equal_13 && equal_23) {
                 // all fine
             } else if (equal_13) {
-#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<size_type &>(size2) = size1; // fix m_size1 as the others are equal
-#else
-                std::runtime_error e("fixable size error");
-                boost::throw_exception(e);
-#endif
             } else if (equal_23) {
-#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<size_type &>(size1) = size2; // fix m_size1 as the others are equal
-#else
-                std::runtime_error e("fixable size error");
-                boost::throw_exception(e);
-#endif
             } else if (equal_12) {
-#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<size_type &>(size3) = size1; // fix m_size3 as the others are equal
-#else
-                std::runtime_error e("fixable size error");
-                boost::throw_exception(e);
-#endif
             } else {
                 std::runtime_error e("size error"); // all three sizes differ
                 boost::throw_exception(e);
@@ -668,11 +655,11 @@ namespace boost { namespace self_healing {
             }*/
         }
 
-        vector_chunk_pointer head;  //!< Pointer to the first chunk of an array of vector_chunk instances.
+        chunk_pointer head;  //!< Pointer to the first chunk of an array of chunk instances.
         size_type size1;            //!< Counts how much elements are stored currently in all chunks.
         size_type chunks;           //!< Chunk counter.
         size_type size2;
-        vector_chunk_pointer tail;  //!< Pointer to the last chunk in the array of vector_chunk instances.
+        chunk_pointer tail;  //!< Pointer to the last chunk in the array of chunk instances.
         size_type size3;
     };
 
