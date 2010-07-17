@@ -640,11 +640,26 @@ namespace boost { namespace self_healing {
             if (equal_12 && equal_13 && equal_23) {
                 // all fine
             } else if (equal_13) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<size_type &>(size2) = size1; // fix m_size1 as the others are equal
+#else
+                std::runtime_error e("fixable size error");
+                boost::throw_exception(e);
+#endif
             } else if (equal_23) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<size_type &>(size1) = size2; // fix m_size1 as the others are equal
+#else
+                std::runtime_error e("fixable size error");
+                boost::throw_exception(e);
+#endif
             } else if (equal_12) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<size_type &>(size3) = size1; // fix m_size3 as the others are equal
+#else
+                std::runtime_error e("fixable size error");
+                boost::throw_exception(e);
+#endif
             } else {
                 std::runtime_error e("size error"); // all three sizes differ
                 boost::throw_exception(e);
