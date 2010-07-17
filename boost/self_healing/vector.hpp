@@ -589,7 +589,12 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
                     std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage() fix chunk counter" << std::endl;
 #endif
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                     const_cast<size_type &>(chunks) = head_tail_diff_abs + 1;
+#else
+                    std::runtime_error e("fixable chunk counter error");
+                    boost::throw_exception(e);
+#endif
                 }
             } else if (test_head) {
                 if (estimated_min_chunks > chunks) {
@@ -599,7 +604,12 @@ namespace boost { namespace self_healing {
                     //TODO: see if fixable
                     //const_cast<size_type &>(chunks) = estimated_min_chunks;
                 }
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<chunk_pointer &>(tail) = &head[chunks];
+#else
+                std::runtime_error e("fixable tail pointer error");
+                boost::throw_exception(e);
+#endif
             } else if (test_tail) {
                 if (estimated_min_chunks > chunks) {
                     // chunk counter was damaged and shows less than real, this may lead to a chunks loss
@@ -608,7 +618,12 @@ namespace boost { namespace self_healing {
                     //TODO: see if fixable
                     //const_cast<size_type &>(chunks) = estimated_min_chunks;
                 }
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<chunk_pointer &>(head) = tail - (chunks - 1) * sizeof(chunk_type);
+#else
+                std::runtime_error e("fixable head pointer error");
+                boost::throw_exception(e);
+#endif
             } else {
                 std::runtime_error e("head and tail pointer error");
                 boost::throw_exception(e);
@@ -618,13 +633,23 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
                 std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage() fix parent of head" << std::endl;
 #endif
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 test_head->set_parent(const_cast<vector_pointer>(this));
+#else
+                std::runtime_error e("fixable head pointer parent error");
+                boost::throw_exception(e);
+#endif
             }
             if (test_tail->parent() != this) {
 #ifdef BOOST_SELF_HEALING_DEBUG
                 std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage() fix parent of tail" << std::endl;
 #endif
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 test_tail->set_parent(const_cast<vector_pointer>(this));
+#else
+                std::runtime_error e("fixable tail pointer parent error");
+                boost::throw_exception(e);
+#endif
             }
         }
 
