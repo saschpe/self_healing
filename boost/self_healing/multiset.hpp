@@ -57,20 +57,20 @@ namespace boost { namespace self_healing {
     {
         /// Number of slots in each leaf of the tree. Estimated so that each node
         /// has a size of about 256 bytes.
-        static const unsigned short max_slots = MULTISET_MAX( 8, 256 / (sizeof(Key)) );
+        static const unsigned short MAX_SIZE = MULTISET_MAX( 8, 256 / (sizeof(Key)) );
 
         /// The minimum number of key slots used in a leaf. If fewer slots are
         /// used, the leaf will be merged or slots shifted from it's siblings.
-        static const unsigned short min_slots = max_slots / 2;
+        static const unsigned short MIN_SIZE = MAX_SIZE / 2;
 
         // private type definitions
-        typedef multiset<Key, Compare>               multiset_type;
-        typedef multiset<Key, Compare> *             multiset_pointer;
-        typedef multiset<Key, Compare> &             multiset_reference;
-        typedef multiset_leaf<Key, max_slots>   leaf_type;
-        typedef multiset_leaf<Key, max_slots> * leaf_pointer;
-        typedef multiset_node<Key, max_slots>   node_type;
-        typedef multiset_node<Key, max_slots> * node_pointer;
+        typedef multiset<Key, Compare>         multiset_type;
+        typedef multiset<Key, Compare> *       multiset_pointer;
+        typedef multiset<Key, Compare> &       multiset_reference;
+        typedef multiset_leaf<Key, MAX_SIZE>   leaf_type;
+        typedef multiset_leaf<Key, MAX_SIZE> * leaf_pointer;
+        typedef multiset_node<Key, MAX_SIZE>   node_type;
+        typedef multiset_node<Key, MAX_SIZE> * node_pointer;
 
     public:
         // type definitions
@@ -87,7 +87,6 @@ namespace boost { namespace self_healing {
         typedef std::size_t     size_type;          //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
         typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
 
-    public:
         /*! \brief A bidirectional iterator used to iterate through the <code>multiset</code>.
         */
         class iterator : public child<multiset_type>, public std::iterator<std::bidirectional_iterator_tag, value_type>

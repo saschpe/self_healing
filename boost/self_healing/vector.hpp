@@ -57,7 +57,22 @@ namespace boost { namespace self_healing {
         typedef vector_chunk<T, ChunkSize>   vector_chunk_type;    //!< A vector chunk.
         typedef vector_chunk<T, ChunkSize> * vector_chunk_pointer; //!< A pointer to vector chunk.
 
-        static const std::size_t      vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
+        static const std::size_t vector_chunk_size = sizeof(vector_chunk_type); //!< The size of a vector chunk.
+
+        struct chunk : public child<vector<T, ChunkSize> >, public array<T, ChunkSize>
+        {
+            typedef vector<T, ChunkSize>   parent_type;
+            typedef vector<T, ChunkSize> * parent_pointer;
+
+            explicit vector_chunk(parent_pointer const parent = 0, const_reference value = 0)
+                : child<parent_type>(parent), array<T, ChunkSize>(value) {
+            }
+
+              bool is_valid(parent_pointer const parent = 0) const {
+                return child<parent_type>::is_valid(parent) &&
+                       array<T, ChunkSize>::is_valid();
+            }
+        };
 
     public:
         // type definitions
@@ -71,7 +86,6 @@ namespace boost { namespace self_healing {
         typedef std::size_t     size_type;          //!< An unsigned integral type that can represent any non-negative value of the container's distance type.
         typedef std::ptrdiff_t  difference_type;    //!< A signed integral type used to represent the distance between two iterators.
 
-    public:
         /*! \brief A (random access) iterator used to iterate through the <code>vector</code>.
        */
         class iterator : public child<vector_type>, public std::iterator<std::random_access_iterator_tag, value_type>
