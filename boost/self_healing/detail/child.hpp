@@ -107,11 +107,26 @@ namespace boost { namespace self_healing {
                 if (equal_12 && equal_13 && equal_23) {
                     // all fine
                 } else if (equal_13) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                     const_cast<parent_pointer &>(parent2) = parent1; // fix parent2 as the others are equal
+#else
+                    std::runtime_error e("fixable parent error");
+                    boost::throw_exception(e);
+#endif
                 } else if (equal_23) {
-                    const_cast<parent_pointer &>(parent1) = parent2; // fix m_parent1 as the others are equal
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
+                    const_cast<parent_pointer &>(parent1) = parent2; // fix parent1 as the others are equal
+#else
+                    std::runtime_error e("fixable parent error");
+                    boost::throw_exception(e);
+#endif
                 } else if (equal_12) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                     const_cast<parent_pointer &>(parent3) = parent1; // fix parent3 as the others are equal
+#else
+                    std::runtime_error e("fixable parent error");
+                    boost::throw_exception(e);
+#endif
                 } else {
                     std::runtime_error e("parent error");
                     boost::throw_exception(e);

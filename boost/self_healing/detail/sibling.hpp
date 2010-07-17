@@ -125,13 +125,28 @@ namespace boost { namespace self_healing {
                 if (equal_12 && equal_13 && equal_23) {
                     // all fine
                 } else if (equal_13) {
-                    const_cast<sibling_pointer &>(next2) = next1; // fix m_next2 as the others are equal
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
+                    const_cast<sibling_pointer &>(next2) = next1; // fix next2 as the others are equal
+#else
+                    std::runtime_error e("fixable next sibling error");
+                    boost::throw_exception(e);
+#endif
                 } else if (equal_23) {
-                    const_cast<sibling_pointer &>(next1) = next2; // fix m_next1 as the others are equal
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
+                    const_cast<sibling_pointer &>(next1) = next2; // fix next1 as the others are equal
+#else
+                    std::runtime_error e("fixable next sibling error");
+                    boost::throw_exception(e);
+#endif
                 } else if (equal_12) {
-                    const_cast<sibling_pointer &>(next3) = next1; // fix m_next3 as the others are equal
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
+                    const_cast<sibling_pointer &>(next3) = next1; // fix next3 as the others are equal
+#else
+                    std::runtime_error e("fixable next sibling error");
+                    boost::throw_exception(e);
+#endif
                 } else {
-                    std::runtime_error e("parent error");
+                    std::runtime_error e("next sibling error");
                     boost::throw_exception(e);
                 }
             }
@@ -151,13 +166,28 @@ namespace boost { namespace self_healing {
                 if (equal_12 && equal_13 && equal_23) {
                     // all fine
                 } else if (equal_13) {
-                    const_cast<sibling_pointer &>(previous2) = previous1; // fix m_previous2 as the others are equal
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
+                    const_cast<sibling_pointer &>(previous2) = previous1; // fix previous2 as the others are equal
+#else
+                    std::runtime_error e("fixable previous sibling error");
+                    boost::throw_exception(e);
+#endif
                 } else if (equal_23) {
-                    const_cast<sibling_pointer &>(previous1) = previous2; // fix m_previous1 as the others are equal
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
+                    const_cast<sibling_pointer &>(previous1) = previous2; // fix previous1 as the others are equal
+#else
+                    std::runtime_error e("fixable previous sibling error");
+                    boost::throw_exception(e);
+#endif
                 } else if (equal_12) {
-                    const_cast<sibling_pointer &>(previous3) = previous1; // fix m_previous3 as the others are equal
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
+                    const_cast<sibling_pointer &>(previous3) = previous1; // fix previous3 as the others are equal
+#else
+                    std::runtime_error e("fixable previous sibling error");
+                    boost::throw_exception(e);
+#endif
                 } else {
-                    std::runtime_error e("parent error");
+                    std::runtime_error e("previous sibling error");
                     boost::throw_exception(e);
                 }
             }

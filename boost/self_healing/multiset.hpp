@@ -382,11 +382,26 @@ namespace boost { namespace self_healing {
             if (equal_12 && equal_13 && equal_23) {
                 // all fine
             } else if (equal_13) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<node_type &>(root2) = root1; // fix root2 as the others are equal
+#else
+                std::runtime_error e("fixable root node error");
+                boost::throw_exception(e);
+#endif
             } else if (equal_23) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<node_type &>(root1) = root2; // fix root1 as the others are equal
+#else
+                std::runtime_error e("fixable root node error");
+                boost::throw_exception(e);
+#endif
             } else if (equal_12) {
+#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 const_cast<node_type &>(root3) = root2; // fix root3 as the others are equal
+#else
+                std::runtime_error e("fixable root node error");
+                boost::throw_exception(e);
+#endif
             } else {
                 std::runtime_error e("root node error"); // all three roots differ
                 boost::throw_exception(e);
