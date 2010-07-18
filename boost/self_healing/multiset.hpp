@@ -237,9 +237,8 @@ namespace boost { namespace self_healing {
         /*! Default constructor.
         * \param compare TODO.
         */
-        explicit multiset(const Compare &compare = Compare()) {
-            //TODO
-        }
+        explicit multiset(const Compare &compare = Compare())
+            : root_node(0), head_leaf(0), tail_leaf(0), compare(compare) {}
 
         /*! Constructor to initialize multiset with a custom value range supplied by an iterator.
         * \param first Begin of value range.
@@ -247,8 +246,8 @@ namespace boost { namespace self_healing {
         * \param compare TODO.
         */
         template <class InputIterator>
-        multiset(InputIterator first, InputIterator last, const Compare &compare = Compare()) {
-            //TODO
+        multiset(InputIterator first, InputIterator last, const Compare &compare = Compare())
+            : root_node(0), head_leaf(0), tail_leaf(0), compare(compare) {
             insert(first, last);
         }
 
@@ -269,12 +268,12 @@ namespace boost { namespace self_healing {
         /*! Destructor.
         */
         ~multiset() {
-            //TODO
+            clear();
         }
 
         multiset_type& operator=(const multiset_reference rhs) {
             if (this != &rhs) {
-                //TODO: copy internals...
+                //TODO: copy internals... recursive copy from other
             }
             return *this;
         }
@@ -292,8 +291,8 @@ namespace boost { namespace self_healing {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // capacity
-        bool empty() const { /*TODO*/ }
-        size_type size() const { /*TODO*/ }
+        bool empty() const { return size() == 0; }
+        size_type size() const { return size_type(-1); }
         size_type max_size() const { /*TODO*/ }
 
         // modifiers
@@ -311,13 +310,17 @@ namespace boost { namespace self_healing {
         void erase(iterator pos) { /*TODO*/ }
         size_type erase(const_reference key) { /*TODO*/ }
         void erase(iterator first, iterator last) { /*TODO*/ }
-        void swap(multiset_reference rhs) { /*TODO*/ }
+        void swap(multiset_reference rhs) {
+            boost::swap(root_node, rhs.root_node);
+            boost::swap(head_leaf, rhs.head_leaf);
+            boost::swap(tail_leaf, rhs.tail_leaf);
+            boost::swap(compare, rhs.compare);
+        }
         void clear() { /*TODO*/ }
 
         // observers
-        // TODO: check back
-        key_compare key_comp() const { /*TODO*/ }
-        value_compare value_comp() const { /*TODO*/ }
+        inline key_compare key_comp() const { return compare; }
+        inline value_compare value_comp() const { return compare; }
 
         // multiset operations
         iterator find(const_reference key) const { /*TODO*/ }
@@ -350,8 +353,8 @@ namespace boost { namespace self_healing {
 #endif
             try {
                 // check all parts of the data structure
-                check_root();
-                check_node(root1, true);
+                // check_root();
+                //check_node(root1, true);
                 //TODO
                 return true;
             } catch (const std::runtime_error &e) {
@@ -363,7 +366,7 @@ namespace boost { namespace self_healing {
         }
 
     private:
-        void check_root() const {
+        /*void check_root() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::multise<Key, Compare, Leaves, LeafSize>::check_root()" << std::endl;
 #endif
@@ -404,10 +407,12 @@ namespace boost { namespace self_healing {
         void check_node(node_pointer node, bool recursive = false) const {
 
         }
+    */
+        node_pointer root_node; //!< Pointer to the B+ tree's root node, either leaf or inner node
+        leaf_pointer head_leaf; //!< Pointer to first leaf in the double linked leaf chain
+        leaf_pointer tail_leaf; //!< Pointer to last leaf in the double linked leaf chain
 
-        node_type root1;
-        node_type root2;
-        node_type root3;
+        const key_compare compare;
     };
 
     // comparisons
