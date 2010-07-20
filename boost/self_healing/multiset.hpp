@@ -57,14 +57,6 @@ namespace boost { namespace self_healing {
     template <class Key, class Compare = std::less<Key> >
     class multiset
     {
-        /// Number of slots in each leaf of the tree. Estimated so that each node
-        /// has a size of about 256 bytes.
-        static const unsigned short MAX_SIZE = MULTISET_MAX( 8, 256 / (sizeof(Key)) );
-
-        /// The minimum number of key slots used in a leaf. If fewer slots are
-        /// used, the leaf will be merged or slots shifted from it's siblings.
-        static const unsigned short MIN_SIZE = MAX_SIZE / 2;
-
         // private type definitions
         typedef multiset<Key, Compare>         multiset_type;
         typedef multiset<Key, Compare> *       multiset_pointer;
@@ -75,10 +67,10 @@ namespace boost { namespace self_healing {
             explicit node(node * const parent = 0)
                 : child<node>(parent) {}
 
-            bool is_full() const { return size() == MAX_SIZE; }
+            /*bool is_full() const { return size() == MAX_SIZE; }
             bool is_few() const { return size() <= MAX_SIZE; }
             bool is_underflow() const { return size() < MAX_SIZE; }
-
+*/
             bool is_valid(node * const parent = 0) const {
                return child<node>::is_valid(parent) && sized::is_valid();
             }
@@ -90,18 +82,28 @@ namespace boost { namespace self_healing {
             unsigned short level1;  //!< Level in the b-tree, if level == 0 -> leaf node
         };
 
-        struct inner_node : public node, public array<node *, MAX_SIZE + 1>
+        typedef node         node_type;
+        typedef node *       node_pointer;
+
+        /// Number of slots in each leaf of the tree. Estimated so that each node
+        /// has a size of about 256 bytes.
+        static const unsigned short MAX_INNER_NODE_SIZE = MULTISET_MAX(8, 256 / sizeof(Key) + sizeof(node_pointer));
+        static const unsigned short MAX_LEAF_NODE_SIZE = MULTISET_MAX(8, 256 / sizeof(Key));
+
+        struct inner_node : public node
+        {
+            array<Key, MAX_INNER_NODE_SIZE> keys;
+            array<node_pointer, MAX_INNER_NODE_SIZE + 1> nodes;
+        };
+
+        struct leaf_node : public node, public sibling<leaf_node>, public array<Key, MAX_LEAF_NODE_SIZE>
         {
         };
 
-        struct leaf_node : public node, public sibling<leaf_node>, public array<Key, MAX_SIZE>
-        {
-        };
-
-        typedef leaf_node    leaf_type;
-        typedef leaf_node *  leaf_pointer;
-        typedef inner_node   node_type;
-        typedef inner_node * node_pointer;
+        typedef leaf_node    leaf_node_type;
+        typedef leaf_node *  leaf_node_pointer;
+        typedef inner_node   inner_node_type;
+        typedef inner_node * inner_node_pointer;
 
     public:
         // type definitions
@@ -316,7 +318,16 @@ namespace boost { namespace self_healing {
             boost::swap(tail_leaf, rhs.tail_leaf);
             boost::swap(compare, rhs.compare);
         }
-        void clear() { /*TODO*/ }
+        void clear() {
+            check_entry_points();
+            if (root_node) {
+                recursive_clear(root_node);
+                free_node(root_node);
+                root_node = 0;
+                head_leaf = 0;
+                tail_leaf = 0;
+            }
+        }
 
         // observers
         inline key_compare key_comp() const { return compare; }
@@ -366,6 +377,8 @@ namespace boost { namespace self_healing {
         }
 
     private:
+        void check_entry_points() const {
+        }
         /*void check_root() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::multise<Key, Compare, Leaves, LeafSize>::check_root()" << std::endl;
@@ -408,9 +421,23 @@ namespace boost { namespace self_healing {
 
         }
     */
-        node_pointer root_node; //!< Pointer to the B+ tree's root node, either leaf or inner node
-        leaf_pointer head_leaf; //!< Pointer to first leaf in the double linked leaf chain
-        leaf_pointer tail_leaf; //!< Pointer to last leaf in the double linked leaf chain
+
+
+        void recursive_clear(node_pointer node) {
+            //if
+        }
+
+        void free_node(node_pointer node) {
+            if (dynamic_cast<inner_node_pointer>(node)) {
+                delete static_cast<inner_node_pointer>(node);
+            } else {
+                delete static_cast<leaf_node_pointer>(node);
+            }
+        }
+
+        node_pointer root_node;      //!< Pointer to the B+ tree's root node, either leaf or inner node
+        leaf_node_pointer head_leaf; //!< Pointer to first leaf in the double linked leaf chain
+        leaf_node_pointer tail_leaf; //!< Pointer to last leaf in the double linked leaf chain
 
         const key_compare compare;
     };
