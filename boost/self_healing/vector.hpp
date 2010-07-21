@@ -358,10 +358,10 @@ namespace boost { namespace self_healing {
         const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
 
         // front() and back()
-        reference front() { check_header(); return head.front(); }
-        const_reference front() const { check_header; return head.front(); }
-        reference back() { check_header(); return tail.back(); }
-        const_reference back() const { check_header(); return tail.back(); }
+        reference front() { check_header(); return head->front(); }
+        const_reference front() const { check_header(); return head->front(); }
+        reference back() { check_header(); return tail->back(); }
+        const_reference back() const { check_header(); return tail->back(); }
 
         // modifiers
         iterator insert(iterator position, const_reference value) {
