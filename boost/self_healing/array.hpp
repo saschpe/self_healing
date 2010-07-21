@@ -150,9 +150,9 @@ namespace boost { namespace self_healing {
         array(const_reference value = 0) { update_checksums(); fill(value); }
 
         // iterator support
-        iterator begin() {  return iterator(elements, check_checksums_functor(this), update_checksums_functor(this)); }
+        iterator begin() {  return iterator(elements, check_value_integrity_functor(this), update_checksums_functor(this)); }
         const_iterator begin() const { return elements; }
-        iterator end() { return iterator(elements + Size, check_checksums_functor(this), update_checksums_functor(this)); }
+        iterator end() { return iterator(elements + Size, check_value_integrity_functor(this), update_checksums_functor(this)); }
         const_iterator end() const { return elements + Size; }
 
         // reverse iterator support
@@ -162,18 +162,18 @@ namespace boost { namespace self_healing {
         const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
         // operator[]
-        reference operator[](size_type i) { check_checksums(); return reference(elements[i], update_checksums_functor(this)); }
-        const_reference operator[](size_type i) const { check_checksums(); return elements[i]; }
+        reference operator[](size_type i) { check_value_integrity(); return reference(elements[i], update_checksums_functor(this)); }
+        const_reference operator[](size_type i) const { check_value_integrity(); return elements[i]; }
 
         // at() with range check
         reference at(size_type i) { rangecheck(i); return operator[](i); }
         const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
 
         // front() and back()
-        reference front() { check_checksums(); return reference(elements[0], update_checksums_functor(this)); }
-        const_reference front() const { check_checksums(); return elements[0]; }
-        reference back() { check_checksums(); return reference(elements[Size - 1], update_checksums_functor(this)); }
-        const_reference back() const { check_checksums(); return elements[Size - 1]; }
+        reference front() { check_value_integrity(); return reference(elements[0], update_checksums_functor(this)); }
+        const_reference front() const { check_value_integrity(); return elements[0]; }
+        reference back() { check_value_integrity(); return reference(elements[Size - 1], update_checksums_functor(this)); }
+        const_reference back() const { check_value_integrity(); return elements[Size - 1]; }
 
         // size is constant
         static size_type size() { return Size; }
@@ -190,12 +190,12 @@ namespace boost { namespace self_healing {
             }
             boost::swap(crc1, other.crc1);
             boost::swap(crc2, other.crc2);
-            check_checksums();
+            check_value_integrity();
         }
 
         /*! Read-only direct access to data.
         */
-        const_pointer data() const { check_checksums(); return elements; }
+        const_pointer data() const { check_value_integrity(); return elements; }
 
         //NOTE: this methods would bypass checksumming currently
         //pointer data() { return elements; }
@@ -245,7 +245,7 @@ namespace boost { namespace self_healing {
             std::cout << "boost::self_healing::array<T, Size>::is_valid()" << std::endl;
 #endif
             try {
-                check_checksums();
+                check_value_integrity();
                 return true;
             } catch (const std::runtime_error &e) {
 #ifdef BOOST_SELF_HEALING_DEBUG
@@ -280,9 +280,9 @@ namespace boost { namespace self_healing {
         *          it may change internal state nonetheless.
         * \throws std::runtime_error Thrown if the data was damaged and checksums mismatch.
         */
-        void check_checksums() const {
+        void check_value_integrity() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::array<T, Size>::check_checksums()" << std::endl;
+            std::cout << "boost::self_healing::array<T, Size>::check_value_integrity();" << std::endl;
 #endif
             boost::crc_32_type crc3;
             crc3.process_bytes(&elements, Size * sizeof(value_type));
@@ -321,16 +321,16 @@ namespace boost { namespace self_healing {
 
         /*! A private functor that calls check_checksums() for a given checksummed array instance if called itself.
         */
-        class check_checksums_functor
+        class check_value_integrity_functor
         {
         public:
             /*! Constructor.
             * \param parent The checksummed array instance for which to call check_checksums().
             */
-            explicit check_checksums_functor(array_pointer parent)
+            explicit check_value_integrity_functor(array_pointer parent)
                 : parent(parent) {}
 
-            void operator()() { parent->check_checksums(); }
+            void operator()() { parent->check_value_integrity(); }
 
         private:
             array_pointer parent; //!< Internal reference to owning parent checksummed array instance.
