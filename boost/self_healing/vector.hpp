@@ -248,7 +248,7 @@ namespace boost { namespace self_healing {
         /*! Destructor.
         */
         ~vector() {
-            check_storage();
+            check_header();
             delete[] head;
         }
 
@@ -260,7 +260,7 @@ namespace boost { namespace self_healing {
         void assign(InputIterator first, InputIterator last) {
             resize(last - first);
             size_type i = 0;
-            check_storage();
+            check_header();
             for (InputIterator it = first; it != last; it++) {
                 head[i / ChunkSize][i % ChunkSize] = *it;
                 i++;
@@ -271,7 +271,7 @@ namespace boost { namespace self_healing {
         void assign(Size n, const TT &x = TT()) {
             resize(n);
             size_type i = 0;
-            check_storage();
+            check_header();
             for (; i < n; i++) {
                 head[i / ChunkSize][i % ChunkSize] = x;
             }
@@ -279,10 +279,10 @@ namespace boost { namespace self_healing {
         }
 
         // iterator support
-        iterator begin() { check_storage(); return iterator(this, 0); }
-        const_iterator begin() const { check_storage(); return const_iterator(this, 0); }
-        iterator end() { check_storage(); return iterator(this, sized::size()); }
-        const_iterator end() const { check_storage(); return const_iterator(this, sized::size()); }
+        iterator begin() { check_header(); return iterator(this, 0); }
+        const_iterator begin() const { check_header(); return const_iterator(this, 0); }
+        iterator end() { check_header(); return iterator(this, sized::size()); }
+        const_iterator end() const { check_header(); return const_iterator(this, sized::size()); }
 
         // reverse iterator support
         reverse_iterator rbegin() { return reverse_iterator(end()); }
@@ -298,7 +298,7 @@ namespace boost { namespace self_healing {
             const long int max_elems = std::numeric_limits<size_type>::max() / sizeof(chunk_type) * ChunkSize;
             return std::min(max_elems, std::numeric_limits<difference_type>::max());
         }
-        size_type capacity() const { check_storage(); return chunks * chunk_type::size(); }
+        size_type capacity() const { check_header(); return chunks * chunk_type::size(); }
 
         void resize(size_type new_size, value_type item = T()) {
             if (new_size > size()) {
@@ -334,7 +334,7 @@ namespace boost { namespace self_healing {
                     new_head[c].set_parent(this);
                 }
 
-                check_storage();
+                check_header();
                 if (head) {
                     // copy values from old location to new location
                     for (size_type i = 0; i < size(); i++) {
@@ -350,18 +350,18 @@ namespace boost { namespace self_healing {
         }
 
         // operator[]
-        reference operator[](size_type i) { check_storage(); return head[i / ChunkSize][i % ChunkSize]; }
-        const_reference operator[](size_type i) const { check_storage(); return head[i / ChunkSize][(i % ChunkSize)]; }
+        reference operator[](size_type i) { check_header(); return head[i / ChunkSize][i % ChunkSize]; }
+        const_reference operator[](size_type i) const { check_header(); return head[i / ChunkSize][(i % ChunkSize)]; }
 
         // at() with range check
         reference at(size_type i) { rangecheck(i); return operator[](i); }
         const_reference at(size_type i) const { rangecheck(i); return operator[](i); }
 
         // front() and back()
-        reference front() { check_storage(); return head.front(); }
-        const_reference front() const { check_storage; return head.front(); }
-        reference back() { check_storage(); return tail.back(); }
-        const_reference back() const { check_storage(); return tail.back(); }
+        reference front() { check_header(); return head.front(); }
+        const_reference front() const { check_header; return head.front(); }
+        reference back() { check_header(); return tail.back(); }
+        const_reference back() const { check_header(); return tail.back(); }
 
         // modifiers
         iterator insert(iterator position, const_reference value) {
@@ -497,7 +497,7 @@ namespace boost { namespace self_healing {
             set_size(rhs.size());
             rhs.set_size(tmp_size);
 
-            check_storage();
+            check_header();
         }
 
         /*! Check index validity against size.
@@ -524,7 +524,7 @@ namespace boost { namespace self_healing {
 #endif
             try {
                 // check all parts of the data structure
-                check_storage();
+                check_header();
                 for (int i = 0; i < chunks; i++) {
                     // compute address of next chunk
                     chunk_pointer chunk = head + i * sizeof(chunk_type);
@@ -540,9 +540,9 @@ namespace boost { namespace self_healing {
         }
 
     private:
-        void check_storage() const {
+        void check_header() const {
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage()" << std::endl;
+            std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header()" << std::endl;
 #endif
 
             if (head == 0 && tail == 0 && chunks == 0) {
@@ -554,7 +554,7 @@ namespace boost { namespace self_healing {
             const size_type estimated_min_chunks = std::ceil(size() * ChunkSize);
 
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage()"
+            std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header()"
                       << " head: " << test_head << " tail: " << test_tail << " this: " << this << std::endl;
 #endif
 
@@ -563,7 +563,7 @@ namespace boost { namespace self_healing {
                 const size_type head_tail_diff_abs = static_cast<size_type>((tail - head) / sizeof(chunk_type));
                 if (chunks != head_tail_diff_abs + 1) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                    std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage() fix chunk counter" << std::endl;
+                    std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header() fix chunk counter" << std::endl;
 #endif
 #ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                     const_cast<size_type &>(chunks) = head_tail_diff_abs + 1;
@@ -607,7 +607,7 @@ namespace boost { namespace self_healing {
 
             if (test_head->parent() != this) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage() fix parent of head" << std::endl;
+                std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header() fix parent of head" << std::endl;
 #endif
 #ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 test_head->set_parent(const_cast<vector_pointer>(this));
@@ -618,7 +618,7 @@ namespace boost { namespace self_healing {
             }
             if (test_tail->parent() != this) {
 #ifdef BOOST_SELF_HEALING_DEBUG
-                std::cout << "boost::self_healing::vector<T, ChunkSize>::check_storage() fix parent of tail" << std::endl;
+                std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header() fix parent of tail" << std::endl;
 #endif
 #ifdef BOOST_SELF_HEALING_FIXING_CHECKS
                 test_tail->set_parent(const_cast<vector_pointer>(this));
