@@ -32,9 +32,10 @@ int main()
     cout << "the vector currently holds {1, 2, 3, 4, 5, 6, 7, 8}" << endl;
     cout << "numbers: " << numbers << endl;
 
-    cout << "getting first element via safe_ref" << endl;
-    int &first = numbers.front();
+    boost::self_healing::safe_ref<int> first = numbers.front();
+    cout << "getting first element via safe_ref: " << first << endl;
 
-
+    int &back = numbers.back();
+    cout << "getting last element via int&: " << back << endl;
     return 0;
 }
