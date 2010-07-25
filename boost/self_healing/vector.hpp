@@ -551,7 +551,7 @@ namespace boost { namespace self_healing {
 
             const chunk_pointer test_head = dynamic_cast<chunk_pointer>(head);
             const chunk_pointer test_tail = dynamic_cast<chunk_pointer>(tail);
-            const size_type estimated_min_chunks = std::ceil(size() * ChunkSize);
+            const size_type estimated_min_chunks = std::ceil(size() / static_cast<float>(ChunkSize));
 
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header()"
