@@ -90,10 +90,8 @@ namespace boost { namespace self_healing {
         static const unsigned short MAX_INNER_NODE_SIZE = MULTISET_MAX(8, 256 / sizeof(Key) + sizeof(node_pointer));
         static const unsigned short MAX_LEAF_NODE_SIZE = MULTISET_MAX(8, 256 / sizeof(Key));
 
-        struct inner_node : public node
+        struct inner_node : public node, public array<std::pair<Key, node_pointer>, MAX_INNER_NODE_SIZE +1>
         {
-            array<Key, MAX_INNER_NODE_SIZE> keys;
-            array<node_pointer, MAX_INNER_NODE_SIZE + 1> nodes;
         };
 
         struct leaf_node : public node, public sibling<leaf_node>, public array<Key, MAX_LEAF_NODE_SIZE>
@@ -428,11 +426,12 @@ namespace boost { namespace self_healing {
         }
 
         void free_node(node_pointer node) {
+            /*typeof(node);
             if (dynamic_cast<inner_node_pointer>(node)) {
                 delete static_cast<inner_node_pointer>(node);
             } else {
                 delete static_cast<leaf_node_pointer>(node);
-            }
+            }*/
         }
 
         node_pointer root_node;      //!< Pointer to the B+ tree's root node, either leaf or inner node
