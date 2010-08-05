@@ -14,10 +14,15 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBOOST_SELF_HEALING_DEBUG")
 
 # compile-time options
 option(FIXING_CHECKS "Data structure checks also fix issues" on)
+option(ADVANCED_CHECKS "Enable more complex but deeper checks" on)
 option(BUILD_TESTS "Build tests" on)
 
+# set preprocessor defines based on compile-time options
 if(FIXING_CHECKS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_SELF_HEALING_FIXING_CHECKS")
+endif()
+if(ADVANCED_CHECKS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_SELF_HEALING_ADVANCED_CHECKS")
 endif()
 
 # dependency checks

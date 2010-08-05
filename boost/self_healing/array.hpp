@@ -310,8 +310,28 @@ namespace boost { namespace self_healing {
                 // The computed checksum over the content is not the same as
                 // the stored ones, thus the content was maliciously changed
                 // and the checksummed array is invalid.
+#ifdef BOOST_SELF_HEALING_ADVANCED_CHECKS
+                // Try to recover by flipping each bit and compare resulting
+                // checksum with stored ones.
+                for (std::size_t byte_index = 0; byte_index < Size * sizeof(value_type); byte_index++) {
+                    // get a byte pointer from our (const) elements array and loop through all 8 bits
+                    char *current_byte = reinterpret_cast<char *>(const_cast<value_type *>(elements)) + byte_index;
+                    for (std::size_t bit_index = 0; bit_index < 8; bit_index++) {
+                        *current_byte ^= 2 << bit_index;
+                        // Compute checksum. If successful break, otherwise flip back
+                        boost::crc_32_type tmp_crc;
+                        tmp_crc.process_bytes(&elements, Size * sizeof(value_type));
+                        if (tmp_crc.checksum() == crc1) {
+                            break;
+                        }
+                        *current_byte ^= 2 << bit_index; // Flip back
+                    }
+                }
+                //NOTE: Possibly apply recursively for 2, 3, ... bits
+#else
                 std::runtime_error e("data error");
                 boost::throw_exception(e);
+#endif
             } else {
                 // All three checksums differ
                 std::runtime_error e("checksum error");
