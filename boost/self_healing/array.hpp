@@ -315,7 +315,7 @@ namespace boost { namespace self_healing {
                 // checksum with stored ones.
                 for (std::size_t byte_index = 0; byte_index < Size * sizeof(value_type); byte_index++) {
                     // get a byte pointer from our (const) elements array and loop through all 8 bits
-                    char *current_byte = reinterpret_cast<char *>(const_cast<value_type *>(elements)) + byte_index;
+                    char *current_byte = reinterpret_cast<char *>(const_cast<pointer>(elements)) + byte_index;
                     for (std::size_t bit_index = 0; bit_index < 8; bit_index++) {
                         *current_byte ^= 2 << bit_index;
                         // Compute checksum. If successful break, otherwise flip back
