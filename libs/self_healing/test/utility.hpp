@@ -42,7 +42,7 @@ namespace utility {
             // determine the bit to flip and bit-manipulate the containing byte
             const std::size_t bit_to_flip = dice();
             char *byte_to_modify = reinterpret_cast<char *>(obj) + bit_to_flip / 8;
-            *byte_to_modify ^= 1 << (bit_to_flip % 8);
+            *byte_to_modify ^= 2 << (bit_to_flip % 8);
         }
     }
 
@@ -69,7 +69,7 @@ namespace utility {
         for (std::size_t i = 0; i < burst_length; i++) {
             // determine containing byte and flip the current bit
             char *byte_to_modify = reinterpret_cast<char *>(obj) + (start_pos + i) / 8;
-            *byte_to_modify ^= 1 << ((start_pos + i) % 8);
+            *byte_to_modify ^= 2 << ((start_pos + i) % 8);
         }
     }
 
