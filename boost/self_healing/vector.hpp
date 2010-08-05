@@ -544,7 +544,6 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_DEBUG
             std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header()" << std::endl;
 #endif
-
             if (head == 0 && tail == 0 && chunks == 0) {
                 return; // initial case where nothing is allocated yet
             }
