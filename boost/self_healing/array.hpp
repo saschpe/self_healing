@@ -313,10 +313,10 @@ namespace boost { namespace self_healing {
 #ifdef BOOST_SELF_HEALING_ADVANCED_CHECKS
                 // try to recover by flipping each bit and compare resulting
                 // checksum with stored ones.
-                for (std::size_t byte_index = 0; byte_index < Size * sizeof(value_type); byte_index++) {
+                for (size_type byte_index = 0; byte_index < Size * sizeof(value_type); byte_index++) {
                     // get a byte pointer from our (const) elements array and loop through all 8 bits
                     char *current_byte = reinterpret_cast<char *>(const_cast<pointer>(elements)) + byte_index;
-                    for (std::size_t bit_index = 0; bit_index < 8; bit_index++) {
+                    for (size_type bit_index = 0; bit_index < 8; bit_index++) {
                         *current_byte ^= 2 << bit_index;
                         // compute checksum. If successful break, otherwise flip back
                         boost::crc_32_type tmp_crc;
