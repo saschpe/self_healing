@@ -17,6 +17,7 @@
 #include <boost/detail/workaround.hpp>
 
 #include <boost/random.hpp>
+#include <boost/thread.hpp>
 
 // FIXES for broken compilers
 #include <boost/config.hpp>
@@ -73,6 +74,18 @@ namespace utility {
         }
     }
 
+    /*! Function to change the value of a variable randomly.
+    * \param var The variable to change.
+    */
+    template <class T>
+    void change_value(T &var)
+    {
+        static boost::uniform_int<> dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        static boost::variate_generator<boost::rand48 &, boost::uniform_int<> > dice(s_rng, dist);
+
+        var = dice(); // apply random number to target
+    }
+
     /*! Function to print memory contents of a region.
     * \param obj Object to print.
     * \param size Size of object in bytes.
@@ -86,16 +99,16 @@ namespace utility {
         std::cout << "." << std::endl;
     }
 
-    /*! Function to change the value of a variable randomly.
-    * \param var The variable to change.
+    /*! Thread-safe and reentrant function to print a string
+    * \param msg The string to print.
     */
-    template <class T>
-    void change_value(T &var)
+    template <typename T>
+    void print_string(const std::string msg)
     {
-        static boost::uniform_int<> dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-        static boost::variate_generator<boost::rand48 &, boost::uniform_int<> > dice(s_rng, dist);
+        static boost::mutex print_mutex;
 
-        var = dice(); // apply random number to target
+        boost::lock_guard<boost::mutex> lock(print_mutex);
+        std::cout << msg;
     }
 
 } // namespace utility
