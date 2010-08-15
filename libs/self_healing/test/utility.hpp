@@ -99,16 +99,16 @@ namespace utility {
         std::cout << "." << std::endl;
     }
 
-    /*! Thread-safe and reentrant function to print a string
-    * \param msg The string to print.
+    /*! Thread-safe and reentrant function to print an object.
+    * \param obj Object to print.
     */
-    template <typename T>
-    void print_string(const std::string msg)
+    template <class T>
+    void print_thread_safe(const T &obj)
     {
         static boost::mutex print_mutex;
 
         boost::lock_guard<boost::mutex> lock(print_mutex);
-        std::cout << msg;
+        std::cout << obj;
     }
 
 } // namespace utility
