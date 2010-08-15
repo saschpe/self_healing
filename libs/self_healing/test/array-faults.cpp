@@ -63,9 +63,7 @@ int main()
         for (size_t i = 0; i < 10000; i++) {
             self_healing::array<int, 100> tmp(23);
             utility::flip_bits(&tmp, sizeof(tmp), bit_flips);
-            if (tmp.is_valid()) {
-                still_valid++;
-            }
+            if (tmp.is_valid()) { still_valid++; }
         }
         cout << "array<int,100>: " << still_valid << " out of 10000 are still valid for "
              << bit_flips << " bit flip(s)." << endl;
@@ -75,9 +73,7 @@ int main()
         for (size_t i = 0; i < 10000; i++) {
             self_healing::array<int, 1000> tmp(23);
             utility::flip_bits(&tmp, sizeof(tmp), bit_flips);
-            if (tmp.is_valid()) {
-                still_valid++;
-            }
+            if (tmp.is_valid()) { still_valid++; }
         }
         cout << "array<int,1000>: " << still_valid << " out of 10000 are still valid for "
              << bit_flips << " bit flip(s)." << endl;
@@ -89,9 +85,7 @@ int main()
         for (size_t i = 0; i < 1000; i++) {
             self_healing::array<int, 100> tmp(23);
             utility::burst_flip_bits(&tmp, sizeof(tmp), burst_length);
-            if (tmp.is_valid()) {
-                still_valid++;
-            }
+            if (tmp.is_valid()) { still_valid++; }
         }
         cout << "array<int,100>: " << still_valid << " out of 10000 are still valid for burst of length "
              << burst_length << endl;
@@ -101,9 +95,7 @@ int main()
         for (size_t i = 0; i < 1000; i++) {
             self_healing::array<int, 1000> tmp(23);
             utility::burst_flip_bits(&tmp, sizeof(tmp), burst_length);
-            if (tmp.is_valid()) {
-                still_valid++;
-            }
+            if (tmp.is_valid()) { still_valid++; }
         }
         cout << "array<int,1000>: " << still_valid << " out of 10000 are still valid for burst of length "
              << burst_length << endl;
