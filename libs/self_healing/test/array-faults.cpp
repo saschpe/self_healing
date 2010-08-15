@@ -14,7 +14,6 @@
 #include <boost/self_healing/array.hpp>
 
 #include <iostream>
-#include <cassert>
 
 using namespace boost;
 using namespace std;
