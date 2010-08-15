@@ -16,36 +16,48 @@
 
 #include "utility.hpp"
 
+using namespace std;
+
 int main()
 {
-    std::cout << "testing class boost::self_healing::array<> fault injection" << std::endl;
+    cout << "testing class boost::self_healing::array<> fault injection" << endl;
 
     boost::self_healing::array<int, 8> a, ca;
-    for (std::size_t i = 0; i < a.size(); i++) {
-        std::cout << "a[" << i << "] = " << i << std::endl;
+    for (size_t i = 0; i < a.size(); i++) {
+        cout << "a[" << i << "] = " << i << endl;
         a[i] = i;
     }
-    std::cout << "array: " << a << std::endl;
+    cout << "array: " << a << endl;
 
     ca = a;
     utility::print_raw(&ca, sizeof(ca));
     utility::flip_bits(&ca, sizeof(ca), 1);
     utility::print_raw(&ca, sizeof(ca));
-    std::cout << "1 flipped bit, is valid: " << ca.is_valid() << std::endl;
+    cout << "1 flipped bit, is valid: " << ca.is_valid() << endl;
 
     utility::flip_bits(&(ca = a), sizeof(ca), 2);
-    std::cout << "2 flipped bit, is valid: " << ca.is_valid() << std::endl;
+    cout << "2 flipped bit, is valid: " << ca.is_valid() << endl;
     utility::flip_bits(&(ca = a), sizeof(ca), 3);
-    std::cout << "3 flipped bit, is valid: " << ca.is_valid() << std::endl;
+    cout << "3 flipped bit, is valid: " << ca.is_valid() << endl;
 
     utility::burst_flip_bits(&(ca = a), sizeof(ca), 2);
-    std::cout << " 2 bit burst, is valid: " << ca.is_valid() << std::endl;
+    cout << " 2 bit burst, is valid: " << ca.is_valid() << endl;
     utility::burst_flip_bits(&(ca = a), sizeof(ca), 3);
-    std::cout << " 3 bit burst, is valid: " << ca.is_valid() << std::endl;
+    cout << " 3 bit burst, is valid: " << ca.is_valid() << endl;
     utility::burst_flip_bits(&(ca = a), sizeof(ca), 5);
-    std::cout << " 5 bit burst, is valid: " << ca.is_valid() << std::endl;
+    cout << " 5 bit burst, is valid: " << ca.is_valid() << endl;
     utility::burst_flip_bits(&(ca = a), sizeof(ca), 17);
-    std::cout << "17 bit burst, is valid: " << ca.is_valid() << std::endl;
+    cout << "17 bit burst, is valid: " << ca.is_valid() << endl;
 
+    cout << "statistical test ...\n" << endl;
+    size_t still_valid = 0;
+    for (size_t i = 0; i < 1000; i++) {
+        boost::self_healing::array<int, 64> tmp(23);
+        utility::flip_bits(&tmp, sizeof(tmp), 1);
+        if (tmp.is_valid()) {
+            still_valid++;
+        }
+    }
+    cout << still_valid << " out of 1000 array<int,64> are still valid" << endl;
     return 0;
 }

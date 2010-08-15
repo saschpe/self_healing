@@ -15,11 +15,25 @@
 
 #include "utility.hpp"
 
+using namespace std;
+
 int main()
 {
-    std::cout << "testing class boost::self_healing::vector<> fault injection" << std::endl;
+    cout << "testing class boost::self_healing::vector<> fault injection" << endl;
 
     boost::self_healing::vector<short> v;
+
+
+    cout << "statistical test ...\n" << endl;
+    size_t still_valid = 0;
+    for (size_t i = 0; i < 1000; i++) {
+        boost::self_healing::vector<int> tmp(23);
+        utility::flip_bits(&tmp, sizeof(tmp), 1);
+        if (tmp.is_valid()) {
+            still_valid++;
+        }
+    }
+    cout << still_valid << " out of 1000 vector<int> are still valid" << endl;
 
     return 0;
 }
