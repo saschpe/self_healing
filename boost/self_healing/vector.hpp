@@ -525,10 +525,10 @@ namespace boost { namespace self_healing {
             try {
                 // check all parts of the data structure
                 check_header();
-                for (int i = 0; i < chunks; i++) {
+                for (size_type i = 0; i < chunks; i++) {
                     // compute address of next chunk
                     chunk_pointer chunk = head + i * sizeof(chunk_type);
-                    chunk->is_valid(this);
+                    chunk->is_valid(reinterpret_cast<vector_pointer>(head));
                 }
                 return sized::is_valid();
             } catch (const std::runtime_error &e) {
