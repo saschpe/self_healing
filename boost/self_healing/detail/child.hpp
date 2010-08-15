@@ -75,6 +75,7 @@ namespace boost { namespace self_healing {
                 // If a valid parent pointer was given we simply check against
                 // it and fix the internal pointer if needed.
                 if (parent != parent1) { const_cast<parent_pointer &>(parent1) = parent; }
+                return true;
             } else {
                 return parent1 != 0;
             }
