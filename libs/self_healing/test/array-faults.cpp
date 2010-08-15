@@ -9,55 +9,105 @@
  * 27 April 2010 - Initial Revision (Sascha Peilicke)
  */
 
+#include "utility.hpp"
+
 #include <boost/self_healing/array.hpp>
 
 #include <iostream>
 #include <cassert>
 
-#include "utility.hpp"
-
+using namespace boost;
 using namespace std;
 
-int main()
+/*template <size_t array_size>
+void measure_array_bit_flips(const size_t tests, const size_t bit_flips)
 {
-    cout << "testing class boost::self_healing::array<> fault injection" << endl;
-
-    boost::self_healing::array<int, 8> a, ca;
-    for (size_t i = 0; i < a.size(); i++) {
-        cout << "a[" << i << "] = " << i << endl;
-        a[i] = i;
-    }
-    cout << "array: " << a << endl;
-
-    ca = a;
-    utility::print_raw(&ca, sizeof(ca));
-    utility::flip_bits(&ca, sizeof(ca), 1);
-    utility::print_raw(&ca, sizeof(ca));
-    cout << "1 flipped bit, is valid: " << ca.is_valid() << endl;
-
-    utility::flip_bits(&(ca = a), sizeof(ca), 2);
-    cout << "2 flipped bit, is valid: " << ca.is_valid() << endl;
-    utility::flip_bits(&(ca = a), sizeof(ca), 3);
-    cout << "3 flipped bit, is valid: " << ca.is_valid() << endl;
-
-    utility::burst_flip_bits(&(ca = a), sizeof(ca), 2);
-    cout << " 2 bit burst, is valid: " << ca.is_valid() << endl;
-    utility::burst_flip_bits(&(ca = a), sizeof(ca), 3);
-    cout << " 3 bit burst, is valid: " << ca.is_valid() << endl;
-    utility::burst_flip_bits(&(ca = a), sizeof(ca), 5);
-    cout << " 5 bit burst, is valid: " << ca.is_valid() << endl;
-    utility::burst_flip_bits(&(ca = a), sizeof(ca), 17);
-    cout << "17 bit burst, is valid: " << ca.is_valid() << endl;
-
-    cout << "statistical test ...\n" << endl;
-    size_t still_valid = 0;
-    for (size_t i = 0; i < 1000; i++) {
-        boost::self_healing::array<int, 64> tmp(23);
-        utility::flip_bits(&tmp, sizeof(tmp), 1);
+   size_t still_valid = 0;
+    for (size_t i = 0; i < tests; i++) {
+        self_healing::array<int, array_size> tmp(23);
+        utility::flip_bits(&tmp, sizeof(tmp), bit_flips);
         if (tmp.is_valid()) {
             still_valid++;
         }
     }
-    cout << still_valid << " out of 1000 array<int,64> are still valid" << endl;
+    std::stringstream ss;
+    ss << "array<int," << array_size << ">: " << still_valid << " out of "
+       << tests << " are still valid for " << bit_flips << " bit flip(s)." << endl;
+    utility::print_thread_safe<std::string>(ss.str());
+}
+
+template <size_t array_size>
+void measure_array_burst(const size_t tests, const size_t burst_length)
+{
+    size_t still_valid = 0;
+    for (size_t i = 0; i < tests; i++) {
+        self_healing::array<int, array_size> tmp(23);
+        utility::burst_flip_bits(&tmp, sizeof(tmp), burst_length);
+        if (tmp.is_valid()) {
+            still_valid++;
+        }
+    }
+    std::stringstream ss;
+    ss << "array<int," << array_size << ">: " << still_valid << " out of "
+       << tests << " are still valid for a burst length of " << burst_length << endl;
+    utility::print_thread_safe<std::string>(ss.str());
+}*/
+
+int main()
+{
+    cout << "testing class self_healing::array<> fault injection" << endl;
+
+    // bit flip tests
+    for (size_t bit_flips = 1; bit_flips <= 4; bit_flips++) {
+        size_t still_valid = 0;
+        for (size_t i = 0; i < 10000; i++) {
+            self_healing::array<int, 100> tmp(23);
+            utility::flip_bits(&tmp, sizeof(tmp), bit_flips);
+            if (tmp.is_valid()) {
+                still_valid++;
+            }
+        }
+        cout << "array<int,100>: " << still_valid << " out of 10000 are still valid for "
+             << bit_flips << " bit flip(s)." << endl;
+    }
+    for (size_t bit_flips = 1; bit_flips <= 4; bit_flips++) {
+        size_t still_valid = 0;
+        for (size_t i = 0; i < 10000; i++) {
+            self_healing::array<int, 1000> tmp(23);
+            utility::flip_bits(&tmp, sizeof(tmp), bit_flips);
+            if (tmp.is_valid()) {
+                still_valid++;
+            }
+        }
+        cout << "array<int,1000>: " << still_valid << " out of 10000 are still valid for "
+             << bit_flips << " bit flip(s)." << endl;
+    }
+
+    // burst tests
+    for (size_t burst_length = 4; burst_length <= 16; burst_length *= 2) {
+        size_t still_valid = 0;
+        for (size_t i = 0; i < 1000; i++) {
+            self_healing::array<int, 100> tmp(23);
+            utility::burst_flip_bits(&tmp, sizeof(tmp), burst_length);
+            if (tmp.is_valid()) {
+                still_valid++;
+            }
+        }
+        cout << "array<int,100>: " << still_valid << " out of 10000 are still valid for burst of length "
+             << burst_length << endl;
+    }
+    for (size_t burst_length = 4; burst_length <= 16; burst_length *= 2) {
+        size_t still_valid = 0;
+        for (size_t i = 0; i < 1000; i++) {
+            self_healing::array<int, 1000> tmp(23);
+            utility::burst_flip_bits(&tmp, sizeof(tmp), burst_length);
+            if (tmp.is_valid()) {
+                still_valid++;
+            }
+        }
+        cout << "array<int,1000>: " << still_valid << " out of 10000 are still valid for burst of length "
+             << burst_length << endl;
+    }
+
     return 0;
 }
