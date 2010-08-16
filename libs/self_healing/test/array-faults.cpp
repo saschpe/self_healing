@@ -18,40 +18,6 @@
 using namespace boost;
 using namespace std;
 
-/*template <size_t array_size>
-void measure_array_bit_flips(const size_t tests, const size_t bit_flips)
-{
-   size_t still_valid = 0;
-    for (size_t i = 0; i < tests; i++) {
-        self_healing::array<int, array_size> tmp(23);
-        utility::flip_bits(&tmp, sizeof(tmp), bit_flips);
-        if (tmp.is_valid()) {
-            still_valid++;
-        }
-    }
-    std::stringstream ss;
-    ss << "array<int," << array_size << ">: " << still_valid << " out of "
-       << tests << " are still valid for " << bit_flips << " bit flip(s)." << endl;
-    utility::print_thread_safe<std::string>(ss.str());
-}
-
-template <size_t array_size>
-void measure_array_burst(const size_t tests, const size_t burst_length)
-{
-    size_t still_valid = 0;
-    for (size_t i = 0; i < tests; i++) {
-        self_healing::array<int, array_size> tmp(23);
-        utility::burst_flip_bits(&tmp, sizeof(tmp), burst_length);
-        if (tmp.is_valid()) {
-            still_valid++;
-        }
-    }
-    std::stringstream ss;
-    ss << "array<int," << array_size << ">: " << still_valid << " out of "
-       << tests << " are still valid for a burst length of " << burst_length << endl;
-    utility::print_thread_safe<std::string>(ss.str());
-}*/
-
 int main()
 {
     cout << "testing class self_healing::array<> fault injection" << endl;
@@ -89,15 +55,15 @@ int main()
         cout << "array<int,100>: " << still_valid << " out of 10000 are still valid for burst of length "
              << burst_length << endl;
     }
-    for (size_t burst_length = 4; burst_length <= 16; burst_length *= 2) {
+    for (size_t burst_length = 4; burst_length <= 32; burst_length *= 2) {
         size_t still_valid = 0;
         for (size_t i = 0; i < 1000; i++) {
             self_healing::array<int, 1000> tmp(23);
-            utility::burst_flip_bits(&tmp, sizeof(tmp), burst_length);
+            utility::burst_flip_bits(&tmp, sizeof(tmp), 32);
             if (tmp.is_valid()) { still_valid++; }
         }
         cout << "array<int,1000>: " << still_valid << " out of 1000 are still valid for burst of length "
-             << burst_length << endl;
+             << 32 << endl;
     }
 
     return 0;
