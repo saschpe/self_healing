@@ -51,10 +51,10 @@ namespace boost { namespace self_healing {
         * \throws std::invalid_argument Thrown if parent pointer is invalid.
         */
         void set_parent(parent_pointer const parent) {
-            if (!parent) {
+            /*if (!parent) {
                 std::invalid_argument e("parent argument is null");
                 boost::throw_exception(e);
-            };
+            };*/
             parent1 = parent;
         }
 
