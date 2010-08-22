@@ -15,7 +15,13 @@
 #ifndef BOOST_SELF_HEALING_UTILITY_HPP
 #define BOOST_SELF_HEALING_UTILITY_HPP
 
+#include <boost/config.hpp>
+
 #include <sstream>
+
+#ifdef BOOST_HAS_UNISTD_H
+#include <unistd.h>
+#endif
 
 
 /// The namespace self_healing contains fault-tolerant data structures and utility classes.
@@ -31,6 +37,21 @@ namespace boost { namespace self_healing {
         std::stringstream ss;
         ss << value;
         return ss.str();
+    }
+
+    /*! Checks if a heap address is within allocated memory.
+    *
+    * Note: This function currently only works for UNIX-like operating systems.
+    *
+    * \param addr The address to check.
+    */
+    inline bool is_valid_heap_address(void *addr)
+    {
+#ifdef BOOST_HAS_UNISTD_H
+        return addr < sbrk(0);
+#else
+        return false
+#endif
     }
 
 } } // namespace boost::self_healing
