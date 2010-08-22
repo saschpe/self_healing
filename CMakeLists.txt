@@ -92,8 +92,8 @@ if(BUILD_TESTS)
     #add_test(multiset ${EXECUTABLE_OUTPUT_PATH}/test-multiset)
     #add_executable(test-multiset-iterators libs/self_healing/test/multiset-iterators.cpp)
     #add_test(multiset-iterators ${EXECUTABLE_OUTPUT_PATH}/test-multiset-iterators)
-    add_executable(test-multiset-faults libs/self_healing/test/multiset-faults.cpp)
-    add_test(multiset-faults ${EXECUTABLE_OUTPUT_PATH}/test-multiset-faults)
+    #add_executable(test-multiset-faults libs/self_healing/test/multiset-faults.cpp)
+    #add_test(multiset-faults ${EXECUTABLE_OUTPUT_PATH}/test-multiset-faults)
 
     # additionnal tests
     add_executable(test-non-virtual libs/self_healing/test/non-virtual.cpp)
