@@ -327,6 +327,9 @@ namespace boost { namespace self_healing {
             }
 
             const chunk_pointer new_head = new chunk_type[new_chunk_count];
+#ifdef BOOST_SELF_HEALING_DEBUG
+            std::cout << "boost::self_healing::vector<T, ChunkSize>::reserve() new head: " << new_head << std::endl;
+#endif
 
             // set this vector as the parent of all vector chunks
             for (size_type c = 0; c < new_chunk_count; c++) {
@@ -558,102 +561,39 @@ namespace boost { namespace self_healing {
 
     private:
         void check_header() const {
-            if (head == 0 && tail == 0 && chunks == 0) {
+            if ((head == 0 && tail == 0 && chunks == 0) || size() == 0) {
                 return; // initial case where nothing is allocated yet
             }
 
-            const bool head_and_chunks_valid = head + (chunks - 1) == tail;
-            const bool tail_and_chunks_valid = tail - (chunks - 1) == head;
-
 #ifdef BOOST_SELF_HEALING_DEBUG
-            std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header() head and chunks valid: "
-                      << head_and_chunks_valid << "  ||  tail and chunks valid: " << tail_and_chunks_valid << std::endl;
+            std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header()" << std::endl;
 #endif
 
-            if (head_and_chunks_valid && tail_and_chunks_valid) {
-                // all good
-            } else if (head_and_chunks_valid) {
-                const_cast<chunk_pointer &>(tail) = head + (chunks - 1); // simple case
-            } else if (tail_and_chunks_valid) {
-                const_cast<chunk_pointer &>(head) = tail - (chunks - 1); // simple case
-            } else {
-                // 3 damage cases: chunks | chunks + head | chunks + tail
+            // check if chunk counter is valid and fix accordingly
+            const size_type estimated_chunks = size() == 0 ? 1 : std::ceil(static_cast<float>(size()) / ChunkSize);
+            if (chunks != estimated_chunks) {
+                const_cast<size_type &>(chunks) = estimated_chunks;
             }
 
-            /*const chunk_pointer test_head = dynamic_cast<chunk_pointer>(head);
-            const chunk_pointer test_tail = dynamic_cast<chunk_pointer>(tail);
+            if (head + (chunks - 1) != tail) {
+                // either one or both pointers are damaged
+                const bool head_valid = is_valid_heap_address(head);
+                const bool tail_valid = is_valid_heap_address(tail);
 
-            if (test_head && test_tail) {
-                // compute the chunk counter difference and fix chunk counter if needed
-                const size_type head_tail_diff_in_chunks = static_cast<size_type>((tail - head) + 1);
-                if (chunks != head_tail_diff_in_chunks) {
-#ifdef BOOST_SELF_HEALING_DEBUG
-                    std::cout << "boost::self_healing::vector<T, ChunkSize>::check_header() fix chunk counter" << std::endl;
-#endif
-#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
-                    const_cast<size_type &>(chunks) = head_tail_diff_in_chunks;
-#else
-                    std::runtime_error e("fixable chunk counter error");
+                if (head_valid && tail_valid) {
+                    // the currently imperfect heap address check passed out
+                    // indicating both are correct, which is wrongs
+                    std::runtime_error e("head and tail pointer error");
                     boost::throw_exception(e);
-#endif
-                }
-            } else if (test_head) {
-#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
-                chunk_pointer tmp_tail = head;
-                size_type tmp_chunks = 0;
-                // stop loop after we tested for more than twice of min estimate.
-                for (; tmp_chunks < estimated_min_chunks * 2; tmp_chunks++) {
-                    if (dynamic_cast<chunk_pointer>(tmp_tail + sizeof(chunk_type))) {
-                        tmp_tail += sizeof(chunk_type);
-                    } else {
-                        // if next place in mem is not a chunk pointer, we found the last one and
-                        // can stop the loop earlier and fix the chunk counter
-                        const_cast<chunk_pointer &>(tail) = tmp_tail;
-                        break;
-                    }
-                }
-                if (tmp_chunks >= estimated_min_chunks * 2) {
-                    std::runtime_error e("tail pointer error");
+                } else if (head_valid && head->parent() == reinterpret_cast<vector_pointer>(head)) {
+                    const_cast<chunk_pointer &>(tail) = head + (chunks -1);
+                } else if (tail_valid && tail->parent() == reinterpret_cast<vector_pointer>(tail - (chunks - 1))) {
+                    const_cast<chunk_pointer &>(head) = tail - (chunks -1);
+                } else {
+                    std::runtime_error e("head and tail pointer error");
                     boost::throw_exception(e);
                 }
-                if (chunks != tmp_chunks) { // chunk counter was damaged too
-                    const_cast<size_type &>(chunks) = tmp_chunks;
-                }
-#else
-                std::runtime_error e("fixable tail pointer error");
-                boost::throw_exception(e);
-#endif
-            } else if (test_tail) {
-#ifdef BOOST_SELF_HEALING_FIXING_CHECKS
-                chunk_pointer tmp_head = tail;
-                size_type tmp_chunks = 0;
-                // stop loop after we tested for more than twice of min estimate.
-                for (; tmp_chunks < estimated_min_chunks * 2; tmp_chunks++) {
-                    if (dynamic_cast<chunk_pointer>(tmp_head - sizeof(chunk_type))) {
-                        tmp_head -= sizeof(chunk_type);
-                    } else {
-                        // if next place in mem is not a chunk pointer, we found the first one and
-                        // can stop the loop earlier and fix the chunk counter
-                        const_cast<chunk_pointer &>(head) = tmp_head;
-                        const_cast<size_type &>(chunks) = tmp_chunks;
-                        break;
-                    }
-                }
-                if (tmp_chunks >= estimated_min_chunks * 2) {
-                    std::runtime_error e("head pointer error");
-                    boost::throw_exception(e);
-                }
-                if (chunks != tmp_chunks) { // chunk counter was damaged too
-                    const_cast<size_type &>(chunks) = tmp_chunks;
-                }
-#else
-                std::runtime_error e("fixable head pointer error");
-                boost::throw_exception(e);
-#endif
-            } else {
-                std::runtime_error e("head and tail pointer error");
-                boost::throw_exception(e);
-            }*/
+            }
         }
 
         chunk_pointer head;  //!< Pointer to the first chunk of an array of chunk instances.
