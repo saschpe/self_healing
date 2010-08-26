@@ -39,9 +39,12 @@ namespace boost { namespace self_healing {
         return ss.str();
     }
 
-    /*! Checks if a heap address is within allocated memory.
+    /*! \brief Checks if a heap address is within allocated memory.
+    * This method can be used to check if a pointer is valid before it is
+    * dereferenced.
     *
-    * Note: This function currently only works for UNIX-like operating systems.
+    * This function currently only works for UNIX-like operating systems and
+    * depends on the semantics of the underlying syscalls.
     *
     * \param addr The address to check.
     */
