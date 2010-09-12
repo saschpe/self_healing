@@ -98,6 +98,8 @@ if(BUILD_TESTS)
     # additionnal tests
     add_executable(test-non-virtual libs/self_healing/test/non-virtual.cpp)
     add_test(non-virtual ${EXECUTABLE_OUTPUT_PATH}/test-non-virtual)
+    add_executable(test-tmr-faults libs/self_healing/test/tmr-faults.cpp)
+    add_test(tmr-faults ${EXECUTABLE_OUTPUT_PATH}/test-tmr-faults)
 endif()
 
 # installation
