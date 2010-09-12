@@ -14,19 +14,15 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
 
+#include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
-
 #include <boost/random.hpp>
 #include <boost/thread.hpp>
-
-// FIXES for broken compilers
-#include <boost/config.hpp>
-
 
 /// The namespace utility contains utility functions to provoke errors.
 namespace utility {
 
-    static boost::rand48 s_rng; //!< Fast number generator used by several functions.
+    static boost::rand48 s_rng(std::time(0)); //!< Fast number generator used by several functions.
 
     /*! Function to randomly flip bits in a given memory region.
     * \param obj Object to modify.
