@@ -103,7 +103,7 @@ int main()
         cout << "tmr_array<int,100>: " << still_valid << " out of 10000 are still valid for "
              << bit_flips << " bit flip(s)." << endl;
     }*/
-    /*for (size_t bit_flips = 1; bit_flips <= 4; bit_flips++) {
+    for (size_t bit_flips = 1; bit_flips <= 4; bit_flips++) {
         const tmr_array<int, 1000> ref_tmp(23);
         size_t still_valid = 0;
         for (size_t i = 0; i < 10000; i++) {
@@ -113,10 +113,10 @@ int main()
         }
         cout << "tmr_array<int,1000>: " << still_valid << " out of 10000 are still valid for "
              << bit_flips << " bit flip(s)." << endl;
-    }*/
+    }
 
     cout << "burst tests" << endl;
-    for (size_t burst_length = 4; burst_length <= 32; burst_length *= 2) {
+    /*for (size_t burst_length = 4; burst_length <= 32; burst_length *= 2) {
         const tmr_array<int, 100> ref_tmp(23);
         size_t still_valid = 0;
         for (size_t i = 0; i < 10000; i++) {
@@ -126,7 +126,7 @@ int main()
         }
         cout << "tmr_array<int,100>: " << still_valid << " out of 10000 are still valid for burst of length "
              << burst_length << endl;
-    }
+    }*/
     /*for (size_t burst_length = 4; burst_length <= 32; burst_length *= 2) {
         const tmr_array<int, 1000> ref_tmp(23);
         size_t still_valid = 0;
