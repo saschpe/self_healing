@@ -19,10 +19,14 @@
 #include <boost/random.hpp>
 #include <boost/thread.hpp>
 
+
 /// The namespace utility contains utility functions to provoke errors.
 namespace utility {
 
-    static boost::rand48 s_rng(std::time(0)); //!< Fast number generator used by several functions.
+    static const std::size_t AMOUNT_OF_TESTS = 10;      //!< Determines how often each test is repeated.
+    static const std::size_t AMOUNT_OF_ELEMENTS = 16;   //!< Determines the size of the test data strucures.
+
+    static boost::rand48 s_rng(std::time(0));           //!< Fast number generator used by several functions.
 
     /*! Function to randomly flip bits in a given memory region.
     * \param obj Object to modify.

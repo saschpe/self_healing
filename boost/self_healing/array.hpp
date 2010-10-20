@@ -269,6 +269,18 @@ namespace boost { namespace self_healing {
         }
 
     private:
+        /*! Helper method for check_checksums.
+        */
+        bool new_checksum_is_equal_to_stored() const
+        {
+            boost::crc_32_type tmp_crc;
+            tmp_crc.process_bytes(&elements, Size * sizeof(value_type));
+            if (tmp_crc.checksum() == crc1) {
+                return true;
+            }
+            return false;
+        }
+
         /*! \brief Validity check that tries to correct minor checksum faults silently.
         *
         * If only one out of the two stored checksums is wrong, this can be corrected.
@@ -311,23 +323,51 @@ namespace boost { namespace self_healing {
                 // the stored ones, thus the content was maliciously changed
                 // and the checksummed array is invalid.
 #ifdef BOOST_SELF_HEALING_ADVANCED_CHECKS
-                // try to recover by flipping each bit and compare resulting
-                // checksum with stored ones.
-                for (size_type byte_index = 0; byte_index < Size * sizeof(value_type); byte_index++) {
-                    // get a byte pointer from our (const) elements array and loop through all 8 bits
-                    char *current_byte = reinterpret_cast<char *>(const_cast<pointer>(elements)) + byte_index;
-                    for (size_type bit_index = 0; bit_index < 8; bit_index++) {
-                        *current_byte ^= 2 << bit_index;
-                        // compute checksum. If successful break, otherwise flip back
-                        boost::crc_32_type tmp_crc;
-                        tmp_crc.process_bytes(&elements, Size * sizeof(value_type));
-                        if (tmp_crc.checksum() == crc1) {
-                            break;
-                        }
-                        *current_byte ^= 2 << bit_index; // flip back
-                    }
+                // compute the overall amount of bits that the data structure currently consists of.
+                const size_type BITS_COUNT = Size * sizeof(value_type) * 8;
+
+                // try to recover by flipping each bit (and bit pairs, triples, ...
+                // and compare resulting checksum(s) with stored ones.
+                // TODO: This is currently encoded non-recursively for execution speed reasons
+                // TODO: Currently non-configurable recursion depth, if you want a smaller
+                //       depth, you currently have to comment out the nested (higher) levels.
+
+                // first level
+                for (size_type bit_index_a = 0; bit_index_a < BITS_COUNT; bit_index_a++) {
+                    // get a pointer to the current byte (containing the actual current bit)
+                    char *byte_a = reinterpret_cast<char *>(const_cast<pointer>(elements)) + bit_index_a / 8;
+                    *byte_a ^= 2 << bit_index_a % 8; // flip the actual bit
+                    // compute checksum. If successful break, otherwise flip back
+                    if (new_checksum_is_equal_to_stored()) { break; }
+
+                    // second level
+                    for (size_type bit_index_b = bit_index_a + 1; bit_index_b < BITS_COUNT; bit_index_b++) {
+                        char *byte_b = reinterpret_cast<char *>(const_cast<pointer>(elements)) + bit_index_b / 8;
+                        *byte_b ^= 2 << bit_index_b % 8; // flip the actual bit
+                        if (new_checksum_is_equal_to_stored()) { break; }
+
+                        // third level
+                        for (size_type bit_index_c = bit_index_b + 1; bit_index_c < BITS_COUNT; bit_index_c++) {
+                            char *byte_c = reinterpret_cast<char *>(const_cast<pointer>(elements)) + bit_index_c / 8;
+                            *byte_c ^= 2 << bit_index_c % 8; // flip the actual bit
+                            if (new_checksum_is_equal_to_stored()) { break; }
+
+                            // fourth level
+                            for (size_type bit_index_d = bit_index_c + 1; bit_index_d < BITS_COUNT; bit_index_d++) {
+                                char *byte_d = reinterpret_cast<char *>(const_cast<pointer>(elements)) + bit_index_d / 8;
+                                *byte_d ^= 2 << bit_index_d % 8; // flip the actual bit
+                                if (new_checksum_is_equal_to_stored()) { break; }
+
+                                // no further level currently
+
+                                *byte_d ^= 2 << bit_index_d % 8; // flip back the tested bit
+                            }
+                            *byte_c ^= 2 << bit_index_c % 8; // flip back the tested bit
+                        } // end third level
+                        *byte_b ^= 2 << bit_index_b % 8; // flip back the tested bit
+                    } // end second level
+                    *byte_a ^= 2 << bit_index_a % 8; // flip back the tested bit
                 }
-                //NOTE: possibly apply recursively for 2, 3, ... bits
 #else
                 std::runtime_error e("data error");
                 boost::throw_exception(e);
