@@ -36,7 +36,7 @@ This license encourages both commercial and non-commercial use.
 
 
 \section acknowledgments_sec Acknowledgments
-This library was written by Sascha Peilicke <sasch.pe@gmx.de>.
+This library was written by Sascha Peilicke <sascha@peilicke.de>.
 */
 
 /*! \page license Software License

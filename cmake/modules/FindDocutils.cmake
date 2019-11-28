@@ -7,7 +7,7 @@
 #   RST2HTML_EXECUTABLE - the rst2html executable
 
 #=============================================================================
-# Copyright 2010 Sascha Peilicke <sasch.pe@gmx.de
+# Copyright 2010 Sascha Peilicke <sascha@peilicke.de
 #
 # Distributed under the OSI-approved BSD License (the "License");
 # see accompanying file Copyright.txt for details.
